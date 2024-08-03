@@ -1,0 +1,146 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4405398397217958697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dea2af9be81a79545b1cdec681eb5730, type: 3}
+  m_Name: Debug
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  position: {x: 173, y: 401}
+  guid: b4e664c9-56fe-4f3a-8e86-deec842f2aad
+  message: 
+  onEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &-3991837907132805714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ed0c02321058e24cabc1881149d1e4c, type: 3}
+  m_Name: Sequencer
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  position: {x: 0, y: 237}
+  guid: 25fc6309-3086-4f73-beae-7d724729f416
+  children:
+  - {fileID: 3433335950843571177}
+  - {fileID: 2542709110856439171}
+  - {fileID: -4405398397217958697}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41ff390c6a0488f41b85a84e73c6e39b, type: 3}
+  m_Name: Sample BT
+  m_EditorClassIdentifier: 
+  rootNode: {fileID: 5511355197402769895}
+  treeState: 0
+  nodeList:
+  - {fileID: 5511355197402769895}
+  - {fileID: -3991837907132805714}
+  - {fileID: 2241286404083374979}
+  - {fileID: 3433335950843571177}
+  - {fileID: 2542709110856439171}
+  - {fileID: -4405398397217958697}
+--- !u!114 &2241286404083374979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baa169d2e4bf16d45b8f56c10eddcfef, type: 3}
+  m_Name: Repeat
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  position: {x: 0, y: 106}
+  guid: 06658524-350b-46ea-a9f6-d838be4abec9
+  child: {fileID: -3991837907132805714}
+--- !u!114 &2542709110856439171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84266bc38451e2e49bb68af89b374249, type: 3}
+  m_Name: Wait
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  position: {x: 0, y: 401}
+  guid: 15e57ce1-9577-43d4-ba8d-8a2a0e6ad72a
+  duration: 1
+--- !u!114 &3433335950843571177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dea2af9be81a79545b1cdec681eb5730, type: 3}
+  m_Name: Debug
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  position: {x: -179, y: 401}
+  guid: cba485a6-6ca7-4ec5-84cf-941e115a2a7c
+  message: 
+  onEnterEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onUpdateEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onExitEvent:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &5511355197402769895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6563dd266a3c03142aad5b47e15e6658, type: 3}
+  m_Name: Root
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  position: {x: 0, y: 0}
+  guid: 2d976c2d-aeae-4e08-aa7a-e27fecc3ce1c
+  child: {fileID: 2241286404083374979}

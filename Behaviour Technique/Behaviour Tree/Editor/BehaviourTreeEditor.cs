@@ -4,6 +4,8 @@ using UnityEngine.UIElements;
 using UnityEditor.Callbacks;
 using System.Reflection;
 using System;
+using System.Linq;
+using System.IO;
 
 public class BehaviourTreeEditor : EditorWindow
 {
@@ -40,24 +42,39 @@ public class BehaviourTreeEditor : EditorWindow
     }
 
 
+    public static string FindEditorGraphicAssetFolder(string searchFilter, string folderPath)
+    {
+        foreach (var guid in AssetDatabase.FindAssets(searchFilter) ?? Enumerable.Empty<string>())
+        {
+            string parentPath = AssetDatabase.GUIDToAssetPath(guid);
+            string resultPath = $"{parentPath}{folderPath}";
+
+            if (Directory.Exists(resultPath))
+            {
+                return resultPath;
+            }
+        }
+
+        return string.Empty;
+    }
+
+
     private void CreateGUI()
     {
-        VisualElement root = rootVisualElement;
+        string basePath = FindEditorGraphicAssetFolder("Behaviour Technique t:Folder", "/Behaviour Tree/Layout");
 
-        string basePath = AssetDatabase.GetAssetPath(_cachedInstanceID);
+        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(basePath + "/BehaviourTreeEditor.uxml");
+        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(basePath + "/BehaviourTreeEditorStyle.uss");
 
-        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(basePath  + "/BehaviourTreeEditor.uxml");
-        visualTree.CloneTree(root);
+        visualTree.CloneTree(rootVisualElement);
+        rootVisualElement.styleSheets.Add(styleSheet);
 
-        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(basePath + "/BehaviourTreeEditor.uss");
-        root.styleSheets.Add(styleSheet);
-
-        _inspectorView = root.Q<InspectorView>();
-        _treeView = root.Q<BehaviourTreeView>();
+        _inspectorView = rootVisualElement.Q<InspectorView>();
+        _treeView = rootVisualElement.Q<BehaviourTreeView>();
 
         _treeView.OnNodeSelected += OnNodeSelectionChanged;
 
-         this.OnSelectionChange();
+        this.OnSelectionChange();
     }
 
 
@@ -90,7 +107,7 @@ public class BehaviourTreeEditor : EditorWindow
     {
         BehaviourTree tree = Selection.activeObject as BehaviourTree;
 
-        if (tree == null && Selection.activeGameObject != null) 
+        if (tree == null && Selection.activeGameObject != null)
         {
             Selection.activeGameObject.TryGetComponent<BehaviourTreeRunner>(out var runner);
             tree = runner?.behaviourTree;

@@ -15,9 +15,13 @@ public class NodeView : Node
     public Port input;
     public Port output;
 
-    private const string UXML_PATH = "Assets/Behaviour Tree Editor/Layout/NodeView.uxml";
+    private static string uxmlPath
+    {
+        get { return BehaviourTreeEditor.FindEditorGraphicAssetFolder("Behaviour Technique t:Folder", "/Behaviour Tree/Layout") + "/NodeView.uxml"; }
+    }
 
-    public NodeView(StateNode node) : base(UXML_PATH)
+
+    public NodeView(StateNode node) : base(uxmlPath)
     {
         this.node = node;
         this.title = node.name;
@@ -148,7 +152,8 @@ public class NodeView : Node
 
         if (node is CompositeNode compositeNode)
         {
-            compositeNode.children.Sort((l, r) => {
+            compositeNode.children.Sort((l, r) =>
+            {
                 return l.position.x < r.position.x ? -1 : 1;
             });
         }

@@ -6,14 +6,10 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.Linq;
-using UnityEditor.AssetImporters;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class BehaviourTreeView : GraphView
 {
     public new class UxmlFactory : UxmlFactory<BehaviourTreeView, UxmlTraits> { }
-
-    private const string PATH = "Assets/Behaviour Tree Editor/Editor/Layout/BehaviourTreeEditor.uss";
 
     public Action<NodeView> OnNodeSelected;
 
@@ -22,7 +18,9 @@ public class BehaviourTreeView : GraphView
 
     public BehaviourTreeView()
     {
-        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(PATH);
+        string basePath = BehaviourTreeEditor.FindEditorGraphicAssetFolder("Behaviour Technique t:Folder", "/Behaviour Tree/Layout");
+        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(basePath + "/BehaviourTreeEditorStyle.uss");
+
         styleSheets.Add(styleSheet);
 
         this.AddManipulator(new ContentZoomer());
