@@ -43,6 +43,11 @@ public class BehaviourTreeView : GraphView
 
     public void PopulateView(BehaviourTree tree)
     {
+        if (tree == null)
+        {
+            return;
+        }
+
         this._cachedTree = tree;
         graphViewChanged -= OnGraphViewChanged;
         base.DeleteElements(graphElements);
@@ -146,8 +151,6 @@ public class BehaviourTreeView : GraphView
         InsertActions(TypeCache.GetTypesDerivedFrom<ActionNode>(), "Action");
         InsertActions(TypeCache.GetTypesDerivedFrom<CompositeNode>(), "Composite");
         InsertActions(TypeCache.GetTypesDerivedFrom<DecoratorNode>(), "Decorator");
-
-        base.BuildContextualMenu(evt);
 
         void InsertActions(TypeCache.TypeCollection types, string prefix)
         {

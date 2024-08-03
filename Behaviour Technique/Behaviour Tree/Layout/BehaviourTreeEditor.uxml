@@ -1,16 +1,14 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <Style src="project://database/Assets/Behaviour%20Tree%20Editor/Editor/BehaviourTreeEditor.uss?fileID=7433441132597879392&amp;guid=d4558447354bb5940a546c8a59d07b16&amp;type=3#BehaviourTreeEditor" />
-    <uie:Toolbar>
-        <uie:ToolbarMenu tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" text="Assets" />
-    </uie:Toolbar>
-    <SplitView fixed-pane-initial-dimension="200" style="flex-direction: row;">
-        <ui:VisualElement name="Left-Panel" focusable="true" style="flex-grow: 1; min-width: 200px; overflow: visible;">
-            <ui:Label tabindex="-1" text="Inspector" parse-escape-sequences="true" display-tooltip-when-elided="true" style="flex-direction: column; background-color: rgb(40, 40, 40); color: rgb(196, 196, 196); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 13px; -unity-text-outline-color: rgba(0, 0, 0, 0); padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 2px; overflow: visible;" />
-            <InspectorView focusable="false" style="flex-grow: 1; margin-top: 5px; margin-right: 10px; margin-bottom: 5px; margin-left: 10px;" />
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Behaviour%20Technique/Behaviour%20Tree/Layout/BehaviourTreeEditorStyle.uss?fileID=7433441132597879392&amp;guid=9f7ef0b4ed1e21f4580d6f651abac776&amp;type=3#BehaviourTreeEditorStyle" />
+    <uie:Toolbar name="Toolbar" />
+    <SplitView fixed-pane-initial-dimension="300" orientation="Horizontal" focusable="false" fixed-pane-index="0" style="overflow: visible; flex-shrink: 1; align-self: auto; justify-content: center; align-items: auto; flex-wrap: wrap; flex-direction: row; flex-basis: auto; flex-grow: 1;">
+        <ui:VisualElement name="left-panel" style="flex-grow: 1; flex-direction: column; width: auto; flex-shrink: 1; min-width: 300px; display: flex; min-height: auto; max-width: 90%;">
+            <ui:Label tabindex="-1" text=" Parameters" parse-escape-sequences="true" display-tooltip-when-elided="true" name="left-view-label" class="window-label" style="flex-shrink: 1; flex-grow: 0;" />
+            <InspectorView style="flex-grow: 1; margin-right: 10px; margin-left: 10px; margin-top: 5px;" />
         </ui:VisualElement>
-        <ui:VisualElement name="Right-Panel" style="flex-grow: 1; min-width: 200px;">
-            <ui:Label tabindex="-1" text="Tree View" parse-escape-sequences="true" display-tooltip-when-elided="true" style="background-color: rgb(40, 40, 40); color: rgb(196, 196, 196); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 13px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 2px;" />
-            <BehaviourTreeView focusable="false" style="flex-grow: 1; left: 0; top: 0; right: 0; bottom: 0; overflow: visible; visibility: visible; display: flex;" />
+        <ui:VisualElement name="right-panel" style="flex-grow: 1; flex-shrink: 1; min-width: 10%; max-width: none;">
+            <ui:Label tabindex="-1" text=" Tree View" parse-escape-sequences="true" display-tooltip-when-elided="true" name="right-view-label" class="window-label" />
+            <BehaviourTreeView style="flex-grow: 1;" />
         </ui:VisualElement>
     </SplitView>
 </ui:UXML>
