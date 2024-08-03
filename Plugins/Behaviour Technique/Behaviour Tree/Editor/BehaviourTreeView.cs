@@ -13,7 +13,7 @@ public class BehaviourTreeView : GraphView
 {
     public new class UxmlFactory : UxmlFactory<BehaviourTreeView, UxmlTraits> { }
 
-    private const string PATH = "Assets/Behaviour Tree Editor/Layout/BehaviourTreeEditor.uss";
+    private const string PATH = "Assets/Behaviour Tree Editor/Editor/Layout/BehaviourTreeEditor.uss";
 
     public Action<NodeView> OnNodeSelected;
 

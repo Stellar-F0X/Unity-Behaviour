@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.Callbacks;
-using Unity.VisualScripting;
+using System.Reflection;
 using System;
 
 public class BehaviourTreeEditor : EditorWindow
@@ -13,11 +13,10 @@ public class BehaviourTreeEditor : EditorWindow
     }
 
     private static bool _isEditorAvailable;
+    private static int _cachedInstanceID;
 
     private BehaviourTreeView _treeView;
     private InspectorView _inspectorView;
-
-    private const string LAYOUT_PATH = "Assets/Behaviour Tree Editor/Layout";
 
     [MenuItem("Tools/BehaviourTreeEditor")]
     private static void OpenWindow()
@@ -31,6 +30,8 @@ public class BehaviourTreeEditor : EditorWindow
     {
         if (Selection.activeObject is BehaviourTree)
         {
+            _cachedInstanceID = instanceID;
+
             OpenWindow();
             return true;
         }
@@ -43,10 +44,12 @@ public class BehaviourTreeEditor : EditorWindow
     {
         VisualElement root = rootVisualElement;
 
-        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(LAYOUT_PATH  + "/BehaviourTreeEditor.uxml");
+        string basePath = AssetDatabase.GetAssetPath(_cachedInstanceID);
+
+        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(basePath  + "/BehaviourTreeEditor.uxml");
         visualTree.CloneTree(root);
 
-        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(LAYOUT_PATH + "/BehaviourTreeEditor.uss");
+        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(basePath + "/BehaviourTreeEditor.uss");
         root.styleSheets.Add(styleSheet);
 
         _inspectorView = root.Q<InspectorView>();
