@@ -69,8 +69,8 @@ public class BehaviourTreeEditor : EditorWindow
         visualTree.CloneTree(rootVisualElement);
         rootVisualElement.styleSheets.Add(styleSheet);
 
-        _inspectorView = rootVisualElement.Q<InspectorView>();
         _treeView = rootVisualElement.Q<BehaviourTreeView>();
+        _inspectorView = rootVisualElement.Q<InspectorView>();
 
         _treeView.OnNodeSelected += OnNodeSelectionChanged;
 

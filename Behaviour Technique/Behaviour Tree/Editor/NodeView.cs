@@ -144,8 +144,7 @@ public class NodeView : Node
 
         if (node is CompositeNode compositeNode)
         {
-            compositeNode.children.Sort((l, r) =>
-            {
+            compositeNode.children.Sort((l, r) => {
                 return l.position.x < r.position.x ? -1 : 1;
             });
         }

@@ -35,7 +35,7 @@ public class BehaviourTree : ScriptableObject
     {
         StateNode node = ScriptableObject.CreateInstance(nodeType) as StateNode;
         node.name = nodeType.Name.Replace("Node", string.Empty);
-        node.guid = Guid.NewGuid().ToString();
+        node.guid = GUID.Generate().ToString();
         nodeList.Add(node);
 
         if (!Application.isPlaying)

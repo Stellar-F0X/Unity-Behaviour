@@ -1,12 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <Style src="project://database/Assets/Behaviour%20Tree%20Editor/Layout/NodeViewStyle.uss?fileID=7433441132597879392&amp;guid=2c3e5f919fbc7c0468933b90f2ec4fd6&amp;type=3#NodeViewStyle" />
+    <Style src="project://database/Assets/Behaviour%20Technique/Behaviour%20Tree/Layout/NodeViewStyle.uss?fileID=7433441132597879392&amp;guid=2c3e5f919fbc7c0468933b90f2ec4fd6&amp;type=3#NodeViewStyle" />
     <ui:VisualElement name="node-state" />
     <ui:VisualElement name="node-border" tabindex="0">
         <ui:VisualElement name="contents">
             <ui:VisualElement name="top" style="flex-wrap: nowrap; justify-content: flex-start; align-self: stretch;">
-                <ui:VisualElement name="divider" class="vertical" />
-                <ui:VisualElement name="input" />
-                <ui:VisualElement name="title">
+                <ui:VisualElement name="divider" picking-mode="Ignore" class="vertical" />
+                <ui:VisualElement name="input" language-direction="Inherit" />
+                <ui:VisualElement name="title" picking-mode="Ignore">
                     <ui:Label name="title-label" text="Node" class="unity-text-element unity-label" />
                     <ui:VisualElement name="title-button-container">
                         <ui:VisualElement name="collapse-button">
@@ -15,7 +15,7 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="output" />
-                <ui:VisualElement name="divider" class="horizontal" />
+                <ui:VisualElement name="divider" picking-mode="Ignore" class="horizontal" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

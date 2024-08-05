@@ -50,7 +50,7 @@ public class BehaviourTreeView : GraphView
 
         this._cachedTree = tree;
         graphViewChanged -= OnGraphViewChanged;
-        this.DeleteElements(graphElements);
+        DeleteElements(graphElements);
         graphViewChanged += OnGraphViewChanged;
 
         if (_cachedTree.rootNode == null)
