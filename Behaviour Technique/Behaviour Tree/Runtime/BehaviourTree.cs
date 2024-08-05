@@ -23,7 +23,7 @@ public class BehaviourTree : ScriptableObject
     {
         if (rootNode.state == StateNode.eState.Running)
         {
-            return rootNode.Update();
+            treeState = rootNode.Update();
         }
 
         return treeState;
