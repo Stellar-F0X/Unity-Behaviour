@@ -58,10 +58,6 @@ public class NodeView : Node
             input.portName = string.Empty;
             input.style.flexDirection = FlexDirection.Column;
 
-            VisualElement connector = input.Q<VisualElement>("connector");
-            connector.style.alignSelf = Align.Center;
-            connector.style.alignContent = Align.Center;
-            connector.style.alignItems = Align.Center;
             base.inputContainer.Add(input);
         }
     }
@@ -90,10 +86,7 @@ public class NodeView : Node
         {
             output.portName = string.Empty;
             output.style.flexDirection = FlexDirection.ColumnReverse;
-            VisualElement connector = output.Q<VisualElement>("connector");
-            connector.style.alignItems = Align.Center;
-            connector.style.alignSelf = Align.Center;
-            connector.style.alignContent = Align.Center;
+
             base.outputContainer.Add(output);
         }
     }
@@ -127,18 +120,17 @@ public class NodeView : Node
 
     public void UpdateState()
     {
-        RemoveFromClassList("running");
-        RemoveFromClassList("done");
+        style.borderBottomColor = new Color(0, 0, 0, 0);
 
         if (Application.isPlaying)
         {
             if (node.state == StateNode.eState.Running && node.started)
             {
-                AddToClassList("running");
+                style.borderBottomColor = new Color(255, 255, 255, 1);
             }
             else
             {
-                AddToClassList("done");
+                style.borderBottomColor = new Color(255, 255, 255, 1);
             }
         }
     }

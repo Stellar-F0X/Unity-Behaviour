@@ -15,25 +15,25 @@ public class BehaviourTreeEditor : EditorWindow
     }
 
     private static bool _isEditorAvailable;
-    private static int _cachedInstanceID;
 
     private BehaviourTreeView _treeView;
     private InspectorView _inspectorView;
+
+
 
     [MenuItem("Tools/BehaviourTreeEditor")]
     private static void OpenWindow()
     {
         BehaviourTreeEditor wnd = GetWindow<BehaviourTreeEditor>();
-        wnd.titleContent = new GUIContent("Behaviour Tree Editor");
+        wnd.titleContent = new GUIContent("BehaviourTreeEditor");
     }
 
-    [OnOpenAsset] //onOpenAsset 어트리뷰트를 사용하면 에셋을 눌렀을떄 해당 함수가 호출됨.
+
+    [OnOpenAsset]
     public static bool OnOpenAsset(int instanceID, int line)
     {
         if (Selection.activeObject is BehaviourTree)
         {
-            _cachedInstanceID = instanceID;
-
             OpenWindow();
             return true;
         }
@@ -103,17 +103,18 @@ public class BehaviourTreeEditor : EditorWindow
         }
     }
 
+
     private void OnSelectionChange()
     {
         BehaviourTree tree = Selection.activeObject as BehaviourTree;
 
         if (tree == null && Selection.activeGameObject != null)
         {
-            Selection.activeGameObject.TryGetComponent<BehaviourTreeRunner>(out var runner);
+            Selection.activeGameObject.TryGetComponent<BehaviourActor>(out var runner);
             tree = runner?.behaviourTree;
         }
 
-        if (tree != null)
+        if (tree != null && _treeView != null)
         {
             if (AssetDatabase.CanOpenAssetInEditor(tree.GetInstanceID()))
             {
@@ -135,6 +136,7 @@ public class BehaviourTreeEditor : EditorWindow
     {
         _inspectorView.UpdateSelection(node);
     }
+
 
     private void Update()
     {

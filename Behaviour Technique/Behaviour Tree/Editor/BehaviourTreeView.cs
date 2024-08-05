@@ -18,17 +18,17 @@ public class BehaviourTreeView : GraphView
 
     public BehaviourTreeView()
     {
-        string basePath = BehaviourTreeEditor.FindEditorGraphicAssetFolder("Behaviour Technique t:Folder", "/Behaviour Tree/Layout");
-        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(basePath + "/BehaviourTreeEditorStyle.uss");
-
-        styleSheets.Add(styleSheet);
+        Insert(0, new GridBackground());
 
         this.AddManipulator(new ContentZoomer());
         this.AddManipulator(new ContentDragger());
         this.AddManipulator(new SelectionDragger());
         this.AddManipulator(new RectangleSelector());
 
-        base.Insert(0, new GridBackground());
+        string basePath = BehaviourTreeEditor.FindEditorGraphicAssetFolder("Behaviour Technique t:Folder", "/Behaviour Tree/Layout");
+        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(basePath + "/BehaviourTreeEditorStyle.uss");
+
+        styleSheets.Add(styleSheet);
 
         Undo.undoRedoPerformed += OnUndoRedo;
     }
@@ -50,7 +50,7 @@ public class BehaviourTreeView : GraphView
 
         this._cachedTree = tree;
         graphViewChanged -= OnGraphViewChanged;
-        base.DeleteElements(graphElements);
+        this.DeleteElements(graphElements);
         graphViewChanged += OnGraphViewChanged;
 
         if (_cachedTree.rootNode == null)
@@ -60,10 +60,10 @@ public class BehaviourTreeView : GraphView
             AssetDatabase.SaveAssets();
         }
 
-        //´Ù½Ã ºÒ·¯¿Ã¶§ ¸¸µé¾îµ×´ø Node¸¦ »ı¼º.
+        //ë‹¤ì‹œ ë¶ˆëŸ¬ì˜¬ë•Œ ë§Œë“¤ì–´ë’€ë˜ Nodeë¥¼ ìƒì„±.
         tree.nodeList.ForEach(n => this.CreateNodeView(n));
 
-        //¸¸µé¾îµ×´ø Node³¢¸® Edge¸¦ ¿¬°á.
+        //ë§Œë“¤ì–´ë’€ë˜ Nodeë¼ë¦¬ Edgeë¥¼ ì—°ê²°.
         foreach (var node in tree.nodeList)
         {
             foreach(var child in tree.GetChildren(node))
@@ -84,7 +84,7 @@ public class BehaviourTreeView : GraphView
 
     private NodeView FindNodeView(StateNode node)
     {
-        return base.GetNodeByGuid(node?.guid) as NodeView;
+        return this.GetNodeByGuid(node?.guid) as NodeView;
     }
 
 
@@ -92,32 +92,30 @@ public class BehaviourTreeView : GraphView
     {
         if (graphViewChange.elementsToRemove != null)
         {
-            graphViewChange.elementsToRemove.ForEach(e =>
+            foreach(var node in graphViewChange.elementsToRemove)
             {
-                if (e is NodeView && _cachedTree != null)
+                if (node is NodeView nodeView)
                 {
-                    NodeView nodeView = e as NodeView;
                     _cachedTree.DeleteNode(nodeView.node);
                 }
 
-                if (e is Edge)
+                if (node is Edge edge)
                 {
-                    var edge = e as Edge;
                     NodeView parentView = edge.output.node as NodeView;
                     NodeView ChildView = edge.input.node as NodeView;
                     _cachedTree.RemoveChild(parentView.node, ChildView.node);
                 }
-            });
+            }
         }
 
         if (graphViewChange.edgesToCreate != null)
         {
-            graphViewChange.edgesToCreate.ForEach(edge =>
+            foreach  (var edge in graphViewChange.edgesToCreate)
             {
                 NodeView parentView = edge.output.node as NodeView;
                 NodeView childView = edge.input.node as NodeView;
                 _cachedTree.AddChild(parentView.node, childView.node);
-            });
+            }
         }
 
         if (graphViewChange.movedElements != null)
@@ -132,7 +130,7 @@ public class BehaviourTreeView : GraphView
     public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
     {
         return base.ports.ToList().Where(endPort =>
-            //directionÀº input°ú outputÀÌ¹Ç·Î, ´Ù¸¥ ³ëµå¶óµµ °°Àº Æ÷Æ®¿¡ ¸ø ²È°Ô ¹æÁö
+            //directionì€ inputê³¼ outputì´ë¯€ë¡œ, ë‹¤ë¥¸ ë…¸ë“œë¼ë„ ê°™ì€ í¬íŠ¸ì— ëª» ê½‚ê²Œ ë°©ì§€
             endPort.direction != startPort.direction &&
             endPort.node != startPort.node
         ).ToList();
@@ -146,19 +144,19 @@ public class BehaviourTreeView : GraphView
             return;
         }
 
-        Vector3 mousePos = evt.localMousePosition;
-
-        InsertActions(TypeCache.GetTypesDerivedFrom<ActionNode>(), "Action");
-        InsertActions(TypeCache.GetTypesDerivedFrom<CompositeNode>(), "Composite");
-        InsertActions(TypeCache.GetTypesDerivedFrom<DecoratorNode>(), "Decorator");
-
-        void InsertActions(TypeCache.TypeCollection types, string prefix)
+        InsertActions(evt, TypeCache.GetTypesDerivedFrom<ActionNode>(), "Action");
+        InsertActions(evt, TypeCache.GetTypesDerivedFrom<CompositeNode>(), "Composite");
+        InsertActions(evt, TypeCache.GetTypesDerivedFrom<DecoratorNode>(), "Decorator");
+    }
+    
+    
+    private void InsertActions(ContextualMenuPopulateEvent evt, TypeCache.TypeCollection types, string prefix)
+    {
+        foreach (var type in types)
         {
-            foreach (var type in types)
-            {
-                string sentence = $"[{prefix}] {type.Name.Replace("Node", string.Empty)}";
-                evt.menu.AppendAction(sentence, a => CreateNode(type, mousePos));
-            }
+            string sentence = $"[{prefix}] {type.Name.Replace("Node", string.Empty)}";
+            
+            evt.menu.AppendAction(sentence, a => CreateNode(type, evt.mousePosition));
         }
     }
 

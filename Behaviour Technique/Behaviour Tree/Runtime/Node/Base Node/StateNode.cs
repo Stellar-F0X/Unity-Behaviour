@@ -1,10 +1,11 @@
 using System;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEngine;
 using Object = UnityEngine.Object;
 
+
+[Serializable]
 public abstract class StateNode : ScriptableObject
 {
     public enum eState
