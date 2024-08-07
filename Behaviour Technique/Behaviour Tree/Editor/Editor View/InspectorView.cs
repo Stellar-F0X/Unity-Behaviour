@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEditorInternal.VR;
 using UnityEngine;
@@ -25,16 +26,17 @@ public class InspectorView : VisualElement
 
         Object.DestroyImmediate(_editor);
         _editor = Editor.CreateEditor(view.node);
+        base.Add(new IMGUIContainer(DrawInspectorGUI));
+    }
 
-        IMGUIContainer container = new IMGUIContainer(() => {
-            if (_editor.target == null)
-            {
-                return;
-            }
 
-            _editor.OnInspectorGUI();
+    private void DrawInspectorGUI()
+    {
+        if (_editor.target == null)
+        {
+            return;
+        }
 
-        });
-        base.Add(container);
+        _editor?.OnInspectorGUI();
     }
 }

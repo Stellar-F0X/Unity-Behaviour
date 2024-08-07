@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class DebugNode : ActionNode
+public class EventNode : ActionNode
 {
-    public string message;
-
     public override string desciption
     {
-        get { return "Logger Node"; }
+        get { return "Event Node"; }
     }
+
+    public BehaviourTreeEvent btEvent;
 
     protected override void OnEnter()
     {
-
+        
     }
 
     protected override eState OnUpdate()

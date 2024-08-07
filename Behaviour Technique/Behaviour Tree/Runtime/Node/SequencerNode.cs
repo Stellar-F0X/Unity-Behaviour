@@ -22,7 +22,7 @@ public class SequencerNode : CompositeNode
         
     }
 
-    //ÇÑ ÇÁ·¹ÀÓ¿¡ ¸ğµç ÀÚ½ÄÀ» ¼øÈ¸ÇÏ´Â °ÍÀÌ ¾Æ´Ï¶ó ÇÑ ÇÁ·¹ÀÓ¿¡ ÇÑ ÀÚ½Ä¾¿¸¸ ¼øÈ¸ÇÏ´Â ±¸Á¶. ÀÌ°Ô ¸Â³ª?
+    //í•œ í”„ë ˆì„ì— ëª¨ë“  ìì‹ì„ ìˆœíšŒí•˜ëŠ” ê²ƒì´ ì•„ë‹ˆë¼ í•œ í”„ë ˆì„ì— í•œ ìì‹ì”©ë§Œ ìˆœíšŒí•˜ëŠ” êµ¬ì¡°. ì´ê²Œ ë§ë‚˜?
     protected override eState OnUpdate()
     {
         StateNode child = children[_current];

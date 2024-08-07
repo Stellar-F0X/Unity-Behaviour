@@ -6,6 +6,7 @@ using System.Reflection;
 using System;
 using System.Linq;
 using System.IO;
+using StateMachine.BT;
 
 public class BehaviourTreeEditor : EditorWindow
 {
@@ -16,9 +17,9 @@ public class BehaviourTreeEditor : EditorWindow
 
     private static bool _isEditorAvailable;
 
+    private BehaviourTree _tree;
     private BehaviourTreeView _treeView;
     private InspectorView _inspectorView;
-
 
 
     [MenuItem("Tools/BehaviourTreeEditor")]
@@ -108,16 +109,21 @@ public class BehaviourTreeEditor : EditorWindow
     {
         BehaviourTree tree = Selection.activeObject as BehaviourTree;
 
-        if (tree == null && Selection.activeGameObject != null)
+        if (tree == null && _treeView != null)
         {
-            Selection.activeGameObject.TryGetComponent<BehaviourActor>(out var runner);
-            tree = runner?.behaviourTree;
+            var runner = Selection.activeGameObject?.GetComponent<BehaviourActor>();
+
+            if (runner != null)
+            {
+                tree = runner?.runtimeTree;
+            }
         }
 
         if (tree != null && _treeView != null)
         {
             if (AssetDatabase.CanOpenAssetInEditor(tree.GetInstanceID()))
             {
+                _tree = tree;
                 _treeView.PopulateView(tree);
                 _isEditorAvailable = true;
                 return;

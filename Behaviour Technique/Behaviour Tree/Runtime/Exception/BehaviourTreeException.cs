@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-public class BTException : Exception
+public class BehaviourTreeException : Exception
 {
-    public BTException(string message) : base(message) { }
+    public BehaviourTreeException(string message) : base(message) { }
 }
 

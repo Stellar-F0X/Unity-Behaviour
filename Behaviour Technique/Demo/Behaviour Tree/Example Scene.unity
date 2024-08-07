@@ -240,7 +240,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea6898e15b6b09a408580d2dbf4e8ae7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  behaviourTree: {fileID: 11400000, guid: 2aec8aa9902b7f54c986e2eca3120648, type: 2}
+  runtimeTree: {fileID: 11400000, guid: 2aec8aa9902b7f54c986e2eca3120648, type: 2}
   updateMode: 1
   startMode: 2
 --- !u!4 &1483340907

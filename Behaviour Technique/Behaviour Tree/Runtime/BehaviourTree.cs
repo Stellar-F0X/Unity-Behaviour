@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Events;
 using Object = UnityEngine.Object;
 
 [CreateAssetMenu()]
@@ -72,7 +73,7 @@ public class BehaviourTree : ScriptableObject
             case StateNode.eNodeType.Decorator: (parent as DecoratorNode).child = child; break;
             case StateNode.eNodeType.Composite: (parent as CompositeNode).children.Add(child); break;
 
-            default: throw new BTException("It is a childless type of node.");
+            default: throw new BehaviourTreeException("It is a childless type of node.");
         }
 
         EditorUtility.SetDirty(child);
@@ -89,7 +90,7 @@ public class BehaviourTree : ScriptableObject
             case StateNode.eNodeType.Decorator: (parent as DecoratorNode).child = null; break;
             case StateNode.eNodeType.Composite: (parent as CompositeNode).children.Remove(child); break;
 
-            default: throw new BTException("It is a childless type of node");
+            default: throw new BehaviourTreeException("It is a childless type of node");
         }
 
         EditorUtility.SetDirty(child);

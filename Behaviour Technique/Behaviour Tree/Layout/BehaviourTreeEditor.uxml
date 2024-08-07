@@ -6,7 +6,7 @@
                 <uie:ToolbarMenu text="Tree Assets" name="tree-assets-menu" />
                 <uie:ToolbarButton icon-image="project://database/Packages/com.unity.2d.animation/Editor/Assets/EditorIcons/Selected/Visibility_Tool.png?fileID=2800000&amp;guid=7342ee656932e31489ea62e64e012645&amp;type=3#Visibility_Tool" name="visiable-button" />
             </uie:Toolbar>
-            <ui:Label tabindex="-1" text=" Parameters" parse-escape-sequences="true" display-tooltip-when-elided="true" name="left-view-label" class="window-label" style="flex-shrink: 1; flex-grow: 0;" />
+            <ui:Label tabindex="-1" text=" Inspector" parse-escape-sequences="true" display-tooltip-when-elided="true" name="left-view-label" class="window-label" style="flex-shrink: 1; flex-grow: 0;" />
             <InspectorView focusable="true" style="flex-grow: 1; margin-right: 10px; margin-left: 10px; margin-top: 5px;" />
         </ui:VisualElement>
         <ui:VisualElement name="right-panel" style="flex-grow: 1; flex-shrink: 1; min-width: 10%; max-width: none;">

@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.Linq;
+using StateMachine.BT;
 
 public class BehaviourTreeView : GraphView
 {
@@ -14,6 +15,7 @@ public class BehaviourTreeView : GraphView
     public Action<NodeView> OnNodeSelected;
 
     private BehaviourTree _cachedTree;
+    private SerializedBehaviourTree _serializedBehaviourTree;
 
 
     public BehaviourTreeView()
@@ -49,6 +51,8 @@ public class BehaviourTreeView : GraphView
         }
 
         this._cachedTree = tree;
+        this._serializedBehaviourTree = new SerializedBehaviourTree(tree);
+        
         graphViewChanged -= OnGraphViewChanged;
         DeleteElements(graphElements);
         graphViewChanged += OnGraphViewChanged;

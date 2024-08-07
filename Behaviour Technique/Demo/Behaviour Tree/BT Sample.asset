@@ -34,26 +34,8 @@ MonoBehaviour:
   position: {x: 0, y: 167}
   guid: 2a72c7d8b4fdb0c4fb7369fa9c25f818
   children:
-  - {fileID: 2250166780895997020}
-  - {fileID: -452711145794344336}
+  - {fileID: 654489413285306118}
   - {fileID: 7213608342993194165}
---- !u!114 &-452711145794344336
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84266bc38451e2e49bb68af89b374249, type: 3}
-  m_Name: Wait
-  m_EditorClassIdentifier: 
-  state: 0
-  started: 0
-  position: {x: -0.000016212463, y: 297.49805}
-  guid: 4ede2d73329ba84449765df3f98e5282
-  duration: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,12 +52,15 @@ MonoBehaviour:
   treeState: 0
   nodeList:
   - {fileID: -7332528754462958646}
-  - {fileID: -452711145794344336}
   - {fileID: -5550728123952093530}
-  - {fileID: 2250166780895997020}
   - {fileID: 5552834910196414700}
   - {fileID: 7213608342993194165}
---- !u!114 &2250166780895997020
+  - {fileID: 654489413285306118}
+  aaaevent:
+    bindGameObject: {fileID: 0}
+    aObject: {fileID: 0}
+    message: 
+--- !u!114 &654489413285306118
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -85,13 +70,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dea2af9be81a79545b1cdec681eb5730, type: 3}
-  m_Name: Debug
+  m_Name: Event
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: -150.00003, y: 297.49805}
-  guid: 0fb01577c9626784a86c7047a5bfd770
-  message: Hello BT
+  position: {x: -90.000084, y: 297.00006}
+  guid: d0520b6948615dc4cb0312a8807c2578
+  btEvent:
+    bindGameObject: {fileID: 0}
+    aObject: {fileID: 0}
+    message: 
 --- !u!114 &5552834910196414700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,7 +94,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 0.000009059906, y: 55.9}
+  position: {x: 0.00000047683716, y: 53.85}
   guid: 932c4c1a8ef10b842a0188723929c088
   child: {fileID: -5550728123952093530}
 --- !u!114 &7213608342993194165
@@ -123,6 +111,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 149.99997, y: 297.49805}
+  position: {x: 102.3, y: 297.00006}
   guid: 9ebe22f5773caa7459dbd24653216b3e
   duration: 1
