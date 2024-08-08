@@ -5,17 +5,17 @@ using UnityEngine;
 
 
 [Serializable]
-public abstract class CompositeNode : StateNode
+public abstract class CompositeNode : Node
 {
     [HideInInspector]
-    public List<StateNode> children = new List<StateNode>();
+    public List<Node> children = new List<Node>();
 
-    public override eNodeType nodeType
+    public override eNodeType baseType
     {
         get { return eNodeType.Composite; }
     }
 
-    public override StateNode Clone()
+    public override Node Clone()
     {
         CompositeNode node = base.Clone() as CompositeNode;
         node.children = children.ConvertAll(c => c.Clone());

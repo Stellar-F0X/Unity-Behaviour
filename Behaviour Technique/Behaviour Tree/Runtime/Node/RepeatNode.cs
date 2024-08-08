@@ -1,27 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class RepeatNode : DecoratorNode
 {
-    public override string desciption
-    {
-        get { return "Iterate through the nodes connected lower layer"; }
-    }
-
-    protected override void OnEnter()
+    protected override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
         
     }
 
-    protected override void OnExit()
+    protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
         
     }
 
-    protected override eState OnUpdate()
+    protected override eState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
-        child.Update();
+        child.UpdateNode(behaviourTree, new PreviusBehaviourInfo(tag, GetType(), baseType));
         return eState.Running;
     }
 }

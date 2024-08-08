@@ -6,7 +6,9 @@ using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
 using UnityEngine.Serialization;
+using Update = UnityEngine.PlayerLoop.Update;
 using FixedUpdate = UnityEngine.PlayerLoop.FixedUpdate;
+
 
 public class BehaviourActor : MonoBehaviour
 {
@@ -15,7 +17,7 @@ public class BehaviourActor : MonoBehaviour
         Update,
         FixedUpdate,
         LateUpdate
-    };
+    }
 
     public enum eStartMode
     {
@@ -27,13 +29,18 @@ public class BehaviourActor : MonoBehaviour
     public BehaviourTree runtimeTree;
     public eUpdateMode updateMode;
     public eStartMode startMode;
-
-    public BehaviourTreeEvent events;
+    
+    [HideInInspector]
+    public BehaviourTreeEvent behaviourEvents = new BehaviourTreeEvent();
+    
+    private bool _canRegisterWhenEnable;
     
     private PlayerLoopSystem _playerLoop;
     private PlayerLoopSystem.UpdateFunction _behaviourTreeUpdate;
 
 
+    #region Activator Functions
+    
     private void Awake()
     {
         this.runtimeTree = runtimeTree.Clone();
@@ -51,67 +58,67 @@ public class BehaviourActor : MonoBehaviour
             RegisterUpdateCallback(eStartMode.Start);
         }
 
-        startMode = eStartMode.Enable;
+        _canRegisterWhenEnable = true;
     }
 
     private void OnEnable()
     {
-        if (startMode == eStartMode.Enable)
+        if (startMode == eStartMode.Enable || _canRegisterWhenEnable)
         {
-            RegisterUpdateCallback(eStartMode.Enable);
+            this.RegisterUpdateCallback(eStartMode.Enable);
         }
     }
 
     private void OnDisable()
     {
-        RemoveUpdateCallback();
+        if (_behaviourTreeUpdate?.GetInvocationList().Length > 0)
+        {
+            this.RemoveUpdateCallback();
+        }
     }
 
+    #endregion
 
 
     private void RemoveUpdateCallback()
     {
-        if (this._behaviourTreeUpdate == null)
-        {
-            return;
-        }
-
         Type updateType = GetUpdateType();
-        var system = _playerLoop.subSystemList.FirstOrDefault(s => s.type == updateType);
-        int index = Array.IndexOf(_playerLoop.subSystemList, system);
+        var loopSystem = _playerLoop.subSystemList.FirstOrDefault(s => s.type == updateType);
+        int index = Array.IndexOf(_playerLoop.subSystemList, loopSystem);
 
         if (index != -1)
         {
-            var newSystems = system.subSystemList.Append(new PlayerLoopSystem {
-                updateDelegate = _behaviourTreeUpdate,
-                type = updateType,
-            });
+            loopSystem.subSystemList = loopSystem.subSystemList
+                .Where(system => system.updateDelegate != _behaviourTreeUpdate)
+                .ToArray();
 
-            system.subSystemList = newSystems.ToArray();
-            _playerLoop.subSystemList[index] = system;
+            _playerLoop.subSystemList[index] = loopSystem;
             PlayerLoop.SetPlayerLoop(_playerLoop);
         }
 
-        _behaviourTreeUpdate = null;
+        this._behaviourTreeUpdate -= BehaviourTreeUpdate;
     }
 
 
     private void RegisterUpdateCallback(eStartMode mode)
     {
         this._playerLoop = PlayerLoop.GetCurrentPlayerLoop();
-        this._behaviourTreeUpdate = BehaviourNodeUpdate;
+        this._behaviourTreeUpdate -= BehaviourTreeUpdate;
+        this._behaviourTreeUpdate += BehaviourTreeUpdate;
+        
         Type updateType = this.GetUpdateType();
-
-        var system = _playerLoop.subSystemList.FirstOrDefault(s => s.type == updateType);
-        int index = Array.IndexOf(_playerLoop.subSystemList, system);
-
+        var loopSystem = _playerLoop.subSystemList.FirstOrDefault(s => s.type == updateType);
+        int index = Array.IndexOf(_playerLoop.subSystemList, loopSystem);
+        
         if (index != -1)
         {
-            system.subSystemList = system.subSystemList
-                .Where(system => system.updateDelegate != _behaviourTreeUpdate)
-                .ToArray();
+            var newSystems = loopSystem.subSystemList.Append(new PlayerLoopSystem {
+                updateDelegate = _behaviourTreeUpdate,
+                type = updateType,
+            });
 
-            _playerLoop.subSystemList[index] = system;
+            loopSystem.subSystemList = newSystems.ToArray();
+            _playerLoop.subSystemList[index] = loopSystem;
             PlayerLoop.SetPlayerLoop(_playerLoop);
         }
     }
@@ -131,8 +138,9 @@ public class BehaviourActor : MonoBehaviour
         }
     }
 
-    private void BehaviourNodeUpdate()
+    
+    private void BehaviourTreeUpdate()
     {
-        runtimeTree.Update();
+        runtimeTree.UpdateTree(this);
     }
 }

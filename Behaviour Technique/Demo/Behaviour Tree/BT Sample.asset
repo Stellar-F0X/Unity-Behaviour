@@ -16,6 +16,7 @@ MonoBehaviour:
   started: 0
   position: {x: 0.000088787085, y: -27.63411}
   guid: 0e62726845342bb469c27a1c878384e5
+  tag: 
   child: {fileID: 5552834910196414700}
 --- !u!114 &-5550728123952093530
 MonoBehaviour:
@@ -31,8 +32,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 0, y: 167}
+  position: {x: 0.0000038146973, y: 168}
   guid: 2a72c7d8b4fdb0c4fb7369fa9c25f818
+  tag: 
   children:
   - {fileID: 654489413285306118}
   - {fileID: 7213608342993194165}
@@ -56,10 +58,6 @@ MonoBehaviour:
   - {fileID: 5552834910196414700}
   - {fileID: 7213608342993194165}
   - {fileID: 654489413285306118}
-  aaaevent:
-    bindGameObject: {fileID: 0}
-    aObject: {fileID: 0}
-    message: 
 --- !u!114 &654489413285306118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74,12 +72,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: -90.000084, y: 297.00006}
+  position: {x: -113, y: 297}
   guid: d0520b6948615dc4cb0312a8807c2578
+  tag: 
   btEvent:
-    bindGameObject: {fileID: 0}
-    aObject: {fileID: 0}
-    message: 
+    onEnterEvent:
+      rid: -2
+    onUpdateEvent:
+      rid: -2
+    onExitEvent:
+      rid: -2
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!114 &5552834910196414700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -96,6 +103,7 @@ MonoBehaviour:
   started: 0
   position: {x: 0.00000047683716, y: 53.85}
   guid: 932c4c1a8ef10b842a0188723929c088
+  tag: 
   child: {fileID: -5550728123952093530}
 --- !u!114 &7213608342993194165
 MonoBehaviour:
@@ -111,6 +119,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 102.3, y: 297.00006}
+  position: {x: 98.67753, y: 297}
   guid: 9ebe22f5773caa7459dbd24653216b3e
-  duration: 1
+  tag: 
+  duration: 0

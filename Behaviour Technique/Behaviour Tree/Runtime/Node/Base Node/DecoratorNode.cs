@@ -5,17 +5,17 @@ using System;
 
 
 [Serializable]
-public abstract class DecoratorNode : StateNode
+public abstract class DecoratorNode : Node
 {
     [HideInInspector]
-    public StateNode child;
+    public Node child;
 
-    public override eNodeType nodeType
+    public override eNodeType baseType
     {
         get { return eNodeType.Decorator; }
     }
 
-    public override StateNode Clone()
+    public override Node Clone()
     {
         DecoratorNode node = base.Clone() as DecoratorNode;
         node.child = this.child.Clone();

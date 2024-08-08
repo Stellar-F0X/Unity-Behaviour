@@ -5,25 +5,22 @@ using UnityEngine.Events;
 
 public class EventNode : ActionNode
 {
-    public override string desciption
-    {
-        get { return "Event Node"; }
-    }
-
     public BehaviourTreeEvent btEvent;
 
-    protected override void OnEnter()
+    protected override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
-        
+        Debug.Log("정상 작동");
     }
 
-    protected override eState OnUpdate()
+    protected override eState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
+        Debug.Log("정상 작동");
+        
         return eState.Success;
     }
 
-    protected override void OnExit()
+    protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
-
+        Debug.Log("정상 작동");
     }
 }

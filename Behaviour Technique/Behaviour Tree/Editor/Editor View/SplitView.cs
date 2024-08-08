@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using UnityEngine.UIElements;
 using UnityEngine;
 
-public class SplitView : TwoPaneSplitView
+namespace BehaviourTechnique.UIElements
 {
-    public new class UxmlFactory : UxmlFactory<SplitView, UxmlTraits> { }
-
-    public SplitView()
+    public class SplitView : TwoPaneSplitView
     {
-        
+        public new class UxmlFactory : UxmlFactory<SplitView, UxmlTraits>
+        {
+        }
+
+        public SplitView()
+        {
+
+        }
     }
 }

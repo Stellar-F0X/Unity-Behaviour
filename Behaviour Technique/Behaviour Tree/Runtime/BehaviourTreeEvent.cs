@@ -7,10 +7,15 @@ using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 
-[System.Serializable]
-public class BehaviourTreeEvent
+[Serializable]
+public class BehaviourTreeEvent 
 {
-    public GameObject bindGameObject;
-    public UnityEngine.Object aObject;
-    public string message;
+    [SerializeReference]
+    public UnityEvent onEnterEvent = new UnityEvent();
+    
+    [SerializeReference]
+    public UnityEvent onUpdateEvent = new UnityEvent();
+    
+    [SerializeReference]
+    public UnityEvent onExitEvent = new UnityEvent();
 }

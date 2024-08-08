@@ -5,9 +5,9 @@ using System;
 
 
 [Serializable]
-public abstract class ActionNode : StateNode
+public abstract class ActionNode : Node
 {
-    public override eNodeType nodeType
+    public override eNodeType baseType
     {
         get { return eNodeType.Action; }
     }

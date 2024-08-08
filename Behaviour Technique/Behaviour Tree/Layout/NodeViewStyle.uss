@@ -126,12 +126,3 @@
     border-left-width: 2px;
     overflow: visible;
 }
-
-.running #node-state {
-    display: flex;
-    background-color: rgb(68, 192, 255);
-}
-
-.done #node-state {
-    background-color: rgba(0, 0, 0, 0);
-}

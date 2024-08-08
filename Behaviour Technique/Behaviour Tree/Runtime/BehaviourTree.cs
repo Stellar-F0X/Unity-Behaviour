@@ -1,30 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Events;
 using Object = UnityEngine.Object;
 
-[CreateAssetMenu()]
+[CreateAssetMenu]
 public class BehaviourTree : ScriptableObject
 {
     [HideInInspector]
-    public StateNode rootNode;
+    public Node rootNode;
 
     [HideInInspector]
-    public StateNode.eState treeState = StateNode.eState.Running;
+    public Node.eState treeState = Node.eState.Running;
 
     [HideInInspector]
-    public List<StateNode> nodeList = new List<StateNode>();
+    public List<Node> nodeList = new List<Node>();
 
 
-    public StateNode.eState Update()
+    public Node.eState UpdateTree(BehaviourActor behaviourActor)
     {
-        if (rootNode.state == StateNode.eState.Running)
+        if (rootNode.state == Node.eState.Running)
         {
-            treeState = rootNode.Update();
+            treeState = rootNode.UpdateNode(behaviourActor, new PreviusBehaviourInfo(string.Empty, null, Node.eNodeType.Root));
         }
 
         return treeState;
@@ -32,9 +30,9 @@ public class BehaviourTree : ScriptableObject
 
 
 #if UNITY_EDITOR
-    public StateNode CreateNode(Type nodeType)
+    public Node CreateNode(Type nodeType)
     {
-        StateNode node = ScriptableObject.CreateInstance(nodeType) as StateNode;
+        Node node = ScriptableObject.CreateInstance(nodeType) as Node;
         node.name = nodeType.Name.Replace("Node", string.Empty);
         node.guid = GUID.Generate().ToString();
         nodeList.Add(node);
@@ -52,7 +50,7 @@ public class BehaviourTree : ScriptableObject
     }
 
 
-    public void DeleteNode(StateNode node)
+    public void DeleteNode(Node node)
     {
         Undo.RecordObject(this, "Behaviour Tree (DeleteNode)");
         nodeList.Remove(node);
@@ -63,15 +61,15 @@ public class BehaviourTree : ScriptableObject
     }
 
 
-    public void AddChild(StateNode parent, StateNode child)
+    public void AddChild(Node parent, Node child)
     {
         Undo.RecordObject(parent, "Behaviour Tree (AddChild)");
 
-        switch (parent.nodeType)
+        switch (parent.baseType)
         {
-            case StateNode.eNodeType.Root: (parent as RootNode).child = child; break;
-            case StateNode.eNodeType.Decorator: (parent as DecoratorNode).child = child; break;
-            case StateNode.eNodeType.Composite: (parent as CompositeNode).children.Add(child); break;
+            case Node.eNodeType.Root: (parent as RootNode).child = child; break;
+            case Node.eNodeType.Decorator: (parent as DecoratorNode).child = child; break;
+            case Node.eNodeType.Composite: (parent as CompositeNode).children.Add(child); break;
 
             default: throw new BehaviourTreeException("It is a childless type of node.");
         }
@@ -80,15 +78,15 @@ public class BehaviourTree : ScriptableObject
     }
 
 
-    public void RemoveChild(StateNode parent, StateNode child)
+    public void RemoveChild(Node parent, Node child)
     {
         Undo.RecordObject(parent, "Behaviour Tree (RemoveChild)");
 
-        switch (parent.nodeType)
+        switch (parent.baseType)
         {
-            case StateNode.eNodeType.Root: (parent as RootNode).child = null; break;
-            case StateNode.eNodeType.Decorator: (parent as DecoratorNode).child = null; break;
-            case StateNode.eNodeType.Composite: (parent as CompositeNode).children.Remove(child); break;
+            case Node.eNodeType.Root: (parent as RootNode).child = null; break;
+            case Node.eNodeType.Decorator: (parent as DecoratorNode).child = null; break;
+            case Node.eNodeType.Composite: (parent as CompositeNode).children.Remove(child); break;
 
             default: throw new BehaviourTreeException("It is a childless type of node");
         }
@@ -97,20 +95,20 @@ public class BehaviourTree : ScriptableObject
     }
 
 
-    public List<StateNode> GetChildren(StateNode parent)
+    public List<Node> GetChildren(Node parent)
     {
-        switch (parent.nodeType)
+        switch (parent.baseType)
         {
-            case StateNode.eNodeType.Root: return new List<StateNode>() { (parent as RootNode).child };
-            case StateNode.eNodeType.Decorator: return new List<StateNode>() { (parent as DecoratorNode).child };
-            case StateNode.eNodeType.Composite: return (parent as CompositeNode).children;
+            case Node.eNodeType.Root: return new List<Node>() { (parent as RootNode).child };
+            case Node.eNodeType.Decorator: return new List<Node>() { (parent as DecoratorNode).child };
+            case Node.eNodeType.Composite: return (parent as CompositeNode).children;
 
-            default: return new List<StateNode>(0);
+            default: return new List<Node>(0);
         }
     }
 
 
-    public void Traverse(StateNode node, Action<StateNode> visiter)
+    public void Traverse(Node node, Action<Node> visiter)
     {
         if (node == null)
         {
@@ -127,7 +125,7 @@ public class BehaviourTree : ScriptableObject
     {
         BehaviourTree tree = Object.Instantiate(this);
         tree.rootNode = tree.rootNode.Clone();
-        tree.nodeList = new List<StateNode>();
+        tree.nodeList = new List<Node>();
 
         this.Traverse(tree.rootNode, n => tree.nodeList.Add(n));
         return tree;
