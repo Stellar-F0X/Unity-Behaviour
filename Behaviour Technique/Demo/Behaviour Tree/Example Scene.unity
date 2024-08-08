@@ -235,9 +235,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5039567519410962693}
+  - component: {fileID: 6964012718825915816}
   - component: {fileID: 6964012718825915815}
   m_Layer: 0
-  m_Name: BTaa
+  m_Name: Behaviour Tree Obejct
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -252,45 +253,53 @@ MonoBehaviour:
   m_GameObject: {fileID: 6964012718825915814}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9e38989272424340803ab67dd08baab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6964012718825915816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6964012718825915814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea6898e15b6b09a408580d2dbf4e8ae7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   runtimeTree: {fileID: 11400000, guid: 2aec8aa9902b7f54c986e2eca3120648, type: 2}
   updateMode: 0
   startMode: 0
-  behaviourEvents:
-  - key: d0520b6948615dc4cb0312a8807c2578-1303409949
-    value:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: 
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: 
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+  _behaviourEvents:
   - key: 052259abe4740f64980e47ff717d17e1-1303409949
     value:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 6964012718825915815}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: "\uB098\uB294 \uC7A5\uBBFC\uC11D\uC774\uB2E4."
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 6964012718825915815}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: "8\uC6D4 9\uC77C \uC774\uBCA4\uD2B8 Drawer \uC218\uC815"
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

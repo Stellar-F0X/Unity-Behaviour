@@ -36,7 +36,6 @@ MonoBehaviour:
   guid: 2a72c7d8b4fdb0c4fb7369fa9c25f818
   tag: 
   children:
-  - {fileID: 654489413285306118}
   - {fileID: 7213608342993194165}
   - {fileID: -4989456852974778497}
 --- !u!114 &-4989456852974778497
@@ -53,15 +52,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 184, y: 299}
+  position: {x: 106, y: 300}
   guid: 052259abe4740f64980e47ff717d17e1
   tag: 
-  message: "\uBC18\uC601 \uC131\uACF5"
   behaviourTreeEvent:
-    key: 
+    key: 052259abe4740f64980e47ff717d17e1-1303409949
     value:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: "\uB098\uB294 \uC7A5\uBBFC\uC11D\uC774\uB2E4."
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: "8\uC6D4 9\uC77C \uC774\uBCA4\uD2B8 Drawer \uC218\uC815"
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -81,31 +103,9 @@ MonoBehaviour:
   - {fileID: -5550728123952093530}
   - {fileID: 5552834910196414700}
   - {fileID: 7213608342993194165}
-  - {fileID: 654489413285306118}
   - {fileID: -4989456852974778497}
---- !u!114 &654489413285306118
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dea2af9be81a79545b1cdec681eb5730, type: 3}
-  m_Name: Event
-  m_EditorClassIdentifier: 
-  state: 0
-  started: 0
-  position: {x: -180, y: 299}
-  guid: d0520b6948615dc4cb0312a8807c2578
-  tag: 
-  message: "\uBC18\uC601 \uC131\uACF5"
-  behaviourTreeEvent:
-    key: 
-    value:
-      m_PersistentCalls:
-        m_Calls: []
+  <specificGuid>k__BackingField: e7eb8ba74e0878d4aaf39ca12f36d34a
+  <cloneGroupID>k__BackingField: 6e57c7a936a36dd478b271b330c6499f
 --- !u!114 &5552834910196414700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,7 +120,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 0, y: 54}
+  position: {x: 0, y: 53}
   guid: 932c4c1a8ef10b842a0188723929c088
   tag: 
   child: {fileID: -5550728123952093530}
@@ -138,7 +138,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 0, y: 299}
+  position: {x: -104, y: 300}
   guid: 9ebe22f5773caa7459dbd24653216b3e
   tag: 
-  duration: 0
+  duration: 0.3

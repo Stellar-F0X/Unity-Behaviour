@@ -30,14 +30,48 @@ public class BehaviourActor : MonoBehaviour
     public eUpdateMode updateMode;
     public eStartMode startMode;
     
-    [HideInInspector]
-    public List<BehaviourTreeEvent> behaviourEvents = new List<BehaviourTreeEvent>();
+    [SerializeField, HideInInspector]
+    private List<BehaviourTreeEvent> _behaviourEvents = new List<BehaviourTreeEvent>();
 
     private bool _canRegisterWhenEnable;
     
     private PlayerLoopSystem _playerLoop;
     private PlayerLoopSystem.UpdateFunction _behaviourTreeUpdate;
 
+
+    public void AddBehaviourEvent(BehaviourTreeEvent newEvent)
+    {
+        if (string.IsNullOrEmpty(newEvent.key) || _behaviourEvents.Contains(newEvent))
+        {
+            return;
+        }
+        
+        _behaviourEvents.Add(newEvent);
+    }
+
+
+    public BehaviourTreeEvent GetLastEvent()
+    {
+        return _behaviourEvents?.Last();
+    }
+    
+    
+    public void RemoveBehaviourEvent(string eventID)
+    {
+        BehaviourTreeEvent behaviourEvent = this.GetBehaviourEvent(eventID);
+
+        if (behaviourEvent != null)
+        {
+            _behaviourEvents.Remove(behaviourEvent);
+        }
+    }
+
+
+    public BehaviourTreeEvent GetBehaviourEvent(string eventID)
+    {
+        return _behaviourEvents.First(e => string.Compare(e.key, eventID) == 0);
+    }
+    
 
     #region Activator Functions
     

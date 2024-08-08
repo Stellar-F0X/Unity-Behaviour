@@ -29,6 +29,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             this.style.top = node.position.y;
 
             _nodeBorder = this.Q<VisualElement>("node-border");
+            _nodeBorder.RegisterCallback<ClickEvent>(OnDisable);
 
             this.SetupEachNodes();
             this.CreateInputPorts();
@@ -152,6 +153,12 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                     return l.position.x < r.position.x ? -1 : 1;
                 });
             }
+        }
+
+        public virtual void OnDisable(ClickEvent evt)
+        {
+            //자신과 관련된 Actor에 등록된 이벤트들 전부 삭제함.
+            Debug.Log(this.name);
         }
     }
 }

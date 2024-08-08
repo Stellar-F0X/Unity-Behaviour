@@ -1,13 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using Unity.VisualScripting.YamlDotNet.Core.Events;
+﻿using System.Linq;
 using UnityEditor;
-using UnityEditor.Events;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UIElements;
 
 namespace BehaviourTechnique.BehaviourTreeEditor
 {
@@ -19,12 +13,16 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private SerializedProperty _serializedEventList;
         private SerializedProperty _serializedTargetEvent;
 
+        private const string EVENT_KEY = "key";
+        private const string EVENT_VALUE = "value";
+        private const string EVENT_LIST_FIELD = "_behaviourEvents";
+
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             if (this.CachingSerializedRuntimeTreeElement(GetTargetEventKey(property)))
             {
-                float height = EditorGUI.GetPropertyHeight(_serializedTargetEvent.FindPropertyRelative("value"));
+                float height = EditorGUI.GetPropertyHeight(_serializedTargetEvent.FindPropertyRelative(EVENT_VALUE));
                 return height + EditorGUIUtility.singleLineHeight;
             }
             else
@@ -32,8 +30,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                 return EditorGUIUtility.singleLineHeight;
             }
         }
-
-
+        
+        
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             if (this.CachingSerializedRuntimeTreeElement(GetTargetEventKey(property)))
@@ -42,10 +40,12 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                 {
                     EditorGUI.BeginChangeCheck();
                     position.y += EditorGUIUtility.singleLineHeight;
-                    this.CreatePropertyField(ref position, _serializedTargetEvent, property.displayName);
+                    this.CreatePropertyField(ref position, _serializedTargetEvent, property);
+                    property.boxedValue = _behaviourActor.GetBehaviourEvent(GetTargetEventKey(property));
 
                     if (EditorGUI.EndChangeCheck())
                     {
+                        property.serializedObject.ApplyModifiedProperties();
                         _serializedEventList.serializedObject.ApplyModifiedProperties();
                     }
                 }
@@ -65,19 +65,20 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         /// <returns> 성공적으로 찾았는지 여부를 반환한다. </returns>
         private bool CachingSerializedRuntimeTreeElement(string findEventKey)
         {
-            _behaviourActor = Resources.FindObjectsOfTypeAll<BehaviourActor>().FirstOrDefault(actor => {
-                return ReferenceEquals(actor.runtimeTree, BehaviourTreeEditorWindow.editorWindow?.tree) && 
+            _behaviourActor ??= Object.FindObjectsByType<BehaviourActor>(FindObjectsSortMode.None).FirstOrDefault(actor => {
+                return actor.runtimeTree.cloneGroupID == BehaviourTreeEditorWindow.editorWindow?.tree.cloneGroupID &&
                        !ReferenceEquals(actor.runtimeTree, null);
             });
-            
+
             if (!ReferenceEquals(_behaviourActor, null))
             {
                 if (ReferenceEquals(_serializedTargetEvent, null))
                 {
                     _serializedRuntimeTree = new SerializedObject(_behaviourActor);
-                    _serializedEventList = _serializedRuntimeTree.FindProperty("behaviourEvents");
-                    _serializedTargetEvent = FindTargetEventWithKey(findEventKey);
+                    _serializedEventList = _serializedRuntimeTree.FindProperty(EVENT_LIST_FIELD);
+                    _serializedTargetEvent = this.FindTargetEventWithKey(findEventKey);
                 }
+
                 return !ReferenceEquals(_serializedTargetEvent, null);
             }
 
@@ -95,7 +96,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             for (int i = 0; i < _serializedEventList.arraySize; ++i)
             {
                 SerializedProperty arrayProperty = _serializedEventList.GetArrayElementAtIndex(i);
-                SerializedProperty keyProperty = arrayProperty.FindPropertyRelative("key");
+                SerializedProperty keyProperty = arrayProperty.FindPropertyRelative(EVENT_KEY);
 
                 //찾을 경우
                 if (string.Compare(keyProperty.stringValue, findEventKey) == 0)
@@ -105,12 +106,12 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             }
 
             //없을 경우, 새로 만들어냄.
-            _behaviourActor.behaviourEvents.Add(new BehaviourTreeEvent(findEventKey, new UnityEvent()));
-            
+            _behaviourActor.AddBehaviourEvent(new BehaviourTreeEvent(findEventKey, new UnityEvent()));
+
             //SerializedObject는 오브젝트를 복사해서 만들어지기 때문에 이렇게 새롭게
             //SerializedObject를 만들지 않으면 _serializedEventList.arraySize 가 0으로 뜸.
             _serializedRuntimeTree = new SerializedObject(_behaviourActor);
-            _serializedEventList = _serializedRuntimeTree.FindProperty("behaviourEvents");
+            _serializedEventList = _serializedRuntimeTree.FindProperty(EVENT_LIST_FIELD);
             return _serializedEventList.GetArrayElementAtIndex(_serializedEventList.arraySize - 1);
         }
 
@@ -121,11 +122,11 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         /// <param name="position"> 생성할 위치 </param>
         /// <param name="eventPoperty"> Event ID로 찾아낸 Event 직렬화 객체 </param>
         /// <param name="originalPropertyName"> 직렬화된 노드 객체의 유니티 이벤트 필드 변수명 </param>
-        private void CreatePropertyField(ref Rect position, SerializedProperty eventPoperty, string originalPropertyName)
+        private void CreatePropertyField(ref Rect position, SerializedProperty eventPoperty, SerializedProperty OriginalProperty)
         {
-            SerializedProperty property = eventPoperty.FindPropertyRelative("value");
-            EditorGUI.PropertyField(position, property, new GUIContent(originalPropertyName));
-            
+            SerializedProperty property = eventPoperty.FindPropertyRelative(EVENT_VALUE);
+            EditorGUI.PropertyField(position, property, new GUIContent(OriginalProperty.displayName));
+
             float spacingHeigth = EditorGUI.GetPropertyHeight(property);
             position.y += spacingHeigth + EditorGUIUtility.standardVerticalSpacing;
             position.height = spacingHeigth;

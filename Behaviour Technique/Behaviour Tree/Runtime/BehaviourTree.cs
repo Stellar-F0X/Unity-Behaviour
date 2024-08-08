@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BehaviourTechnique;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,7 +18,30 @@ public class BehaviourTree : ScriptableObject
     [HideInInspector]
     public List<Node> nodeList = new List<Node>();
 
+    
+    [field: SerializeField, ReadOnly, Tooltip("개별 트리를 구분하기 위한 고유 ID")]
+    public string specificGuid
+    {
+        get;
+        private set;
+    }
+    
+    [field: SerializeField, ReadOnly, Tooltip("복제 트리를 구분하기 위한 GUID")]
+    public string cloneGroupID
+    {
+        get;
+        private set;
+    }
 
+    
+
+    public void OnEnable()
+    {
+        cloneGroupID = GUID.Generate().ToString();
+        specificGuid = GUID.Generate().ToString();
+    }
+
+    
     public Node.eState UpdateTree(BehaviourActor behaviourActor)
     {
         if (rootNode.state == Node.eState.Running)
@@ -124,6 +148,9 @@ public class BehaviourTree : ScriptableObject
     public virtual BehaviourTree Clone()
     {
         BehaviourTree tree = Object.Instantiate(this);
+        tree.specificGuid = GUID.Generate().ToString();
+        tree.cloneGroupID = this.cloneGroupID;
+        
         tree.rootNode = tree.rootNode.Clone();
         tree.nodeList = new List<Node>();
 

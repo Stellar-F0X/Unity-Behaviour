@@ -5,23 +5,21 @@ using UnityEngine.Events;
 
 public class EventNode : ActionNode
 {
-    public string message = "정상 작동";
     public BehaviourTreeEvent behaviourTreeEvent;
 
     protected override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
-        Debug.Log(message);
+        behaviourTreeEvent?.Invoke();
     }
 
     protected override eState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
-        Debug.Log(message);
-        
+        behaviourTreeEvent?.Invoke();
         return eState.Success;
     }
 
     protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
-        Debug.Log(message);
+        behaviourTreeEvent?.Invoke();
     }
 }

@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-public static class EditorUtility
+public static class AssetUtility
 {
     public static string GetAssetFolderPath(string searchFilter, string folderPath = "")
     {
