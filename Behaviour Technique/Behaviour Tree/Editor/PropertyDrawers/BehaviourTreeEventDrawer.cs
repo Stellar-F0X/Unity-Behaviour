@@ -106,8 +106,11 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
             //없을 경우, 새로 만들어냄.
             _behaviourActor.behaviourEvents.Add(new BehaviourTreeEvent(findEventKey, new UnityEvent()));
+            
+            //SerializedObject는 오브젝트를 복사해서 만들어지기 때문에 이렇게 새롭게
+            //SerializedObject를 만들지 않으면 _serializedEventList.arraySize 가 0으로 뜸.
+            _serializedRuntimeTree = new SerializedObject(_behaviourActor);
             _serializedEventList = _serializedRuntimeTree.FindProperty("behaviourEvents");
-            //SerializedProperty listProperty = _serializedEventList.GetArrayElementAtIndex(_serializedEventList.arraySize - 1);
             return _serializedEventList.GetArrayElementAtIndex(_serializedEventList.arraySize - 1);
         }
 
