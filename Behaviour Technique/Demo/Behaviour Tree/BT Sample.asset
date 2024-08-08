@@ -32,12 +32,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 0.0000038146973, y: 168}
+  position: {x: 0, y: 168}
   guid: 2a72c7d8b4fdb0c4fb7369fa9c25f818
   tag: 
   children:
   - {fileID: 654489413285306118}
   - {fileID: 7213608342993194165}
+  - {fileID: -4989456852974778497}
+--- !u!114 &-4989456852974778497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dea2af9be81a79545b1cdec681eb5730, type: 3}
+  m_Name: Event
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  position: {x: 184, y: 299}
+  guid: 052259abe4740f64980e47ff717d17e1
+  tag: 
+  message: "\uBC18\uC601 \uC131\uACF5"
+  behaviourTreeEvent:
+    key: 
+    value:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58,6 +82,7 @@ MonoBehaviour:
   - {fileID: 5552834910196414700}
   - {fileID: 7213608342993194165}
   - {fileID: 654489413285306118}
+  - {fileID: -4989456852974778497}
 --- !u!114 &654489413285306118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72,21 +97,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: -113, y: 297}
+  position: {x: -180, y: 299}
   guid: d0520b6948615dc4cb0312a8807c2578
   tag: 
-  btEvent:
-    onEnterEvent:
-      rid: -2
-    onUpdateEvent:
-      rid: -2
-    onExitEvent:
-      rid: -2
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+  message: "\uBC18\uC601 \uC131\uACF5"
+  behaviourTreeEvent:
+    key: 
+    value:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!114 &5552834910196414700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,7 +120,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 0.00000047683716, y: 53.85}
+  position: {x: 0, y: 54}
   guid: 932c4c1a8ef10b842a0188723929c088
   tag: 
   child: {fileID: -5550728123952093530}
@@ -119,7 +138,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 98.67753, y: 297}
+  position: {x: 0, y: 299}
   guid: 9ebe22f5773caa7459dbd24653216b3e
   tag: 
   duration: 0

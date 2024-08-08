@@ -235,7 +235,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5039567519410962693}
-  - component: {fileID: 8702156375524246299}
+  - component: {fileID: 6964012718825915815}
   m_Layer: 0
   m_Name: BTaa
   m_TagString: Untagged
@@ -243,7 +243,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &8702156375524246299
+--- !u!114 &6964012718825915815
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -259,30 +259,38 @@ MonoBehaviour:
   updateMode: 0
   startMode: 0
   behaviourEvents:
-    onEnterEvent:
-      rid: 5403787579613249696
-    onUpdateEvent:
-      rid: 5403787579613249697
-    onExitEvent:
-      rid: 5403787579613249698
-  references:
-    version: 2
-    RefIds:
-    - rid: 5403787579613249696
-      type: {class: UnityEvent, ns: UnityEngine.Events, asm: UnityEngine.CoreModule}
-      data:
-        m_PersistentCalls:
-          m_Calls: []
-    - rid: 5403787579613249697
-      type: {class: UnityEvent, ns: UnityEngine.Events, asm: UnityEngine.CoreModule}
-      data:
-        m_PersistentCalls:
-          m_Calls: []
-    - rid: 5403787579613249698
-      type: {class: UnityEvent, ns: UnityEngine.Events, asm: UnityEngine.CoreModule}
-      data:
-        m_PersistentCalls:
-          m_Calls: []
+  - key: d0520b6948615dc4cb0312a8807c2578-1303409949
+    value:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - key: 052259abe4740f64980e47ff717d17e1-1303409949
+    value:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -31,8 +31,8 @@ public class BehaviourActor : MonoBehaviour
     public eStartMode startMode;
     
     [HideInInspector]
-    public BehaviourTreeEvent behaviourEvents = new BehaviourTreeEvent();
-    
+    public List<BehaviourTreeEvent> behaviourEvents = new List<BehaviourTreeEvent>();
+
     private bool _canRegisterWhenEnable;
     
     private PlayerLoopSystem _playerLoop;

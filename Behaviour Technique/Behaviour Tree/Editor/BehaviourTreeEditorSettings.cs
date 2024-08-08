@@ -8,6 +8,6 @@ namespace BehaviourTechnique.BehaviourTreeEditor
     [CreateAssetMenu]
     public class BehaviourTreeEditorSettings : ScriptableObject
     {
-        
+        public bool debugMode;
     }
 }
