@@ -8,4 +8,9 @@ public class Logger : MonoBehaviour
     {
         print(message);
     }
+
+    public void PrintLog()
+    {
+        print("Log");
+    }
 }

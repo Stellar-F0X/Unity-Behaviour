@@ -85,7 +85,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private NodeView FindNodeView(Node node)
         {
-            if (node.guid == null)
+            if (node == null || node.guid == null)
             {
                 return null;
             }

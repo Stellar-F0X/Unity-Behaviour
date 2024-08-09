@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
@@ -50,12 +52,6 @@ public class BehaviourActor : MonoBehaviour
     }
 
 
-    public BehaviourTreeEvent GetLastEvent()
-    {
-        return _behaviourEvents?.Last();
-    }
-    
-    
     public void RemoveBehaviourEvent(string eventID)
     {
         BehaviourTreeEvent behaviourEvent = this.GetBehaviourEvent(eventID);
@@ -69,7 +65,17 @@ public class BehaviourActor : MonoBehaviour
 
     public BehaviourTreeEvent GetBehaviourEvent(string eventID)
     {
-        return _behaviourEvents.First(e => string.Compare(e.key, eventID) == 0);
+        foreach (var eventElement in _behaviourEvents)
+        {
+            if (string.Compare(eventElement.key, eventID) != 0)
+            {
+                continue;
+            }
+
+            return eventElement;
+        }
+
+        return null;
     }
     
 

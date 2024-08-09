@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
@@ -8,6 +9,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
     [CustomPropertyDrawer(typeof(BehaviourTreeEvent))]
     public class BehaviourTreeEventDrawer : PropertyDrawer
     {
+        private StringBuilder _eventHashKeyBuilder = new StringBuilder();
+
         private BehaviourActor _behaviourActor;
         private SerializedObject _serializedRuntimeTree;
         private SerializedProperty _serializedEventList;
@@ -30,8 +33,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                 return EditorGUIUtility.singleLineHeight;
             }
         }
-        
-        
+
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             if (this.CachingSerializedRuntimeTreeElement(GetTargetEventKey(property)))
@@ -40,7 +43,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                 {
                     EditorGUI.BeginChangeCheck();
                     position.y += EditorGUIUtility.singleLineHeight;
-                    this.CreatePropertyField(ref position, _serializedTargetEvent, property);
+                    this.CreatePropertyField(ref position, _serializedTargetEvent, property.displayName);
                     property.boxedValue = _behaviourActor.GetBehaviourEvent(GetTargetEventKey(property));
 
                     if (EditorGUI.EndChangeCheck())
@@ -66,19 +69,15 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private bool CachingSerializedRuntimeTreeElement(string findEventKey)
         {
             _behaviourActor ??= Object.FindObjectsByType<BehaviourActor>(FindObjectsSortMode.None).FirstOrDefault(actor => {
-                return actor.runtimeTree.cloneGroupID == BehaviourTreeEditorWindow.editorWindow?.tree.cloneGroupID &&
+                return actor.runtimeTree?.cloneGroupID == BehaviourTreeEditorWindow.editorWindow?.tree?.cloneGroupID &&
                        !ReferenceEquals(actor.runtimeTree, null);
             });
 
             if (!ReferenceEquals(_behaviourActor, null))
             {
-                if (ReferenceEquals(_serializedTargetEvent, null))
-                {
-                    _serializedRuntimeTree = new SerializedObject(_behaviourActor);
-                    _serializedEventList = _serializedRuntimeTree.FindProperty(EVENT_LIST_FIELD);
-                    _serializedTargetEvent = this.FindTargetEventWithKey(findEventKey);
-                }
-
+                _serializedRuntimeTree = new SerializedObject(_behaviourActor);
+                _serializedEventList = _serializedRuntimeTree.FindProperty(EVENT_LIST_FIELD);
+                _serializedTargetEvent = this.FindTargetEventWithKey(findEventKey);
                 return !ReferenceEquals(_serializedTargetEvent, null);
             }
 
@@ -122,10 +121,10 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         /// <param name="position"> 생성할 위치 </param>
         /// <param name="eventPoperty"> Event ID로 찾아낸 Event 직렬화 객체 </param>
         /// <param name="originalPropertyName"> 직렬화된 노드 객체의 유니티 이벤트 필드 변수명 </param>
-        private void CreatePropertyField(ref Rect position, SerializedProperty eventPoperty, SerializedProperty OriginalProperty)
+        private void CreatePropertyField(ref Rect position, SerializedProperty eventPoperty, string originalPropertyName)
         {
             SerializedProperty property = eventPoperty.FindPropertyRelative(EVENT_VALUE);
-            EditorGUI.PropertyField(position, property, new GUIContent(OriginalProperty.displayName));
+            EditorGUI.PropertyField(position, property, new GUIContent(originalPropertyName));
 
             float spacingHeigth = EditorGUI.GetPropertyHeight(property);
             position.y += spacingHeigth + EditorGUIUtility.standardVerticalSpacing;
@@ -140,7 +139,12 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         /// <returns> 생성된 EventID </returns>
         private string GetTargetEventKey(SerializedProperty property)
         {
-            return (property.serializedObject.targetObject as Node).guid + property.displayName.GetHashCode();
+            _eventHashKeyBuilder.Clear();
+
+            _eventHashKeyBuilder.Append((property.serializedObject.targetObject as Node).guid);
+            _eventHashKeyBuilder.Append(property.displayName.GetHashCode());
+
+            return _eventHashKeyBuilder.ToString();
         }
     }
 }

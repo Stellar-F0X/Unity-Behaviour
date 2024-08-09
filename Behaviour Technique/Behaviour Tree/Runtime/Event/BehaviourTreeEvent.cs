@@ -6,14 +6,15 @@ using Object = UnityEngine.Object;
 [Serializable]
 public class BehaviourTreeEvent
 {
+    public string key;
+    public UnityEvent value;
+    
     public BehaviourTreeEvent(string key, UnityEvent value)
     {
         this.value = value;
         this.key = key;
     }
     
-    public string key;
-    public UnityEvent value;
 
 
     public void Invoke()

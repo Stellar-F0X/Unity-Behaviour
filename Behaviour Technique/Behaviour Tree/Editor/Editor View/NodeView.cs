@@ -29,7 +29,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             this.style.top = node.position.y;
 
             _nodeBorder = this.Q<VisualElement>("node-border");
-            _nodeBorder.RegisterCallback<ClickEvent>(OnDisable);
+            //_nodeBorder.RegisterCallback<ClickEvent>(this.OnDisable);
 
             this.SetupEachNodes();
             this.CreateInputPorts();

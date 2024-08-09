@@ -2,24 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 public class EventNode : ActionNode
 {
-    public BehaviourTreeEvent behaviourTreeEvent;
+    public BehaviourTreeEvent onEnterEvent;
+    public BehaviourTreeEvent onUpdateEvent;
+    public BehaviourTreeEvent onExitEvent;
 
     protected override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
-        behaviourTreeEvent?.Invoke();
+        onEnterEvent?.Invoke();
     }
 
     protected override eState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
-        behaviourTreeEvent?.Invoke();
+        onUpdateEvent?.Invoke();
         return eState.Success;
     }
 
     protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
-        behaviourTreeEvent?.Invoke();
+        onExitEvent?.Invoke();
     }
 }
