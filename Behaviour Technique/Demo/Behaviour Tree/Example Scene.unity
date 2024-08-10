@@ -235,8 +235,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5039567519410962693}
-  - component: {fileID: 6964012718825915815}
   - component: {fileID: 6964012718825915816}
+  - component: {fileID: 6964012718825915815}
   m_Layer: 0
   m_Name: Behaviour Tree Obejct
   m_TagString: Untagged
@@ -268,31 +268,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea6898e15b6b09a408580d2dbf4e8ae7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runtimeTree: {fileID: 11400000, guid: 2aec8aa9902b7f54c986e2eca3120648, type: 2}
+  runtimeTree: {fileID: 11400000, guid: a64ad600f38906441be6ac6c26eb31eb, type: 2}
   updateMode: 0
   startMode: 0
   _behaviourEvents:
-  - key: 052259abe4740f64980e47ff717d17e1-1638141083
+  - key: 782dd2bc4e17abd4880ffa51d5272d52-1638141083
     value:
       m_PersistentCalls:
         m_Calls: []
-  - key: 052259abe4740f64980e47ff717d17e1-1679589096
+  - key: 782dd2bc4e17abd4880ffa51d5272d52-1679589096
     value:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 6964012718825915815}
-          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
-          m_MethodName: PrintLog
-          m_Mode: 5
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 2
-            m_BoolArgument: 0
-          m_CallState: 2
-  - key: 052259abe4740f64980e47ff717d17e1-1803575251
+        m_Calls: []
+  - key: 782dd2bc4e17abd4880ffa51d5272d52-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 88e6b6fa941cc4644aac5c40e23173ef-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 88e6b6fa941cc4644aac5c40e23173ef-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 88e6b6fa941cc4644aac5c40e23173ef-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: eccfd33a02f963f40813e3feed5eb5e4-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: eccfd33a02f963f40813e3feed5eb5e4-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: eccfd33a02f963f40813e3feed5eb5e4-1803575251
     value:
       m_PersistentCalls:
         m_Calls: []

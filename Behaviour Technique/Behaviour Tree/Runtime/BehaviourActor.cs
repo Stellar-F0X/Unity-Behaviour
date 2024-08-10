@@ -1,13 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
-using UnityEngine.Serialization;
 using Update = UnityEngine.PlayerLoop.Update;
 using FixedUpdate = UnityEngine.PlayerLoop.FixedUpdate;
 
@@ -32,14 +28,30 @@ public class BehaviourActor : MonoBehaviour
     public eUpdateMode updateMode;
     public eStartMode startMode;
     
+    private bool _canRegisterWhenEnable;
+    
     [SerializeField, HideInInspector]
     private List<BehaviourTreeEvent> _behaviourEvents = new List<BehaviourTreeEvent>();
-
-    private bool _canRegisterWhenEnable;
     
     private PlayerLoopSystem _playerLoop;
     private PlayerLoopSystem.UpdateFunction _behaviourTreeUpdate;
 
+
+    public Node FindBehaviourNodeByTag(string tag)
+    {
+        foreach (var node in runtimeTree.nodeList)
+        {
+            if (string.Compare(node.tag, tag) == 0)
+            {
+                return node;
+            }
+        }
+
+        return null;
+    }
+    
+    
+    #region RegistryBehaviourEvent
 
     public void AddBehaviourEvent(BehaviourTreeEvent newEvent)
     {
@@ -67,16 +79,16 @@ public class BehaviourActor : MonoBehaviour
     {
         foreach (var eventElement in _behaviourEvents)
         {
-            if (string.Compare(eventElement.key, eventID) != 0)
+            if (string.Compare(eventElement.key, eventID) == 0)
             {
-                continue;
+                return eventElement;
             }
-
-            return eventElement;
         }
 
         return null;
     }
+    
+    #endregion
     
 
     #region Activator Functions
@@ -119,6 +131,8 @@ public class BehaviourActor : MonoBehaviour
 
     #endregion
 
+
+    #region RegistryUpdateCallback
 
     private void RemoveUpdateCallback()
     {
@@ -178,6 +192,8 @@ public class BehaviourActor : MonoBehaviour
         }
     }
 
+    #endregion
+    
     
     private void BehaviourTreeUpdate()
     {

@@ -10,10 +10,5 @@ namespace BehaviourTechnique.UIElements
         public new class UxmlFactory : UxmlFactory<SplitView, UxmlTraits>
         {
         }
-
-        public SplitView()
-        {
-
-        }
     }
 }

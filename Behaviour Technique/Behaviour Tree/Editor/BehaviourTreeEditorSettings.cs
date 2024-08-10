@@ -9,5 +9,12 @@ namespace BehaviourTechnique.BehaviourTreeEditor
     public class BehaviourTreeEditorSettings : ScriptableObject
     {
         public bool debugMode;
+        
+        [Header("Node Canvas Settings")]
+        [Tooltip("Horizontal grid size nodes will snap to")]
+        public int gridSnapSizeX = 15;
+
+        [Tooltip("Vertical grid size nodes will snap to")]
+        public int gridSnapSizeY = 225;
     }
 }
