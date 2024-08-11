@@ -10,7 +10,6 @@ namespace BehaviourTechnique.BehaviourTreeEditor
     {
         public bool debugMode;
         
-        [Header("Node Canvas Settings")]
         [Tooltip("Horizontal grid size nodes will snap to")]
         public int gridSnapSizeX = 15;
 

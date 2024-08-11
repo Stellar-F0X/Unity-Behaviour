@@ -61,7 +61,7 @@ public class BehaviourTree : ScriptableObject
         node.guid = GUID.Generate().ToString();
         nodeList.Add(node);
 
-        if (!Application.isPlaying)
+        if (!Application.isPlaying && !Undo.isProcessing)
         {
             Undo.RecordObject(this, "Behaviour Tree (CreateNode)");
             Undo.RegisterCreatedObjectUndo(node, "Behaviour Tree (CreateNode)");
@@ -78,8 +78,7 @@ public class BehaviourTree : ScriptableObject
     {
         Undo.RecordObject(this, "Behaviour Tree (DeleteNode)");
         nodeList.Remove(node);
-
-        //AssetDatabase.RemoveObjectFromAsset(node);
+        
         Undo.DestroyObjectImmediate(node);
         AssetDatabase.SaveAssets();
     }

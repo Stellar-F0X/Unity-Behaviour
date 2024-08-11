@@ -123,7 +123,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         {
             if (Application.isPlaying)
             {
-                if (node.state == Node.eState.Running && node.started)
+                if (node.started)
                 {
                     _nodeBorder.style.borderBottomColor = _runningColor;
                     _nodeBorder.style.borderLeftColor = _runningColor;
@@ -149,9 +149,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
             if (node is CompositeNode compositeNode)
             {
-                compositeNode.children.Sort((l, r) => {
-                    return l.position.x < r.position.x ? -1 : 1;
-                });
+                compositeNode.children.Sort((l, r) => l.position.x < r.position.x ? -1 : 1);
             }
         }
 

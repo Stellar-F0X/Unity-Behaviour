@@ -18,7 +18,7 @@
                 </ui:VisualElement>
             </uie:Toolbar>
             <ui:Label tabindex="-1" text=" Tree View" parse-escape-sequences="true" display-tooltip-when-elided="true" name="right-view-label" class="window-label" />
-            <BehaviourTechnique.BehaviourTreeEditor.BehaviourTreeView style="flex-grow: 1;" />
+            <BehaviourTechnique.BehaviourTreeEditor.BehaviourTreeView focusable="true" style="flex-grow: 1;" />
         </ui:VisualElement>
     </BehaviourTechnique.UIElements.SplitView>
 </ui:UXML>

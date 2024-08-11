@@ -19,7 +19,8 @@ public abstract class Node : ScriptableObject
         Root,
         Action,
         Composite,
-        Decorator
+        Decorator,
+        Setsub
     };
 
     [HideInInspector]
@@ -29,7 +30,7 @@ public abstract class Node : ScriptableObject
     public bool started = false;
 
     [HideInInspector]
-    public Vector2 position;
+    public Vector2 position; //나중에 nodeView로 옮김
     
     [ReadOnly]
     public string guid;
@@ -49,7 +50,7 @@ public abstract class Node : ScriptableObject
     protected abstract void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info);
     
 
-    public eState UpdateNode(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+    public virtual eState UpdateNode(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
         if (!started)
         {

@@ -10,17 +10,11 @@ using BehaviourTechnique.UIElements;
 
 namespace BehaviourTechnique.BehaviourTreeEditor
 {
-    [UxmlElement]
-    public partial class BehaviourTreeView : GraphView
+    public class BehaviourTreeView : GraphView
     {
         public new class UxmlFactory : UxmlFactory<BehaviourTreeView, UxmlTraits>
         {
         }
-
-        public Action<NodeView> onNodeSelected;
-
-        private BehaviourTree _cachedTree;
-
 
         public BehaviourTreeView()
         {
@@ -30,67 +24,135 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
-            
+
             styleSheets.Add(BehaviourTreeEditorWindow.behaviourTreeStyle);
 
-            //OnUndoRedo
+            _nodeEdgeHandler = new NodeEdgeHandler();
+
             Undo.undoRedoPerformed = () => {
-                PopulateView(_cachedTree);
+                this.OnGraphEditorView(_tree);
                 AssetDatabase.SaveAssets();
             };
         }
-        
 
-        public void PopulateView(BehaviourTree tree)
+
+        public Action<NodeView> onNodeSelected;
+
+        private BehaviourTree _tree;
+        private NodeEdgeHandler _nodeEdgeHandler;
+        private NodeCreationWindow _nodeCreationWindow;
+
+
+        public List<NodeView> GetNodeViewsToUpdate
+        {
+            get { return nodes.Where(n => n is NodeView).Cast<NodeView>().ToList(); }
+        }
+
+
+        private void Intialize(BehaviourTree tree)
+        {
+            graphViewChanged -= OnGraphViewChanged;
+            DeleteElements(graphElements.ToList());
+            graphViewChanged += OnGraphViewChanged;
+
+            if (_tree.rootNode == null)
+            {
+                tree.rootNode = tree.CreateNode(typeof(RootNode)) as RootNode;
+                UnityEditor.EditorUtility.SetDirty(tree);
+                AssetDatabase.SaveAssets();
+            }
+        }
+
+
+        private void IntegrityCheckNodeList(BehaviourTree tree)
+        {
+            for (int i = 0; i < tree.nodeList.Count; ++i)
+            {
+                //Undo로 생성이 취소된 노드를 여기서 처리.
+                if (tree.nodeList[i] == null)
+                {
+                    tree.nodeList.RemoveAt(i);
+                }
+            }
+
+            //트리 구조라서 미리 모두 생성해둬야 자식과 부모를 연결 할 수 있음.
+            tree.nodeList.ForEach(n => this.CreateNodeView(n));
+            tree.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.GetChildren(n)));
+        }
+
+
+        public void OnGraphEditorView(BehaviourTree tree)
         {
             if (tree == null)
             {
                 return;
             }
 
-            this._cachedTree = tree;
-
-            graphViewChanged -= OnGraphViewChanged;
-            DeleteElements(graphElements);
-            graphViewChanged += OnGraphViewChanged;
-
-            if (_cachedTree.rootNode == null)
-            {
-                tree.rootNode = tree.CreateNode(typeof(RootNode)) as RootNode;
-                UnityEditor.EditorUtility.SetDirty(tree);
-                AssetDatabase.SaveAssets();
-            }
-
-            //다시 불러올때 만들어뒀던 Node를 생성.
-            tree.nodeList.ForEach(n => this.CreateNodeView(n));
-
-            //만들어뒀던 Node끼리 Edge를 연결.
-            foreach (var node in tree.nodeList)
-            {
-                foreach (var child in tree.GetChildren(node))
-                {
-                    NodeView parentView = this.FindNodeView(node);
-                    NodeView childView = this.FindNodeView(child);
-
-                    if (parentView == null || childView == null)
-                    {
-                        continue;
-                    }
-
-                    base.AddElement(parentView.output.ConnectTo(childView.input));
-                }
-            }
+            this._tree = tree;
+            this.Intialize(tree);
+            this.IntegrityCheckNodeList(tree);
         }
 
 
-        private NodeView FindNodeView(Node node)
+        public NodeView FindNodeView(Node node)
         {
             if (node == null || node.guid == null)
             {
                 return null;
             }
-            
+
             return this.GetNodeByGuid(node.guid) as NodeView;
+        }
+
+
+        public override List<Port> GetCompatiblePorts(Port input, NodeAdapter nodeAdapter)
+        {
+            if (input == null)
+            {
+                throw new ArgumentNullException(nameof(input));
+            }
+
+            //direction은 input과 output이므로, 다른 노드라도 같은 포트에 못 꽂게 방지
+            return ports.Where(output => input.direction != output.direction && input.node != output.node).ToList();
+        }
+
+
+        public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        {
+            if (!BehaviourTreeEditorWindow.editorWindow.editable)
+            {
+                return;
+            }
+
+            if (_nodeCreationWindow == null)
+            {
+                _nodeCreationWindow = ScriptableObject.CreateInstance<NodeCreationWindow>();
+                _nodeCreationWindow.Initialize(this);
+            }
+
+            Vector2 screenPoint = GUIUtility.GUIToScreenPoint(evt.mousePosition);
+            SearchWindowContext context = new SearchWindowContext(screenPoint, 200, 240);
+
+            SearchWindow.Open(context, _nodeCreationWindow);
+        }
+
+
+        public void SelectNode(NodeView nodeView)
+        {
+            base.ClearSelection();
+
+            if (nodeView != null)
+            {
+                base.AddToSelection(nodeView);
+            }
+        }
+
+
+        public NodeView CreateNodeAndView(Type type, Vector2 mousePosition)
+        {
+            Node node = _tree.CreateNode(type);
+            node.position = mousePosition;
+            return this.CreateNodeView(node);
         }
 
 
@@ -98,99 +160,40 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         {
             if (graphViewChange.elementsToRemove != null)
             {
-                foreach (var node in graphViewChange.elementsToRemove)
+                foreach (var element in graphViewChange.elementsToRemove)
                 {
-                    if (node is NodeView nodeView)
+                    if (element is NodeView view)
                     {
-                        _cachedTree.DeleteNode(nodeView.node);
+                        this._tree.DeleteNode(view.node);
                     }
 
-                    if (node is Edge edge)
+                    if (element is Edge edge)
                     {
-                        NodeView parentView = edge.output.node as NodeView;
-                        NodeView childView = edge.input.node as NodeView;
-                        _cachedTree.RemoveChild(parentView?.node, childView?.node);
+                        this._nodeEdgeHandler.DeleteEdges(_tree, edge);
                     }
                 }
             }
 
             if (graphViewChange.edgesToCreate != null)
             {
-                foreach (var edge in graphViewChange.edgesToCreate)
-                {
-                    NodeView parentView = edge.output.node as NodeView;
-                    NodeView childView = edge.input.node as NodeView;
-                    _cachedTree.AddChild(parentView?.node, childView?.node);
-                }
+                this._nodeEdgeHandler.ConnectEdges(_tree, graphViewChange.edgesToCreate);
             }
 
             if (graphViewChange.movedElements != null)
             {
-                this.nodes.ForEach(n => (n as NodeView)?.SortChildren());
+                base.nodes.ForEach(n => (n as NodeView)?.SortChildren());
             }
 
             return graphViewChange;
         }
 
 
-        public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
-        {
-            if (startPort == null)
-            {
-                throw new ArgumentNullException(nameof(startPort));
-            }
-
-            return base.ports.ToList().Where(endPort =>
-                //direction은 input과 output이므로, 다른 노드라도 같은 포트에 못 꽂게 방지
-                endPort.direction != startPort.direction &&
-                endPort.node != startPort.node
-            ).ToList();
-        }
-
-
-        public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
-        {
-            if (! BehaviourTreeEditorWindow.editorWindow.editable)
-            {
-                return;
-            }
-
-            InsertActions(evt, TypeCache.GetTypesDerivedFrom<ActionNode>(), "Action");
-            InsertActions(evt, TypeCache.GetTypesDerivedFrom<CompositeNode>(), "Composite");
-            InsertActions(evt, TypeCache.GetTypesDerivedFrom<DecoratorNode>(), "Decorator");
-        }
-
-
-        private void InsertActions(ContextualMenuPopulateEvent evt, TypeCache.TypeCollection types, string prefix)
-        {
-            foreach (var type in types)
-            {
-                string sentence = $"[{prefix}] {type.Name.Replace("Node", string.Empty)}";
-
-                evt.menu.AppendAction(sentence, a => CreateNode(type, evt.mousePosition));
-            }
-        }
-
-
-        private void CreateNode(Type type, Vector2 mousePosition)
-        {
-            Node node = _cachedTree.CreateNode(type);
-            node.position = mousePosition;
-            this.CreateNodeView(node);
-        }
-
-
-        private void CreateNodeView(Node node)
+        private NodeView CreateNodeView(Node node)
         {
             NodeView nodeView = new NodeView(node, BehaviourTreeEditorWindow.nodeViewXml);
             nodeView.OnNodeSelected = this.onNodeSelected;
-            AddElement(nodeView);
-        }
-
-
-        public void UpdateNodeState()
-        {
-            nodes.ForEach(n => (n as NodeView)?.UpdateState());
+            base.AddElement(nodeView); //nodes라는 GraphElement 컨테이너에 추가.
+            return nodeView;
         }
     }
 }

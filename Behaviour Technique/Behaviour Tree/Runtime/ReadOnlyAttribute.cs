@@ -2,8 +2,7 @@
 using UnityEngine;
 
 namespace BehaviourTechnique
-{
-    [AttributeUsage(AttributeTargets.Field)]
+{ [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class ReadOnlyAttribute : PropertyAttribute
     {
         public readonly bool isRuntimeOnly;

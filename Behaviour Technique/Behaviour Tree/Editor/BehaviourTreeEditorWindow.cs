@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.Callbacks;
 using BehaviourTechnique.UIElements;
+using Object = UnityEngine.Object;
 
 namespace BehaviourTechnique.BehaviourTreeEditor
 {
@@ -12,13 +13,42 @@ namespace BehaviourTechnique.BehaviourTreeEditor
     {
         public static BehaviourTreeEditorWindow editorWindow;
 
+        #region Static Style Properties
+        
+        public static VisualTreeAsset behaviourTreeEditorXml
+        {
+            get { return EditorUtility.FindAsset<VisualTreeAsset>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/BehaviourTreeEditor.uxml"); }
+        }
+
+        public static StyleSheet behaviourTreeStyle
+        {
+            get { return EditorUtility.FindAsset<StyleSheet>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/BehaviourTreeEditorStyle.uss"); }
+        }
+
+        public static VisualTreeAsset nodeViewXml
+        {
+            get { return EditorUtility.FindAsset<VisualTreeAsset>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/NodeView.uxml"); }
+        }
+
+        public static StyleSheet nodeViewStyle
+        {
+            get { return EditorUtility.FindAsset<StyleSheet>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/NodeViewStyle.uss"); }
+        }
+
+        #endregion
 
         private bool _isEditorAvailable;
-
+        
         private BehaviourTree _tree;
+        private BehaviourNodeViewUpdater _nodeViewUpdater;
+        
+        //UI Elements
         private BehaviourTreeView _treeView;
         private InspectorView _inspectorView;
 
+
+        #region Properties
+        
         public bool editable
         {
             get { return _isEditorAvailable && !Application.isPlaying; }
@@ -29,33 +59,19 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             get { return _tree; }
         }
 
-        public static VisualTreeAsset behaviourTreeEditorXml
+        public BehaviourTreeView view
         {
-            get { return AssetUtility.FindAsset<VisualTreeAsset>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/BehaviourTreeEditor.uxml"); }
+            get { return _treeView; }
         }
 
-        public static StyleSheet behaviourTreeStyle
-        {
-            get { return AssetUtility.FindAsset<StyleSheet>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/BehaviourTreeEditorStyle.uss"); }
-        }
-
-        public static VisualTreeAsset nodeViewXml
-        {
-            get { return AssetUtility.FindAsset<VisualTreeAsset>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/NodeView.uxml"); }
-        }
-
-        public static StyleSheet nodeViewStyle
-        {
-            get { return AssetUtility.FindAsset<StyleSheet>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/NodeViewStyle.uss"); }
-        }
-
+        #endregion
+        
 
         [MenuItem("Tools/BehaviourTreeEditor")]
         private static void OpenWindow()
         {
             BehaviourTreeEditorWindow wnd = GetWindow<BehaviourTreeEditorWindow>();
             wnd.titleContent = new GUIContent("BehaviourTreeEditor");
-            editorWindow = wnd;
         }
 
 
@@ -74,13 +90,15 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private void CreateGUI()
         {
+            editorWindow ??= this;
+            
             behaviourTreeEditorXml.CloneTree(rootVisualElement);
             rootVisualElement.styleSheets.Add(behaviourTreeStyle);
 
             _treeView = rootVisualElement.Q<BehaviourTreeView>();
             _inspectorView = rootVisualElement.Q<InspectorView>();
 
-            _treeView.onNodeSelected += OnNodeSelectionChanged;
+            _treeView.onNodeSelected += _inspectorView.UpdateSelection;
 
             this.OnSelectionChange();
         }
@@ -95,7 +113,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private void OnDisable()
         {
-            EditorApplication.playModeStateChanged += OnPlayNodeStateChanged;
+            EditorApplication.playModeStateChanged -= OnPlayNodeStateChanged;
         }
 
 
@@ -105,14 +123,15 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             {
                 case PlayModeStateChange.EnteredEditMode:
                     this.OnSelectionChange();
+                    this._nodeViewUpdater.Dispose();
                     break;
 
                 case PlayModeStateChange.EnteredPlayMode:
                     this.OnSelectionChange();
+                    this._nodeViewUpdater = new BehaviourNodeViewUpdater(_treeView.GetNodeViewsToUpdate);
                     break;
 
                 case PlayModeStateChange.ExitingEditMode: break;
-
                 case PlayModeStateChange.ExitingPlayMode: break;
             }
         }
@@ -120,41 +139,36 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private void OnSelectionChange()
         {
-            editorWindow ??= this;
-            BehaviourTree tree = Selection.activeObject as BehaviourTree;
+            BehaviourTree tree = this.GetBehaviourTreeForSelectedObject();
+            _isEditorAvailable = tree != null && !Application.isPlaying;
 
-            if (tree == null && _treeView != null)
+            if (tree != null)
             {
-                var runner = Selection.activeGameObject?.GetComponent<BehaviourActor>();
+                _tree = tree;
 
-                if (runner != null)
+                if (Application.isPlaying)
                 {
-                    tree = runner?.runtimeTree;
+                    _treeView.OnGraphEditorView(tree);
                 }
-            }
-
-            if (tree != null && _treeView != null)
-            {
-                if (AssetDatabase.CanOpenAssetInEditor(tree.GetInstanceID()))
+                else if (AssetDatabase.CanOpenAssetInEditor(tree.GetInstanceID()))
                 {
-                    _tree = tree;
-                    _treeView.PopulateView(tree);
-                    _isEditorAvailable = true;
-                    return;
+                    _treeView.OnGraphEditorView(tree);
                 }
-                else if (Application.isPlaying)
-                {
-                    _treeView?.PopulateView(tree);
-                }
-
-                _isEditorAvailable = false;
             }
         }
 
 
-        private void OnNodeSelectionChanged(NodeView node)
+        private BehaviourTree GetBehaviourTreeForSelectedObject()
         {
-            _inspectorView.UpdateSelection(node);
+            BehaviourTree tree = Selection.activeObject as BehaviourTree;
+
+            if (Selection.activeGameObject != null)
+            {
+                GameObject targetObject = Selection.activeGameObject;
+                var runner = targetObject.GetComponent<BehaviourActor>();
+                tree ??= runner?.runtimeTree;
+            }
+            return tree;
         }
 
 
@@ -164,8 +178,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             {
                 return;
             }
-
-            _treeView.UpdateNodeState();
+            
+            _nodeViewUpdater.UpdateViewsState();
         }
     }
 }
