@@ -56,8 +56,8 @@ MonoBehaviour:
   - {fileID: -3070210934051277641}
   - {fileID: 6283669520344988517}
   - {fileID: 779380092199425321}
-  <specificGuid>k__BackingField: 85ce7e173d3fa014995e23f076608723
-  <cloneGroupID>k__BackingField: f5b64f6d80e736645a804f7556cea6df
+  <specificGuid>k__BackingField: 2a944d229170d684da0bdbfa981d72e7
+  <cloneGroupID>k__BackingField: e55c69191efbbad46b506ecac3b8fd17
 --- !u!114 &779380092199425321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72,7 +72,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 89, y: 369}
+  position: {x: 95, y: 371}
   guid: c3753d2a1258c22419bbf3d846ce59f6
   tag: 
   onEnterEvent:
@@ -104,7 +104,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: -75, y: 369}
+  position: {x: -69, y: 371}
   guid: 7b66183ed77d95042a882d4fedc9a21e
   tag: 
   duration: 1
@@ -126,5 +126,5 @@ MonoBehaviour:
   guid: 72d2e74101cc3da4897b53b0e40b51b5
   tag: 
   children:
-  - {fileID: 779380092199425321}
   - {fileID: 6283669520344988517}
+  - {fileID: 779380092199425321}

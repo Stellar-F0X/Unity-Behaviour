@@ -51,6 +51,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private void Intialize(BehaviourTree tree)
         {
+            DeleteEventDetector.removeCallback?.Invoke();
+            
             graphViewChanged -= OnGraphViewChanged;
             DeleteElements(graphElements.ToList());
             graphViewChanged += OnGraphViewChanged;

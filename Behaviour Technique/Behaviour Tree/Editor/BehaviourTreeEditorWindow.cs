@@ -91,7 +91,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private void CreateGUI()
         {
             editorWindow ??= this;
-            
+
             behaviourTreeEditorXml.CloneTree(rootVisualElement);
             rootVisualElement.styleSheets.Add(behaviourTreeStyle);
 
@@ -146,11 +146,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             {
                 _tree = tree;
 
-                if (Application.isPlaying)
-                {
-                    _treeView.OnGraphEditorView(tree);
-                }
-                else if (AssetDatabase.CanOpenAssetInEditor(tree.GetInstanceID()))
+                if (Application.isPlaying || AssetDatabase.CanOpenAssetInEditor(tree.GetInstanceID()))
                 {
                     _treeView.OnGraphEditorView(tree);
                 }
