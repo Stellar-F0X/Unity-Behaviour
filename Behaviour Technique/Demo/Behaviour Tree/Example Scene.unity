@@ -268,10 +268,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea6898e15b6b09a408580d2dbf4e8ae7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runtimeTree: {fileID: 11400000, guid: 5b76cf7d94dc9b6469778c8997ea9097, type: 2}
+  runtimeTree: {fileID: 11400000, guid: c4542f12e6b178f42b63624d427f92c5, type: 2}
   updateMode: 0
   startMode: 0
-  _behaviourEvents: []
+  _behaviourEvents:
+  - key: c3753d2a1258c22419bbf3d846ce59f6-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: c3753d2a1258c22419bbf3d846ce59f6-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: c3753d2a1258c22419bbf3d846ce59f6-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 79d84223f95ffbe48b969b69a53ca3de-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 79d84223f95ffbe48b969b69a53ca3de-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 79d84223f95ffbe48b969b69a53ca3de-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

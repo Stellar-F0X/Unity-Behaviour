@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace BehaviourTechnique.BehaviourTreeEditor
 {
-    public class NodeView : UnityEditor.Experimental.GraphView.Node
+    public class NodeView : UnityEditor.Experimental.GraphView.Node, INodeViewDeletable
     {
         public NodeView(Node node, VisualTreeAsset nodeUxml) : base(AssetDatabase.GetAssetPath(nodeUxml))
         {
@@ -19,7 +19,6 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             this.style.top = node.position.y;
 
             _nodeBorder = this.Q<VisualElement>("node-border");
-            _deleteEventDetector = new DeleteEventDetector(this);
 
             this.SetupEachNodes();
             this.CreateInputPorts();
@@ -28,17 +27,23 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         
         
         public Action<NodeView> OnNodeSelected;
+        public Action<NodeView> OnNodeUnselected;
 
         public Node node;
         public Port input;
         public Port output;
 
         private VisualElement _nodeBorder;
-        private DeleteEventDetector _deleteEventDetector;
 
         private readonly Color _runningColor = new Color32(54, 154, 204, 255);
         private readonly Color _doneColor = new Color32(24, 93, 125, 255);
 
+        
+        
+        public override void OnSelected() => OnNodeSelected?.Invoke(this);
+
+        public override void OnUnselected() => OnNodeUnselected?.Invoke(this);
+        
 
         private void CreateInputPorts()
         {
@@ -68,6 +73,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             }
         }
 
+        
         private void CreateOutputPorts()
         {
             switch (node.baseType)
@@ -96,12 +102,14 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             }
         }
 
+        
         public void SetupEachNodes()
         {
             string nodeType = node.baseType.ToString();
             nodeType = nodeType.ToLower();
             base.AddToClassList(nodeType);
         }
+        
 
         public override void SetPosition(Rect newPos)
         {
@@ -114,13 +122,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
             UnityEditor.EditorUtility.SetDirty(node);
         }
-
-        public override void OnSelected()
-        {
-            base.OnSelected();
-            OnNodeSelected?.Invoke(this);
-            _deleteEventDetector.RegisterDetectedElement(OnDeletedElementEvent);
-        }
+        
 
         public void UpdateState()
         {
@@ -143,6 +145,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             }
         }
 
+        
         public void SortChildren()
         {
             if (this.node.baseType != Node.eNodeType.Composite)
@@ -156,7 +159,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             }
         }
         
-        private void OnDeletedElementEvent(DeleteEventDetector evt)
+        
+        public void OnDeletedElementEvent(DeleteEventDetector evt)
         {
             Debug.Log("노드 삭제됨");
         }

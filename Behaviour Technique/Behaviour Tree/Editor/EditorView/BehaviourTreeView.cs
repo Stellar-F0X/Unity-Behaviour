@@ -28,6 +28,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             styleSheets.Add(BehaviourTreeEditorWindow.behaviourTreeStyle);
 
             _nodeEdgeHandler = new NodeEdgeHandler();
+            _deleteEventDetector = new DeleteEventDetector();
 
             Undo.undoRedoPerformed = () => {
                 this.OnGraphEditorView(_tree);
@@ -36,23 +37,26 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         }
 
 
+        public Action onGraphViewChange;
         public Action<NodeView> onNodeSelected;
 
         private BehaviourTree _tree;
         private NodeEdgeHandler _nodeEdgeHandler;
         private NodeCreationWindow _nodeCreationWindow;
+        private DeleteEventDetector _deleteEventDetector;
 
 
         public List<NodeView> GetNodeViewsToUpdate
         {
             get { return nodes.Where(n => n is NodeView).Cast<NodeView>().ToList(); }
         }
-
+        
+        
 
         private void Intialize(BehaviourTree tree)
         {
-            DeleteEventDetector.removeCallback?.Invoke();
-            
+            onGraphViewChange?.Invoke();
+
             graphViewChanged -= OnGraphViewChanged;
             DeleteElements(graphElements.ToList());
             graphViewChanged += OnGraphViewChanged;
@@ -193,7 +197,13 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private NodeView CreateNodeView(Node node)
         {
             NodeView nodeView = new NodeView(node, BehaviourTreeEditorWindow.nodeViewXml);
-            nodeView.OnNodeSelected = this.onNodeSelected;
+            
+            nodeView.OnNodeSelected += this.onNodeSelected;
+            nodeView.OnNodeSelected += this._deleteEventDetector.RegisterCallback;
+            nodeView.OnNodeUnselected += this._deleteEventDetector.UnregisterCallback;
+            
+            onGraphViewChange = () => _deleteEventDetector.UnregisterCallback(nodeView);
+            
             base.AddElement(nodeView); //nodes라는 GraphElement 컨테이너에 추가.
             return nodeView;
         }

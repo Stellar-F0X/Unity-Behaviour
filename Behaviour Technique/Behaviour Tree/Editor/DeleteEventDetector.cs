@@ -6,33 +6,21 @@ using UnityEngine.UIElements;
 
 namespace BehaviourTechnique.BehaviourTreeEditor
 {
-    public class DeleteEventDetector
+    public sealed class DeleteEventDetector
     {
-        public DeleteEventDetector(NodeView nodeView)
-        {
-            _currentElement = nodeView;
-            
-            removeCallback -= UnregistryCallback;
-            removeCallback += UnregistryCallback;
-        }
-
-        
-        public static Action removeCallback;
-
-        private VisualElement _currentElement;
         private Action<DeleteEventDetector> _cachedDeleteEvent;
 
-        public void RegisterDetectedElement(Action<DeleteEventDetector> evt)
+        public void RegisterCallback(INodeViewDeletable deletable)
         {
-            _currentElement.RegisterCallback<DetachFromPanelEvent>(OnElementDetached);
+            (deletable as NodeView)?.RegisterCallback<DetachFromPanelEvent>(OnElementDetached);
 
-            _cachedDeleteEvent -= evt;
-            _cachedDeleteEvent += evt;
+            _cachedDeleteEvent -= deletable.OnDeletedElementEvent;
+            _cachedDeleteEvent += deletable.OnDeletedElementEvent;
         }
-
-        public void UnregistryCallback()
+        
+        public void UnregisterCallback(INodeViewDeletable deletable)
         {
-            _currentElement.UnregisterCallback<DetachFromPanelEvent>(OnElementDetached);
+            (deletable as NodeView)?.UnregisterCallback<DetachFromPanelEvent>(OnElementDetached);
             _cachedDeleteEvent = null;
         }
         
