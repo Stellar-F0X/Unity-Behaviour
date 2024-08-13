@@ -12,16 +12,22 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         public void RegisterCallback(INodeViewDeletable deletable)
         {
-            (deletable as NodeView)?.RegisterCallback<DetachFromPanelEvent>(OnElementDetached);
+            if (deletable is NodeView nodeView)
+            {
+                nodeView.RegisterCallback<DetachFromPanelEvent>(OnElementDetached);
 
-            _cachedDeleteEvent -= deletable.OnDeletedElementEvent;
-            _cachedDeleteEvent += deletable.OnDeletedElementEvent;
+                _cachedDeleteEvent -= deletable.OnDeletedElementEvent;
+                _cachedDeleteEvent += deletable.OnDeletedElementEvent;
+            }
         }
         
         public void UnregisterCallback(INodeViewDeletable deletable)
         {
-            (deletable as NodeView)?.UnregisterCallback<DetachFromPanelEvent>(OnElementDetached);
-            _cachedDeleteEvent = null;
+            if (deletable is NodeView nodeView)
+            {
+                nodeView.UnregisterCallback<DetachFromPanelEvent>(OnElementDetached);
+                _cachedDeleteEvent = null;
+            }
         }
         
         private void OnElementDetached(DetachFromPanelEvent evt)

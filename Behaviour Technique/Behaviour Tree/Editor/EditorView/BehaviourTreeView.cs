@@ -46,12 +46,6 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private DeleteEventDetector _deleteEventDetector;
 
 
-        public List<NodeView> GetNodeViewsToUpdate
-        {
-            get { return nodes.Where(n => n is NodeView).Cast<NodeView>().ToList(); }
-        }
-        
-        
 
         private void Intialize(BehaviourTree tree)
         {
@@ -162,6 +156,18 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         }
 
 
+        public void UpdateNodeView()
+        {
+            foreach (var node in nodes)
+            {
+                if (node is NodeView nodeView)
+                {
+                    nodeView.UpdateState();
+                } 
+            }
+        }
+
+
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
         {
             if (graphViewChange.elementsToRemove != null)
@@ -202,7 +208,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             nodeView.OnNodeSelected += this._deleteEventDetector.RegisterCallback;
             nodeView.OnNodeUnselected += this._deleteEventDetector.UnregisterCallback;
             
-            onGraphViewChange = () => _deleteEventDetector.UnregisterCallback(nodeView);
+            this.onGraphViewChange = () => _deleteEventDetector.UnregisterCallback(nodeView);
             
             base.AddElement(nodeView); //nodes라는 GraphElement 컨테이너에 추가.
             return nodeView;

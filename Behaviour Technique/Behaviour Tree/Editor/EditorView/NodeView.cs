@@ -20,7 +20,9 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
             _nodeBorder = this.Q<VisualElement>("node-border");
 
-            this.SetupEachNodes();
+            string nodeType = node.baseType.ToString();
+            base.AddToClassList(nodeType.ToLower());
+            
             this.CreateInputPorts();
             this.CreateOutputPorts();
         }
@@ -101,14 +103,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                 base.outputContainer.Add(output);
             }
         }
-
         
-        public void SetupEachNodes()
-        {
-            string nodeType = node.baseType.ToString();
-            nodeType = nodeType.ToLower();
-            base.AddToClassList(nodeType);
-        }
         
 
         public override void SetPosition(Rect newPos)

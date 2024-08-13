@@ -40,8 +40,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private bool _isEditorAvailable;
         
         private BehaviourTree _tree;
-        private BehaviourNodeViewUpdater _nodeViewUpdater;
-        
+
         //UI Elements
         private BehaviourTreeView _treeView;
         private InspectorView _inspectorView;
@@ -123,12 +122,10 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             {
                 case PlayModeStateChange.EnteredEditMode:
                     this.OnSelectionChange();
-                    this._nodeViewUpdater.Dispose();
                     break;
 
                 case PlayModeStateChange.EnteredPlayMode:
                     this.OnSelectionChange();
-                    this._nodeViewUpdater = new BehaviourNodeViewUpdater(_treeView.GetNodeViewsToUpdate);
                     break;
 
                 case PlayModeStateChange.ExitingEditMode: break;
@@ -170,12 +167,12 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private void Update()
         {
-            if (!Application.isPlaying)
+            if (!Application.isPlaying || _treeView == null)
             {
                 return;
             }
-            
-            _nodeViewUpdater.UpdateViewsState();
+
+            _treeView.UpdateNodeView();
         }
     }
 }

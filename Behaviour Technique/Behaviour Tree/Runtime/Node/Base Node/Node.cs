@@ -20,7 +20,7 @@ public abstract class Node : ScriptableObject
         Action,
         Composite,
         Decorator,
-        Setsub
+        Subset
     };
 
     [HideInInspector]

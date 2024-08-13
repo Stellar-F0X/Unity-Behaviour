@@ -2,6 +2,6 @@
 {
     public override eNodeType baseType
     {
-        get { return eNodeType.Setsub; }
+        get { return eNodeType.Subset; }
     }
 }

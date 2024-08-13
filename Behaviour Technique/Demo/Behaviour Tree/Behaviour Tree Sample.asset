@@ -18,9 +18,9 @@ MonoBehaviour:
   guid: 1a3a78f8ae1125248b89a23e57eaaea7
   tag: 
   children:
+  - {fileID: -1036048434580541482}
   - {fileID: -6885392580094667985}
   - {fileID: -6511049219490913180}
-  - {fileID: 6900331366750789776}
 --- !u!114 &-6885392580094667985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35,7 +35,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: -179, y: 392}
+  position: {x: 0, y: 385}
   guid: 52ed0b755309f984c8875fb74e0c013c
   tag: 
   duration: 1
@@ -53,24 +53,60 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 0, y: 392}
+  position: {x: 180, y: 385}
   guid: 79d84223f95ffbe48b969b69a53ca3de
   tag: 
   onEnterEvent:
     key: 79d84223f95ffbe48b969b69a53ca3de-1638141083
     value:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: logger enter
+            m_BoolArgument: 0
+          m_CallState: 2
   onUpdateEvent:
     key: 79d84223f95ffbe48b969b69a53ca3de-1679589096
     value:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: logger update
+            m_BoolArgument: 0
+          m_CallState: 2
   onExitEvent:
     key: 79d84223f95ffbe48b969b69a53ca3de-1803575251
     value:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: logger exit
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!114 &-3767277991314621414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,10 +121,48 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 0, y: 0}
+  position: {x: 0, y: 36}
   guid: 5548899ea2d09b741bf3e0da6a9be229
   tag: 
   child: {fileID: 685414129390571248}
+--- !u!114 &-3053460691615350013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84266bc38451e2e49bb68af89b374249, type: 3}
+  m_Name: Wait
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  position: {x: -293, y: 567}
+  guid: 1ad48eb9bf5f5f94ba0747bcf6bcdbe1
+  tag: 
+  duration: 1
+--- !u!114 &-1036048434580541482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ed0c02321058e24cabc1881149d1e4c, type: 3}
+  m_Name: Sequencer
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  position: {x: -195, y: 385}
+  guid: b6c979ec7a206b44c84490052987bbe5
+  tag: 
+  children:
+  - {fileID: -3053460691615350013}
+  - {fileID: 8564686023613990179}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,9 +183,11 @@ MonoBehaviour:
   - {fileID: -9139635184969991742}
   - {fileID: 685414129390571248}
   - {fileID: -6511049219490913180}
-  - {fileID: 6900331366750789776}
-  <specificGuid>k__BackingField: b0f95e8460651cf4b98f47f1cd806736
-  <cloneGroupID>k__BackingField: 49d9985e24ead384aab85db34e82ce12
+  - {fileID: -1036048434580541482}
+  - {fileID: -3053460691615350013}
+  - {fileID: 8564686023613990179}
+  <specificGuid>k__BackingField: 125e315a754c64448bf4e8f985e74f83
+  <cloneGroupID>k__BackingField: ce2061818988bc94794ac6db446cd7b0
 --- !u!114 &685414129390571248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,11 +202,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 0, y: 96}
+  position: {x: 0, y: 117}
   guid: efa5fe1a644acbc4faba2392b0a63de4
   tag: 
   child: {fileID: -9139635184969991742}
---- !u!114 &6900331366750789776
+--- !u!114 &8564686023613990179
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -139,12 +215,62 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84266bc38451e2e49bb68af89b374249, type: 3}
-  m_Name: Wait
+  m_Script: {fileID: 11500000, guid: dea2af9be81a79545b1cdec681eb5730, type: 3}
+  m_Name: Event
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 174, y: 392}
-  guid: 2f8c07727bcad9740a1647f99c9bf147
+  position: {x: -120, y: 567}
+  guid: 0a91c6e0a3a756f458136439f5120d45
   tag: 
-  duration: 1
+  onEnterEvent:
+    key: 0a91c6e0a3a756f458136439f5120d45-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  onUpdateEvent:
+    key: 0a91c6e0a3a756f458136439f5120d45-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  onExitEvent:
+    key: 0a91c6e0a3a756f458136439f5120d45-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
