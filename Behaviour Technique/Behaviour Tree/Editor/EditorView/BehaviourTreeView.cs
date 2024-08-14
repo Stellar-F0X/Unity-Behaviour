@@ -25,7 +25,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
 
-            styleSheets.Add(BehaviourTreeEditorWindow.behaviourTreeStyle);
+            styleSheets.Add(BehaviourTreeEditorWindow.BehaviourTreeStyle);
 
             _nodeEdgeHandler = new NodeEdgeHandler();
             _deleteEventDetector = new DeleteEventDetector();
@@ -119,7 +119,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            if (!BehaviourTreeEditorWindow.editorWindow.editable)
+            if (!BehaviourTreeEditorWindow.Editor.Editable)
             {
                 return;
             }
@@ -202,7 +202,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private NodeView CreateNodeView(Node node)
         {
-            NodeView nodeView = new NodeView(node, BehaviourTreeEditorWindow.nodeViewXml);
+            NodeView nodeView = new NodeView(node, BehaviourTreeEditorWindow.NodeViewXml);
             
             nodeView.OnNodeSelected += this.onNodeSelected;
             nodeView.OnNodeSelected += this._deleteEventDetector.RegisterCallback;

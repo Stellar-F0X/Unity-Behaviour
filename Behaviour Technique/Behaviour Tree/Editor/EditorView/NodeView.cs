@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
@@ -21,62 +21,35 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             _nodeBorder = this.Q<VisualElement>("node-border");
 
             string nodeType = node.baseType.ToString();
-            base.AddToClassList(nodeType.ToLower());
-            
-            this.CreateInputPorts();
-            this.CreateOutputPorts();
+            _nodeType = node.GetType();
+
+            this.AddToClassList(nodeType.ToLower());
+            this.CreatePorts();
         }
-        
-        
-        public Action<NodeView> OnNodeSelected;
-        public Action<NodeView> OnNodeUnselected;
+
+
+        public event Action<NodeView> OnNodeSelected;
+        public event Action<NodeView> OnNodeUnselected;
+        public event Action<NodeView> OnNodeDeleted;
 
         public Node node;
         public Port input;
         public Port output;
 
+        private Type _nodeType;
         private VisualElement _nodeBorder;
 
         private readonly Color _runningColor = new Color32(54, 154, 204, 255);
         private readonly Color _doneColor = new Color32(24, 93, 125, 255);
 
-        
-        
+
+
         public override void OnSelected() => OnNodeSelected?.Invoke(this);
 
         public override void OnUnselected() => OnNodeUnselected?.Invoke(this);
-        
 
-        private void CreateInputPorts()
-        {
-            switch (node.baseType)
-            {
-                case Node.eNodeType.Root:
-                    break;
 
-                case Node.eNodeType.Action:
-                    input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
-                    break;
-
-                case Node.eNodeType.Composite:
-                    input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
-                    break;
-
-                case Node.eNodeType.Decorator:
-                    input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
-                    break;
-            }
-
-            if (input != null)
-            {
-                input.portName = string.Empty;
-                input.style.flexDirection = FlexDirection.Column;
-                base.inputContainer.Add(input);
-            }
-        }
-
-        
-        private void CreateOutputPorts()
+        private void CreatePorts()
         {
             switch (node.baseType)
             {
@@ -85,26 +58,36 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                     break;
 
                 case Node.eNodeType.Action:
+                    input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     break;
 
                 case Node.eNodeType.Composite:
+                    input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Multi, typeof(bool));
                     break;
 
                 case Node.eNodeType.Decorator:
+                    input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
                     break;
             }
 
-            if (output != null)
+            this.SetupPort(input, string.Empty, FlexDirection.Column, base.inputContainer);
+            this.SetupPort(output, string.Empty, FlexDirection.ColumnReverse, base.outputContainer);
+        }
+
+
+        private void SetupPort(Port port, string portName, FlexDirection direction, VisualElement container)
+        {
+            if (port != null)
             {
-                output.portName = string.Empty;
-                output.style.flexDirection = FlexDirection.ColumnReverse;
-                base.outputContainer.Add(output);
+                port.style.flexDirection = direction;
+                port.portName = portName;
+                container.Add(port);
             }
         }
-        
-        
+
+
 
         public override void SetPosition(Rect newPos)
         {
@@ -117,7 +100,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
             UnityEditor.EditorUtility.SetDirty(node);
         }
-        
+
 
         public void UpdateState()
         {
@@ -140,7 +123,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             }
         }
 
-        
+
         public void SortChildren()
         {
             if (this.node.baseType != Node.eNodeType.Composite)
@@ -153,11 +136,24 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                 compositeNode.children.Sort((l, r) => l.position.x < r.position.x ? -1 : 1);
             }
         }
-        
-        
-        public void OnDeletedElementEvent(DeleteEventDetector evt)
+
+
+        public void OnNodeDeletedEvent(BehaviourActor actor)
         {
-            Debug.Log("노드 삭제됨");
+            foreach (FieldInfo fieldInfo in _nodeType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (fieldInfo.FieldType != typeof(BehaviourTreeEvent))
+                {
+                    continue;
+                }
+
+                if (fieldInfo.GetValue(node) is BehaviourTreeEvent eventValue && !string.IsNullOrEmpty(eventValue.key))
+                {
+                    actor?.RemoveBehaviourEvent(eventValue.key);
+                }
+            }
+
+            OnNodeDeleted?.Invoke(this);
         }
     }
 }

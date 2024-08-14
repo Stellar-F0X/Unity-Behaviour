@@ -76,12 +76,12 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private NodeView CreateNode(Type type, SearchWindowContext context)
         {
-            BehaviourTreeEditorWindow editorWindow = BehaviourTreeEditorWindow.editorWindow;
+            BehaviourTreeEditorWindow editorWindow = BehaviourTreeEditorWindow.Editor;
 
             Vector2 targetVector = context.screenMousePosition - editorWindow.position.position;
             Vector2 mousePosition = editorWindow.rootVisualElement.ChangeCoordinatesTo(editorWindow.rootVisualElement.parent, targetVector);
 
-            Vector2 graphMousePosition = editorWindow.view.contentViewContainer.WorldToLocal(mousePosition);
+            Vector2 graphMousePosition = editorWindow.View.contentViewContainer.WorldToLocal(mousePosition);
             Vector2 nodeResultPosition = _nodeOffset + graphMousePosition;
 
             nodeResultPosition = new Vector2() {

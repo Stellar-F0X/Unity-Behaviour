@@ -56,7 +56,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             else
             {
                 position.height = EditorGUIUtility.singleLineHeight;
-                EditorGUI.LabelField(position, "The event requires the BehaviourTreeActor in Scene");
+                EditorGUI.LabelField(position, "Event requires BehaviourTreeActor in Scene");
             }
         }
 
@@ -69,8 +69,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private bool CachingSerializedRuntimeTreeElement(string findEventKey)
         {
             _behaviourActor ??= Object.FindObjectsByType<BehaviourActor>(FindObjectsSortMode.None).FirstOrDefault(actor => {
-                return actor.runtimeTree?.cloneGroupID == BehaviourTreeEditorWindow.editorWindow?.tree?.cloneGroupID &&
-                       !ReferenceEquals(actor.runtimeTree, null);
+                return actor.runtimeTree?.cloneGroupID == BehaviourTreeEditorWindow.Editor?.Tree?.cloneGroupID && !ReferenceEquals(actor.runtimeTree, null);
             });
 
             if (!ReferenceEquals(_behaviourActor, null))

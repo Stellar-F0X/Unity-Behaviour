@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace BehaviourTechnique.BehaviourTreeEditor
 {
     public sealed class DeleteEventDetector
     {
-        private Action<DeleteEventDetector> _cachedDeleteEvent;
+        private Action<BehaviourActor> _cachedDeleteEvent;
 
         public void RegisterCallback(INodeViewDeletable deletable)
         {
@@ -16,8 +18,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             {
                 nodeView.RegisterCallback<DetachFromPanelEvent>(OnElementDetached);
 
-                _cachedDeleteEvent -= deletable.OnDeletedElementEvent;
-                _cachedDeleteEvent += deletable.OnDeletedElementEvent;
+                _cachedDeleteEvent -= deletable.OnNodeDeletedEvent;
+                _cachedDeleteEvent += deletable.OnNodeDeletedEvent;
             }
         }
         
@@ -32,7 +34,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         
         private void OnElementDetached(DetachFromPanelEvent evt)
         {
-            _cachedDeleteEvent?.Invoke(this);
+            var actors = Object.FindObjectsByType<BehaviourActor>(FindObjectsSortMode.None);
+            _cachedDeleteEvent?.Invoke(actors.FirstOrDefault(actor => actor?.runtimeTree == BehaviourTreeEditorWindow.Editor?.Tree));
         }
     }
 }

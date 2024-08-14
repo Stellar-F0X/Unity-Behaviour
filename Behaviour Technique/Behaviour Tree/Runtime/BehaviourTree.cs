@@ -7,7 +7,7 @@ using UnityEngine.Events;
 using Object = UnityEngine.Object;
 
 [CreateAssetMenu]
-public class BehaviourTree : ScriptableObject
+public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
 {
     [HideInInspector]
     public Node rootNode;
@@ -157,4 +157,21 @@ public class BehaviourTree : ScriptableObject
         return tree;
     }
 #endif
+    
+    
+    public bool Equals(BehaviourTree x, BehaviourTree y)
+    {
+        if (ReferenceEquals(x, null) || ReferenceEquals(y, null) || x.GetType() != y.GetType())
+        {
+            return false;
+        }
+
+        return x.rootNode.guid == y.rootNode.guid && x.specificGuid == y.specificGuid;
+    }
+
+    
+    public int GetHashCode(BehaviourTree obj)
+    {
+        return HashCode.Combine(obj.rootNode, obj.specificGuid);
+    }
 }

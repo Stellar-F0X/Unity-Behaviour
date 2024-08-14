@@ -411,6 +411,126 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  - key: 95bbde44076aacf4d962f31a97499616-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 95bbde44076aacf4d962f31a97499616-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 95bbde44076aacf4d962f31a97499616-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 37019424cdae72d46a8521aa9c2e547c-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 37019424cdae72d46a8521aa9c2e547c-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 37019424cdae72d46a8521aa9c2e547c-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 056de917d0e13d348a5b449f252e5896-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 056de917d0e13d348a5b449f252e5896-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 056de917d0e13d348a5b449f252e5896-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 52ff9b42da2188045a6e08c244a502bc-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 52ff9b42da2188045a6e08c244a502bc-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 52ff9b42da2188045a6e08c244a502bc-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 7b91632892371b5488380fece5edb8d1-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 7b91632892371b5488380fece5edb8d1-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 7b91632892371b5488380fece5edb8d1-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: bd17c55e7ed92514eac4430b5d5c3ee4-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: bd17c55e7ed92514eac4430b5d5c3ee4-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: bd17c55e7ed92514eac4430b5d5c3ee4-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 29b92759b35500346909f10e92c66535-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1015184277}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: logger enter first msg
+            m_BoolArgument: 0
+          m_CallState: 2
+  - key: 29b92759b35500346909f10e92c66535-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1015184277}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: logger updater first msg
+            m_BoolArgument: 0
+          m_CallState: 2
+  - key: 29b92759b35500346909f10e92c66535-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1015184277}
+          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
+          m_MethodName: PrintLog
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: logger exit first msg
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

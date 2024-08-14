@@ -2,6 +2,6 @@
 {
     public interface INodeViewDeletable
     {
-        public void OnDeletedElementEvent(DeleteEventDetector evt);
+        public void OnNodeDeletedEvent(BehaviourActor actor);
     }
 }

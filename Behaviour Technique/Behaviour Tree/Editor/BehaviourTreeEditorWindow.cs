@@ -11,26 +11,30 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 {
     public class BehaviourTreeEditorWindow : EditorWindow
     {
-        public static BehaviourTreeEditorWindow editorWindow;
+        public static BehaviourTreeEditorWindow Editor
+        {
+            get;
+            private set;
+        }
 
         #region Static Style Properties
         
-        public static VisualTreeAsset behaviourTreeEditorXml
+        public static VisualTreeAsset BehaviourTreeEditorXml
         {
             get { return EditorUtility.FindAsset<VisualTreeAsset>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/BehaviourTreeEditor.uxml"); }
         }
 
-        public static StyleSheet behaviourTreeStyle
+        public static StyleSheet BehaviourTreeStyle
         {
             get { return EditorUtility.FindAsset<StyleSheet>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/BehaviourTreeEditorStyle.uss"); }
         }
 
-        public static VisualTreeAsset nodeViewXml
+        public static VisualTreeAsset NodeViewXml
         {
             get { return EditorUtility.FindAsset<VisualTreeAsset>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/NodeView.uxml"); }
         }
 
-        public static StyleSheet nodeViewStyle
+        public static StyleSheet NodeViewStyle
         {
             get { return EditorUtility.FindAsset<StyleSheet>("Behaviour Technique t:Folder", "Behaviour Tree/Layout/NodeViewStyle.uss"); }
         }
@@ -48,17 +52,17 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         #region Properties
         
-        public bool editable
+        public bool Editable
         {
             get { return _isEditorAvailable && !Application.isPlaying; }
         }
 
-        public BehaviourTree tree
+        public BehaviourTree Tree
         {
             get { return _tree; }
         }
 
-        public BehaviourTreeView view
+        public BehaviourTreeView View
         {
             get { return _treeView; }
         }
@@ -89,10 +93,10 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private void CreateGUI()
         {
-            editorWindow ??= this;
+            Editor ??= this;
 
-            behaviourTreeEditorXml.CloneTree(rootVisualElement);
-            rootVisualElement.styleSheets.Add(behaviourTreeStyle);
+            BehaviourTreeEditorXml.CloneTree(rootVisualElement);
+            rootVisualElement.styleSheets.Add(BehaviourTreeStyle);
 
             _treeView = rootVisualElement.Q<BehaviourTreeView>();
             _inspectorView = rootVisualElement.Q<InspectorView>();
