@@ -68,11 +68,9 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         /// <returns> 성공적으로 찾았는지 여부를 반환한다. </returns>
         private bool CachingSerializedRuntimeTreeElement(string findEventKey)
         {
-            _behaviourActor ??= Object.FindObjectsByType<BehaviourActor>(FindObjectsSortMode.None).FirstOrDefault(actor => {
-                return actor.runtimeTree?.cloneGroupID == BehaviourTreeEditorWindow.Editor?.Tree?.cloneGroupID && !ReferenceEquals(actor.runtimeTree, null);
-            });
+            _behaviourActor = BehaviourTreeEditorWindow.Instance.Actor;
 
-            if (!ReferenceEquals(_behaviourActor, null))
+            if (_behaviourActor != null)
             {
                 _serializedRuntimeTree = new SerializedObject(_behaviourActor);
                 _serializedEventList = _serializedRuntimeTree.FindProperty(EVENT_LIST_FIELD);

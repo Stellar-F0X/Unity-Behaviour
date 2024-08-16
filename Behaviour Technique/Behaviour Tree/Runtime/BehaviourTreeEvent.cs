@@ -6,11 +6,6 @@ using Object = UnityEngine.Object;
 [Serializable]
 public class BehaviourTreeEvent
 {
-    public BehaviourTreeEvent()
-    {
-        
-    }
-    
     public BehaviourTreeEvent(string key, UnityEvent value)
     {
         this.value = value;

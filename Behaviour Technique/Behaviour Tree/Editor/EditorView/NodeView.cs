@@ -36,8 +36,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         public Port input;
         public Port output;
 
-        private Type _nodeType;
-        private VisualElement _nodeBorder;
+        private readonly Type _nodeType;
+        private readonly VisualElement _nodeBorder;
 
         private readonly Color _runningColor = new Color32(54, 154, 204, 255);
         private readonly Color _doneColor = new Color32(24, 93, 125, 255);
@@ -138,16 +138,15 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         }
 
 
+        /// <summary>
+        /// BehaviourTreeView의 DeleteEventDetector에서 선택된 노드가 제거될때 호출된다.
+        /// </summary>
+        /// <param name="actor"> 현재 Editor에 그려진 BehaviourTree가 등록된 Actor </param>
         public void OnNodeDeletedEvent(BehaviourActor actor)
         {
             foreach (FieldInfo fieldInfo in _nodeType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
-                if (fieldInfo.FieldType != typeof(BehaviourTreeEvent))
-                {
-                    continue;
-                }
-
-                if (fieldInfo.GetValue(node) is BehaviourTreeEvent eventValue && !string.IsNullOrEmpty(eventValue.key))
+                if (fieldInfo.FieldType == typeof(BehaviourTreeEvent) && fieldInfo.GetValue(node) is BehaviourTreeEvent eventValue)
                 {
                     actor?.RemoveBehaviourEvent(eventValue.key);
                 }

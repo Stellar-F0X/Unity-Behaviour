@@ -299,7 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea6898e15b6b09a408580d2dbf4e8ae7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runtimeTree: {fileID: 11400000, guid: c4542f12e6b178f42b63624d427f92c5, type: 2}
+  runtimeTree: {fileID: 11400000, guid: b6524db4c112ac84ca41f907a88be571, type: 2}
   updateMode: 0
   startMode: 0
   _behaviourEvents:
@@ -315,54 +315,6 @@ MonoBehaviour:
     value:
       m_PersistentCalls:
         m_Calls: []
-  - key: 79d84223f95ffbe48b969b69a53ca3de-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1015184277}
-          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
-          m_MethodName: PrintLog
-          m_Mode: 5
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: logger enter
-            m_BoolArgument: 0
-          m_CallState: 2
-  - key: 79d84223f95ffbe48b969b69a53ca3de-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1015184277}
-          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
-          m_MethodName: PrintLog
-          m_Mode: 5
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: logger update
-            m_BoolArgument: 0
-          m_CallState: 2
-  - key: 79d84223f95ffbe48b969b69a53ca3de-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1015184277}
-          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
-          m_MethodName: PrintLog
-          m_Mode: 5
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: logger exit
-            m_BoolArgument: 0
-          m_CallState: 2
   - key: 0a91c6e0a3a756f458136439f5120d45-1638141083
     value:
       m_PersistentCalls:
@@ -483,54 +435,114 @@ MonoBehaviour:
     value:
       m_PersistentCalls:
         m_Calls: []
-  - key: 29b92759b35500346909f10e92c66535-1638141083
+  - key: de53970ff24d01f468bca72127918152-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: de53970ff24d01f468bca72127918152-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: de53970ff24d01f468bca72127918152-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 7c7976e8a9c8b624da5d05582f27dfe0-1638141083
     value:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1015184277}
           m_TargetAssemblyTypeName: Logger, Assembly-CSharp
           m_MethodName: PrintLog
-          m_Mode: 5
+          m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: logger enter first msg
+            m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - key: 29b92759b35500346909f10e92c66535-1679589096
+  - key: 7c7976e8a9c8b624da5d05582f27dfe0-1679589096
     value:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1015184277}
           m_TargetAssemblyTypeName: Logger, Assembly-CSharp
           m_MethodName: PrintLog
-          m_Mode: 5
+          m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: logger updater first msg
+            m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - key: 29b92759b35500346909f10e92c66535-1803575251
+  - key: 7c7976e8a9c8b624da5d05582f27dfe0-1803575251
     value:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1015184277}
           m_TargetAssemblyTypeName: Logger, Assembly-CSharp
           m_MethodName: PrintLog
-          m_Mode: 5
+          m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: logger exit first msg
+            m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  - key: bdd69c626dcc6864e8dcacc204678a07-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: bdd69c626dcc6864e8dcacc204678a07-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: bdd69c626dcc6864e8dcacc204678a07-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: f8902c9a9e95fda4f98017f43de76bea-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: f8902c9a9e95fda4f98017f43de76bea-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: f8902c9a9e95fda4f98017f43de76bea-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 29d18619f512e5d4bb985939eb6de879-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 29d18619f512e5d4bb985939eb6de879-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 29d18619f512e5d4bb985939eb6de879-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 2e49fd8f9894c0743867b6c9898d7434-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 2e49fd8f9894c0743867b6c9898d7434-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 2e49fd8f9894c0743867b6c9898d7434-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

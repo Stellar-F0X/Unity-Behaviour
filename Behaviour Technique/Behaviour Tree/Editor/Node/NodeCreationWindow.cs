@@ -76,7 +76,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private NodeView CreateNode(Type type, SearchWindowContext context)
         {
-            BehaviourTreeEditorWindow editorWindow = BehaviourTreeEditorWindow.Editor;
+            BehaviourTreeEditorWindow editorWindow = BehaviourTreeEditorWindow.Instance;
 
             Vector2 targetVector = context.screenMousePosition - editorWindow.position.position;
             Vector2 mousePosition = editorWindow.rootVisualElement.ChangeCoordinatesTo(editorWindow.rootVisualElement.parent, targetVector);

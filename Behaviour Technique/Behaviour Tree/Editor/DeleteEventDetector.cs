@@ -22,7 +22,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                 _cachedDeleteEvent += deletable.OnNodeDeletedEvent;
             }
         }
-        
+
         public void UnregisterCallback(INodeViewDeletable deletable)
         {
             if (deletable is NodeView nodeView)
@@ -31,11 +31,15 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                 _cachedDeleteEvent = null;
             }
         }
-        
+
         private void OnElementDetached(DetachFromPanelEvent evt)
         {
-            var actors = Object.FindObjectsByType<BehaviourActor>(FindObjectsSortMode.None);
-            _cachedDeleteEvent?.Invoke(actors.FirstOrDefault(actor => actor?.runtimeTree == BehaviourTreeEditorWindow.Editor?.Tree));
+            if (BehaviourTreeEditorWindow.Instance.Actor == null)
+            {
+                return;
+            }
+
+            _cachedDeleteEvent?.Invoke(BehaviourTreeEditorWindow.Instance.Actor);
         }
     }
 }

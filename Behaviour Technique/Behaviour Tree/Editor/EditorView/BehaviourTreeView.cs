@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
+using BehaviourTechnique.BehaviourTreeEditor.Setting;
 using UnityEngine.UIElements;
 using UnityEngine;
 using UnityEditor;
@@ -20,7 +21,13 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         {
             Insert(0, new GridBackground());
 
-            this.AddManipulator(new ContentZoomer());
+            
+            ContentZoomer zoomer = new ContentZoomer() {
+                maxScale = BehaviourTreeEditorWindow.Settings.enlargementScale,
+                minScale = BehaviourTreeEditorWindow.Settings.reductionScale
+            };
+
+            this.AddManipulator(zoomer);
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
@@ -119,7 +126,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            if (!BehaviourTreeEditorWindow.Editor.Editable)
+            if (!BehaviourTreeEditorWindow.Instance.Editable)
             {
                 return;
             }
