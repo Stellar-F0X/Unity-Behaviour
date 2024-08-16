@@ -7,8 +7,8 @@ using System;
 [Serializable]
 public abstract class ActionNode : Node
 {
-    public override eNodeType baseType
+    public override ENodeType baseType
     {
-        get { return eNodeType.Action; }
+        get { return ENodeType.Action; }
     }
 }

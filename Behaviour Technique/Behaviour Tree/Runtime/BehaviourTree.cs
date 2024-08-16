@@ -13,7 +13,7 @@ public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
     public Node rootNode;
 
     [HideInInspector]
-    public Node.eState treeState = Node.eState.Running;
+    public Node.EState treeState = Node.EState.Running;
 
     [HideInInspector]
     public List<Node> nodeList = new List<Node>();
@@ -42,11 +42,11 @@ public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
     }
 
     
-    public Node.eState UpdateTree(BehaviourActor behaviourActor)
+    public Node.EState UpdateTree(BehaviourActor behaviourActor)
     {
-        if (rootNode.state == Node.eState.Running)
+        if (rootNode.state == Node.EState.Running)
         {
-            treeState = rootNode.UpdateNode(behaviourActor, new PreviusBehaviourInfo(string.Empty, null, Node.eNodeType.Root));
+            treeState = rootNode.UpdateNode(behaviourActor, new PreviusBehaviourInfo(string.Empty, null, Node.ENodeType.Root));
         }
 
         return treeState;
@@ -90,9 +90,9 @@ public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
 
         switch (parent.baseType)
         {
-            case Node.eNodeType.Root: (parent as RootNode).child = child; break;
-            case Node.eNodeType.Decorator: (parent as DecoratorNode).child = child; break;
-            case Node.eNodeType.Composite: (parent as CompositeNode).children.Add(child); break;
+            case Node.ENodeType.Root: (parent as RootNode).child = child; break;
+            case Node.ENodeType.Decorator: (parent as DecoratorNode).child = child; break;
+            case Node.ENodeType.Composite: (parent as CompositeNode).children.Add(child); break;
 
             default: throw new BehaviourTreeException("It is a childless type of node.");
         }
@@ -107,9 +107,9 @@ public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
 
         switch (parent.baseType)
         {
-            case Node.eNodeType.Root: (parent as RootNode).child = null; break;
-            case Node.eNodeType.Decorator: (parent as DecoratorNode).child = null; break;
-            case Node.eNodeType.Composite: (parent as CompositeNode).children.Remove(child); break;
+            case Node.ENodeType.Root: (parent as RootNode).child = null; break;
+            case Node.ENodeType.Decorator: (parent as DecoratorNode).child = null; break;
+            case Node.ENodeType.Composite: (parent as CompositeNode).children.Remove(child); break;
 
             default: throw new BehaviourTreeException("It is a childless type of node");
         }
@@ -122,16 +122,16 @@ public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
     {
         switch (parent.baseType)
         {
-            case Node.eNodeType.Root: return new List<Node>() { (parent as RootNode).child };
-            case Node.eNodeType.Decorator: return new List<Node>() { (parent as DecoratorNode).child };
-            case Node.eNodeType.Composite: return (parent as CompositeNode).children;
+            case Node.ENodeType.Root: return new List<Node>() { (parent as RootNode).child };
+            case Node.ENodeType.Decorator: return new List<Node>() { (parent as DecoratorNode).child };
+            case Node.ENodeType.Composite: return (parent as CompositeNode).children;
 
             default: return new List<Node>(0);
         }
     }
 
 
-    public void Traverse(Node node, Action<Node> visiter)
+    private void Traverse(Node node, Action<Node> visiter)
     {
         if (node == null)
         {

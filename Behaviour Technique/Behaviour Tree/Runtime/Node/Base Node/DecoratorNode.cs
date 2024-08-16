@@ -10,9 +10,9 @@ public abstract class DecoratorNode : Node
     [HideInInspector]
     public Node child;
 
-    public override eNodeType baseType
+    public override ENodeType baseType
     {
-        get { return eNodeType.Decorator; }
+        get { return ENodeType.Decorator; }
     }
 
     public override Node Clone()

@@ -4,7 +4,7 @@ using System;
 [Serializable]
 public struct PreviusBehaviourInfo
 {
-    public PreviusBehaviourInfo(string tag, Type nodeType, Node.eNodeType basedType)
+    public PreviusBehaviourInfo(string tag, Type nodeType, Node.ENodeType basedType)
     {
         this.tag = tag;
         this.nodeType = nodeType;
@@ -13,5 +13,5 @@ public struct PreviusBehaviourInfo
 
     public string tag;
     public Type nodeType;
-    public Node.eNodeType basedType;
+    public Node.ENodeType basedType;
 }

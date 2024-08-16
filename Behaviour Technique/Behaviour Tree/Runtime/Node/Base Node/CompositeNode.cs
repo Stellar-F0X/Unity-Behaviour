@@ -10,9 +10,9 @@ public abstract class CompositeNode : Node
     [HideInInspector]
     public List<Node> children = new List<Node>();
 
-    public override eNodeType baseType
+    public override ENodeType baseType
     {
-        get { return eNodeType.Composite; }
+        get { return ENodeType.Composite; }
     }
 
     public override Node Clone()

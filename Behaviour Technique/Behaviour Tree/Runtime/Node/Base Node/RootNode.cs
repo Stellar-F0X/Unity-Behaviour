@@ -7,9 +7,9 @@ public class RootNode : Node
     [HideInInspector]
     public Node child;
 
-    public override eNodeType baseType
+    public override ENodeType baseType
     {
-        get { return eNodeType.Root; }
+        get { return ENodeType.Root; }
     }
 
     protected override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
@@ -17,7 +17,7 @@ public class RootNode : Node
         
     }
 
-    protected override eState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+    protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
         return child.UpdateNode(behaviourTree, new PreviusBehaviourInfo(tag, this.GetType(), baseType));
     }

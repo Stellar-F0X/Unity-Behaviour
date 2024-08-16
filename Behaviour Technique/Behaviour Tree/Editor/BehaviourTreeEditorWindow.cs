@@ -124,16 +124,14 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
             if (tree != null)
             {
-                if (tree != _tree)
+                if (Application.isPlaying && _actor != null)
                 {
-                    var actorList = FindObjectsByType<BehaviourActor>(FindObjectsSortMode.None);
-                    _actor = actorList.FirstOrDefault(actor => actor.runtimeTree == tree);
+                    _inspectorView.Clear();
+                    _treeView.OnGraphEditorView(_actor.runtimeTree);
                 }
-
-                _tree = tree;
-
-                if (Application.isPlaying || AssetDatabase.CanOpenAssetInEditor(_tree.GetInstanceID()))
+                else if (AssetDatabase.CanOpenAssetInEditor(tree.GetInstanceID()))
                 {
+                    _tree = tree;
                     _inspectorView.Clear();
                     _treeView.OnGraphEditorView(_tree);
                 }
@@ -151,6 +149,12 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                 _actor = targetObject.GetComponent<BehaviourActor>();
                 tree ??= _actor?.runtimeTree;
             }
+            
+            if (_actor == null)
+            {
+                var actorList = FindObjectsByType<BehaviourActor>(FindObjectsSortMode.None);
+                _actor = actorList.FirstOrDefault(actor => actor.runtimeTree == tree);
+            }
 
             return tree;
         }
@@ -158,7 +162,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private void Update()
         {
-            if (!Application.isPlaying || _treeView == null)
+            if (!Application.isPlaying || _actor == null)
             {
                 return;
             }

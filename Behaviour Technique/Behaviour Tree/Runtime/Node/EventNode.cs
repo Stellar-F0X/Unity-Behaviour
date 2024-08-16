@@ -15,10 +15,10 @@ public class EventNode : ActionNode
         onEnterEvent?.Invoke();
     }
 
-    protected override eState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+    protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
         onUpdateEvent?.Invoke();
-        return eState.Success;
+        return EState.Success;
     }
 
     protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info)

@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1015184278}
   - component: {fileID: 1015184277}
+  - component: {fileID: 1015184279}
   m_Layer: 0
   m_Name: Logger
   m_TagString: Untagged
@@ -163,6 +164,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1015184279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015184276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea6898e15b6b09a408580d2dbf4e8ae7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  runtimeTree: {fileID: 11400000, guid: b6524db4c112ac84ca41f907a88be571, type: 2}
+  updateMode: 0
+  startMode: 0
+  _behaviourEvents: []
 --- !u!4 &1864815955023588656
 Transform:
   m_ObjectHideFlags: 0
@@ -237,21 +254,6 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6102284756164154270}
   m_Enabled: 1
---- !u!4 &5039567519410962693
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6964012718825915814}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 2, z: 3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6102284756164154270
 GameObject:
   m_ObjectHideFlags: 0
@@ -270,283 +272,9 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &6964012718825915814
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5039567519410962693}
-  - component: {fileID: 6964012718825915816}
-  m_Layer: 0
-  m_Name: Behaviour Actor
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &6964012718825915816
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6964012718825915814}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea6898e15b6b09a408580d2dbf4e8ae7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  runtimeTree: {fileID: 11400000, guid: b6524db4c112ac84ca41f907a88be571, type: 2}
-  updateMode: 0
-  startMode: 0
-  _behaviourEvents:
-  - key: c3753d2a1258c22419bbf3d846ce59f6-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: c3753d2a1258c22419bbf3d846ce59f6-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: c3753d2a1258c22419bbf3d846ce59f6-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 0a91c6e0a3a756f458136439f5120d45-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1015184277}
-          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
-          m_MethodName: PrintLog
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - key: 0a91c6e0a3a756f458136439f5120d45-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1015184277}
-          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
-          m_MethodName: PrintLog
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - key: 0a91c6e0a3a756f458136439f5120d45-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1015184277}
-          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
-          m_MethodName: PrintLog
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - key: 95bbde44076aacf4d962f31a97499616-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 95bbde44076aacf4d962f31a97499616-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 95bbde44076aacf4d962f31a97499616-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 37019424cdae72d46a8521aa9c2e547c-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 37019424cdae72d46a8521aa9c2e547c-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 37019424cdae72d46a8521aa9c2e547c-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 056de917d0e13d348a5b449f252e5896-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 056de917d0e13d348a5b449f252e5896-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 056de917d0e13d348a5b449f252e5896-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 52ff9b42da2188045a6e08c244a502bc-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 52ff9b42da2188045a6e08c244a502bc-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 52ff9b42da2188045a6e08c244a502bc-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 7b91632892371b5488380fece5edb8d1-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 7b91632892371b5488380fece5edb8d1-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 7b91632892371b5488380fece5edb8d1-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: bd17c55e7ed92514eac4430b5d5c3ee4-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: bd17c55e7ed92514eac4430b5d5c3ee4-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: bd17c55e7ed92514eac4430b5d5c3ee4-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: de53970ff24d01f468bca72127918152-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: de53970ff24d01f468bca72127918152-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: de53970ff24d01f468bca72127918152-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 7c7976e8a9c8b624da5d05582f27dfe0-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1015184277}
-          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
-          m_MethodName: PrintLog
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - key: 7c7976e8a9c8b624da5d05582f27dfe0-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1015184277}
-          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
-          m_MethodName: PrintLog
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - key: 7c7976e8a9c8b624da5d05582f27dfe0-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 1015184277}
-          m_TargetAssemblyTypeName: Logger, Assembly-CSharp
-          m_MethodName: PrintLog
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - key: bdd69c626dcc6864e8dcacc204678a07-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: bdd69c626dcc6864e8dcacc204678a07-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: bdd69c626dcc6864e8dcacc204678a07-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: f8902c9a9e95fda4f98017f43de76bea-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: f8902c9a9e95fda4f98017f43de76bea-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: f8902c9a9e95fda4f98017f43de76bea-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 29d18619f512e5d4bb985939eb6de879-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 29d18619f512e5d4bb985939eb6de879-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 29d18619f512e5d4bb985939eb6de879-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 2e49fd8f9894c0743867b6c9898d7434-1638141083
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 2e49fd8f9894c0743867b6c9898d7434-1679589096
-    value:
-      m_PersistentCalls:
-        m_Calls: []
-  - key: 2e49fd8f9894c0743867b6c9898d7434-1803575251
-    value:
-      m_PersistentCalls:
-        m_Calls: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1864815955023588656}
-  - {fileID: 5039567519410962693}
   - {fileID: 1015184278}

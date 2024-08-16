@@ -1,7 +1,7 @@
 ﻿public abstract class SubsetNode : Node
 {
-    public override eNodeType baseType
+    public override ENodeType baseType
     {
-        get { return eNodeType.Subset; }
+        get { return ENodeType.Subset; }
     }
 }

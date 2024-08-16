@@ -15,7 +15,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             {
                 BehaviourTreeEditorWindow wnd = EditorWindow.GetWindow<BehaviourTreeEditorWindow>();
                 DeleteNodeEvent(wnd.Tree.nodeList, wnd.Actor);
-                wnd.View?.DeleteElements(wnd.View?.nodes.ToList());
+                wnd.View.ClearEditorViwer();
             }
             else if (BehaviourTreeEditorWindow.Instance != null && BehaviourTreeEditorWindow.Instance.Actor != null)
             {

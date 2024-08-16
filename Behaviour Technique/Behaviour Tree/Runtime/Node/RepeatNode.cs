@@ -10,9 +10,9 @@ public class RepeatNode : DecoratorNode
         
     }
 
-    protected override eState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+    protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
         child.UpdateNode(behaviourTree, new PreviusBehaviourInfo(tag, GetType(), baseType));
-        return eState.Running;
+        return EState.Running;
     }
 }

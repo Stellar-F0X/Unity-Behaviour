@@ -21,7 +21,6 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         {
             Insert(0, new GridBackground());
 
-            
             ContentZoomer zoomer = new ContentZoomer() {
                 maxScale = BehaviourTreeEditorWindow.Settings.enlargementScale,
                 minScale = BehaviourTreeEditorWindow.Settings.reductionScale
@@ -51,41 +50,6 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private NodeEdgeHandler _nodeEdgeHandler;
         private NodeCreationWindow _nodeCreationWindow;
         private DeleteEventDetector _deleteEventDetector;
-
-
-
-        private void Intialize(BehaviourTree tree)
-        {
-            onGraphViewChange?.Invoke();
-
-            graphViewChanged -= OnGraphViewChanged;
-            DeleteElements(graphElements.ToList());
-            graphViewChanged += OnGraphViewChanged;
-
-            if (_tree.rootNode == null)
-            {
-                tree.rootNode = tree.CreateNode(typeof(RootNode)) as RootNode;
-                UnityEditor.EditorUtility.SetDirty(tree);
-                AssetDatabase.SaveAssets();
-            }
-        }
-
-
-        private void IntegrityCheckNodeList(BehaviourTree tree)
-        {
-            for (int i = 0; i < tree.nodeList.Count; ++i)
-            {
-                //Undo로 생성이 취소된 노드를 여기서 처리.
-                if (tree.nodeList[i] == null)
-                {
-                    tree.nodeList.RemoveAt(i);
-                }
-            }
-
-            //트리 구조라서 미리 모두 생성해둬야 자식과 부모를 연결 할 수 있음.
-            tree.nodeList.ForEach(n => this.CreateNodeView(n));
-            tree.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.GetChildren(n)));
-        }
 
 
         public void OnGraphEditorView(BehaviourTree tree)
@@ -163,6 +127,16 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         }
 
 
+        public void ClearEditorViwer()
+        {
+            graphViewChanged -= OnGraphViewChanged;
+            DeleteElements(graphElements.ToList());
+            
+            nodes.ForEach(n => n.RemoveFromHierarchy());
+            edges.ForEach(e => e.RemoveFromHierarchy());
+        }
+
+
         public void UpdateNodeView()
         {
             foreach (var node in nodes)
@@ -174,7 +148,42 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             }
         }
 
+        #region Private API
+        
+        private void Intialize(BehaviourTree tree)
+        {
+            onGraphViewChange?.Invoke();
 
+            graphViewChanged -= OnGraphViewChanged;
+            DeleteElements(graphElements.ToList());
+            graphViewChanged += OnGraphViewChanged;
+
+            if (_tree.rootNode == null)
+            {
+                tree.rootNode = tree.CreateNode(typeof(RootNode)) as RootNode;
+                UnityEditor.EditorUtility.SetDirty(tree);
+                AssetDatabase.SaveAssets();
+            }
+        }
+
+
+        private void IntegrityCheckNodeList(BehaviourTree tree)
+        {
+            for (int i = 0; i < tree.nodeList.Count; ++i)
+            {
+                //Undo로 생성이 취소된 노드를 여기서 처리.
+                if (tree.nodeList[i] == null)
+                {
+                    tree.nodeList.RemoveAt(i);
+                }
+            }
+
+            //트리 구조라서 미리 모두 생성해둬야 자식과 부모를 연결 할 수 있음.
+            tree.nodeList.ForEach(n => this.CreateNodeView(n));
+            tree.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.GetChildren(n)));
+        }
+        
+        
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
         {
             if (graphViewChange.elementsToRemove != null)
@@ -220,5 +229,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             base.AddElement(nodeView); //nodes라는 GraphElement 컨테이너에 추가.
             return nodeView;
         }
+        
+        #endregion
     }
 }

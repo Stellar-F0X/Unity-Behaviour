@@ -5,9 +5,9 @@
         
     }
 
-    protected override eState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+    protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
-        return eState.Running;
+        return EState.Running;
     }
 
     protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info)

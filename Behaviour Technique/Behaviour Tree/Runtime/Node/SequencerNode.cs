@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,7 @@ using UnityEngine;
 public class SequencerNode : CompositeNode
 {
     private int _current;
+    private readonly Type _type = typeof(SequencerNode);
 
     protected  override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
@@ -18,22 +20,22 @@ public class SequencerNode : CompositeNode
     }
     
     
-    protected override eState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+    protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
-        switch (children[_current].UpdateNode(behaviourTree, new PreviusBehaviourInfo(tag, GetType(), baseType)))
+        switch (children[_current].UpdateNode(behaviourTree, new PreviusBehaviourInfo(tag, _type, baseType)))
         {
-            case eState.Running: return eState.Running;
-            case eState.Failure: return eState.Failure;
-            case eState.Success: _current++; break;
+            case EState.Running: return EState.Running;
+            case EState.Failure: return EState.Failure;
+            case EState.Success: _current++; break;
         }
 
         if (_current == children.Count)
         {
-            return eState.Success;
+            return EState.Success;
         }
         else
         {
-            return eState.Running;
+            return EState.Running;
         }
     }
 }

@@ -53,20 +53,20 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         {
             switch (node.baseType)
             {
-                case Node.eNodeType.Root:
+                case Node.ENodeType.Root:
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
                     break;
 
-                case Node.eNodeType.Action:
+                case Node.ENodeType.Action:
                     input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     break;
 
-                case Node.eNodeType.Composite:
+                case Node.ENodeType.Composite:
                     input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Multi, typeof(bool));
                     break;
 
-                case Node.eNodeType.Decorator:
+                case Node.ENodeType.Decorator:
                     input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
                     break;
@@ -126,7 +126,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         public void SortChildren()
         {
-            if (this.node.baseType != Node.eNodeType.Composite)
+            if (this.node.baseType != Node.ENodeType.Composite)
             {
                 return;
             }

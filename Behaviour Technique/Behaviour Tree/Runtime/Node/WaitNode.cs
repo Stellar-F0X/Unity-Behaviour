@@ -12,19 +12,19 @@ public class WaitNode : ActionNode
     {
         _startTime = Time.time;
     }
-
-    protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
-    {
-        
-    }
-
-    protected override eState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+    
+    protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
     {
         if (Time.time > _startTime + duration)
         {
-            return eState.Success;
+            return EState.Success;
         }
 
-        return eState.Running;
+        return EState.Running;
+    }
+    
+    protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+    {
+        
     }
 }
