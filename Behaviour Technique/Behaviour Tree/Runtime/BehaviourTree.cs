@@ -9,13 +9,13 @@ using Object = UnityEngine.Object;
 [CreateAssetMenu]
 public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
 {
-    [HideInInspector]
+    //[HideInInspector]
     public Node rootNode;
 
     [HideInInspector]
     public Node.EState treeState = Node.EState.Running;
 
-    [HideInInspector]
+    //[HideInInspector]
     public List<Node> nodeList = new List<Node>();
 
     

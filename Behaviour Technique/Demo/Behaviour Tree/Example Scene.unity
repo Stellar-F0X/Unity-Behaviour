@@ -179,7 +179,67 @@ MonoBehaviour:
   runtimeTree: {fileID: 11400000, guid: b6524db4c112ac84ca41f907a88be571, type: 2}
   updateMode: 0
   startMode: 0
-  _behaviourEvents: []
+  _behaviourEvents:
+  - key: fe8a5ae70b8040344b1770e73ea2b7b2-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: fe8a5ae70b8040344b1770e73ea2b7b2-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: fe8a5ae70b8040344b1770e73ea2b7b2-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: cffb7a70a86140f409b5d6926475a4f1-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: cffb7a70a86140f409b5d6926475a4f1-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: cffb7a70a86140f409b5d6926475a4f1-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 46c051c56af126244b907e1db7bd8741-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 46c051c56af126244b907e1db7bd8741-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: 46c051c56af126244b907e1db7bd8741-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: aef1d300064544945b95d993dd488923-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: aef1d300064544945b95d993dd488923-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: aef1d300064544945b95d993dd488923-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: b19ae922d0001104e96985cef2463b54-1638141083
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: b19ae922d0001104e96985cef2463b54-1679589096
+    value:
+      m_PersistentCalls:
+        m_Calls: []
+  - key: b19ae922d0001104e96985cef2463b54-1803575251
+    value:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!4 &1864815955023588656
 Transform:
   m_ObjectHideFlags: 0

@@ -30,7 +30,12 @@ public class RootNode : Node
     public override Node Clone()
     {
         RootNode node = base.Clone() as RootNode;
-        node.child = this.child.Clone();
+
+        if (this.child != null)
+        {
+            node.child = this.child.Clone();
+        }
+
         return node;
     }
 }
