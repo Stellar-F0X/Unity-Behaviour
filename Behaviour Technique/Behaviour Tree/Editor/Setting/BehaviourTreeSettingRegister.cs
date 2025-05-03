@@ -30,7 +30,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor.Setting
             properties.AddToClassList("property-list");
             rootElement.Add(properties);
 
-            var settings = EditorUtility.FindAssetByName<BehaviourTreeEditorSettings>(
+            var settings = BTEditorUtility.FindAssetByName<BehaviourTreeEditorSettings>(
                 $"t:{nameof(BehaviourTreeEditorSettings)}"
             );
 

@@ -12,12 +12,9 @@ namespace BehaviourTechnique.UIElements
 
         private Editor _editor;
 
-        public InspectorView() 
-        {
-            
-        }
+        public InspectorView() { }
 
-        //객체가 선택 되었을때 Action을 통해 호출될 함수로 인스펙터에 노드 정보를 그린다.
+
         public void UpdateSelection(NodeView view)
         {
             base.Clear();

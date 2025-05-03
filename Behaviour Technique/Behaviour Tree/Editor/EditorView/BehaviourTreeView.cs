@@ -13,15 +13,14 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 {
     public class BehaviourTreeView : GraphView
     {
-        public new class UxmlFactory : UxmlFactory<BehaviourTreeView, UxmlTraits>
-        {
-        }
+        public new class UxmlFactory : UxmlFactory<BehaviourTreeView, UxmlTraits> { }
 
         public BehaviourTreeView()
         {
             Insert(0, new GridBackground());
 
-            ContentZoomer zoomer = new ContentZoomer() {
+            ContentZoomer zoomer = new ContentZoomer()
+            {
                 maxScale = BehaviourTreeEditorWindow.Settings.enlargementScale,
                 minScale = BehaviourTreeEditorWindow.Settings.reductionScale
             };
@@ -31,12 +30,12 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
 
-            styleSheets.Add(BehaviourTreeEditorWindow.BehaviourTreeStyle);
+            styleSheets.Add(BehaviourTreeEditorWindow.Settings.behaviourTreeStyle);
 
             _nodeEdgeHandler = new NodeEdgeHandler();
-            _deleteEventDetector = new DeleteEventDetector();
 
-            Undo.undoRedoPerformed = () => {
+            Undo.undoRedoPerformed = () =>
+            {
                 this.OnGraphEditorView(_tree);
                 AssetDatabase.SaveAssets();
             };
@@ -49,7 +48,6 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private BehaviourTree _tree;
         private NodeEdgeHandler _nodeEdgeHandler;
         private NodeCreationWindow _nodeCreationWindow;
-        private DeleteEventDetector _deleteEventDetector;
 
 
         public void OnGraphEditorView(BehaviourTree tree)
@@ -90,7 +88,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            if (!BehaviourTreeEditorWindow.Instance.Editable)
+            if (BehaviourTreeEditorWindow.Instance.CanEditTree == false)
             {
                 return;
             }
@@ -131,7 +129,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         {
             graphViewChanged -= OnGraphViewChanged;
             DeleteElements(graphElements.ToList());
-            
+
             nodes.ForEach(n => n.RemoveFromHierarchy());
             edges.ForEach(e => e.RemoveFromHierarchy());
         }
@@ -139,17 +137,20 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         public void UpdateNodeView()
         {
-            foreach (var node in nodes)
+            int length = nodes.Count();
+
+            for (int i = 0; i < length; i++)
             {
+                var node = nodes.AtIndex(i);
+
                 if (node is NodeView nodeView)
                 {
                     nodeView.UpdateState();
-                } 
+                }
             }
         }
 
-        #region Private API
-        
+
         private void Intialize(BehaviourTree tree)
         {
             onGraphViewChange?.Invoke();
@@ -182,8 +183,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             tree.nodeList.ForEach(n => this.CreateNodeView(n));
             tree.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.GetChildren(n)));
         }
-        
-        
+
+
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
         {
             if (graphViewChange.elementsToRemove != null)
@@ -218,18 +219,11 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private NodeView CreateNodeView(Node node)
         {
-            NodeView nodeView = new NodeView(node, BehaviourTreeEditorWindow.NodeViewXml);
-            
-            nodeView.OnNodeSelected += this.onNodeSelected;
-            nodeView.OnNodeSelected += this._deleteEventDetector.RegisterCallback;
-            nodeView.OnNodeUnselected += this._deleteEventDetector.UnregisterCallback;
-            
-            this.onGraphViewChange = () => _deleteEventDetector.UnregisterCallback(nodeView);
-            
+            NodeView nodeView = new NodeView(node, BehaviourTreeEditorWindow.Settings.nodeViewXml);
+            nodeView.OnNodeSelected   += this.onNodeSelected;
+
             base.AddElement(nodeView); //nodes라는 GraphElement 컨테이너에 추가.
             return nodeView;
         }
-        
-        #endregion
     }
 }

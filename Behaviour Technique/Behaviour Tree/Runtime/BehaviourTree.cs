@@ -3,45 +3,48 @@ using System.Collections.Generic;
 using BehaviourTechnique;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
 using Object = UnityEngine.Object;
 
 [CreateAssetMenu]
 public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
 {
-    //[HideInInspector]
+    [HideInInspector]
     public Node rootNode;
 
     [HideInInspector]
     public Node.EState treeState = Node.EState.Running;
 
-    //[HideInInspector]
+    [HideInInspector]
     public List<Node> nodeList = new List<Node>();
+    
+    [HideInInspector]
+    public BlackboardData blackboardData = new BlackboardData();
+    
+    [SerializeField, ReadOnly, Tooltip("개별 트리를 구분하기 위한 고유 ID")]
+    private string _specificGuid;
+    
+    [SerializeField, ReadOnly, Tooltip("복제 트리를 구분하기 위한 GUID")]
+    private string _cloneGroupID;
 
     
-    [field: SerializeField, ReadOnly, Tooltip("개별 트리를 구분하기 위한 고유 ID")]
-    public string specificGuid
+    private string specificGuid
     {
-        get;
-        private set;
+        get { return _specificGuid; }
     }
     
-    [field: SerializeField, ReadOnly, Tooltip("복제 트리를 구분하기 위한 GUID")]
-    public string cloneGroupID
+    public string cloneGroupID 
     {
-        get;
-        private set;
+        get { return _cloneGroupID; }
     }
-
     
 
     public void OnEnable()
     {
-        cloneGroupID = GUID.Generate().ToString();
-        specificGuid = GUID.Generate().ToString();
+        _cloneGroupID = GUID.Generate().ToString();
+        _specificGuid = GUID.Generate().ToString();
     }
 
-    
+
     public Node.EState UpdateTree(BehaviourActor behaviourActor)
     {
         if (rootNode.state == Node.EState.Running)
@@ -50,6 +53,23 @@ public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
         }
 
         return treeState;
+    }
+    
+    
+    public bool Equals(BehaviourTree x, BehaviourTree y)
+    {
+        if (x is null || y is null || x.GetType() != y.GetType())
+        {
+            return false;
+        }
+
+        return x.rootNode.guid == y.rootNode.guid && x._specificGuid == y._specificGuid;
+    }
+
+    
+    public int GetHashCode(BehaviourTree obj)
+    {
+        return HashCode.Combine(obj.rootNode, obj._specificGuid);
     }
 
 
@@ -147,8 +167,8 @@ public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
     public virtual BehaviourTree Clone()
     {
         BehaviourTree tree = Object.Instantiate(this);
-        tree.specificGuid = GUID.Generate().ToString();
-        tree.cloneGroupID = this.cloneGroupID;
+        tree._specificGuid = GUID.Generate().ToString();
+        tree._cloneGroupID = this._cloneGroupID;
         
         tree.rootNode = tree.rootNode.Clone();
         tree.nodeList = new List<Node>();
@@ -157,21 +177,4 @@ public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
         return tree;
     }
 #endif
-    
-    
-    public bool Equals(BehaviourTree x, BehaviourTree y)
-    {
-        if (ReferenceEquals(x, null) || ReferenceEquals(y, null) || x.GetType() != y.GetType())
-        {
-            return false;
-        }
-
-        return x.rootNode.guid == y.rootNode.guid && x.specificGuid == y.specificGuid;
-    }
-
-    
-    public int GetHashCode(BehaviourTree obj)
-    {
-        return HashCode.Combine(obj.rootNode, obj.specificGuid);
-    }
 }

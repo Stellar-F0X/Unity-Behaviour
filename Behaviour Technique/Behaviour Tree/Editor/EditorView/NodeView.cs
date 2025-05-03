@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
@@ -144,14 +143,6 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         /// <param name="actor"> 현재 Editor에 그려진 BehaviourTree가 등록된 Actor </param>
         public void OnNodeDeletedEvent(BehaviourActor actor)
         {
-            foreach (FieldInfo fieldInfo in _nodeType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-            {
-                if (fieldInfo.FieldType == typeof(BehaviourTreeEvent) && fieldInfo.GetValue(node) is BehaviourTreeEvent eventValue)
-                {
-                    actor?.RemoveBehaviourEvent(eventValue.key);
-                }
-            }
-
             OnNodeDeleted?.Invoke(this);
         }
     }

@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-public static class EditorUtility
+public static class BTEditorUtility
 {
     public static string GetAssetFolderPath(string searchFilter, string folderPath = "")
     {
@@ -20,23 +20,6 @@ public static class EditorUtility
         }
 
         return string.Empty;
-    }
-
-
-    public static T FindAsset<T>(string searchFilter, string assetPath) where T : Object
-    {
-        string[] paths = assetPath.Split('/', '\\');
-        string folderPath = Path.Combine("/", string.Join("/", paths[0..(paths.Length - 1)]));
-        string combinedPath = Path.Combine(GetAssetFolderPath(searchFilter, folderPath), paths.Last());
-
-        T findAsset = AssetDatabase.LoadAssetAtPath<T>(combinedPath);
-
-        if (findAsset == null)
-        {
-            throw new FileNotFoundException($"Asset not found at path: {combinedPath}");
-        }
-
-        return findAsset;
     }
 
 

@@ -60,7 +60,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             {
                 Type currentNodeType = typeList[i - 1];
 
-                if (filter == null || !filter.Where(t => t == currentNodeType).Any())
+                if (filter == null || filter.Where(t => t == currentNodeType).Any() == false)
                 {
                     Action createNodeEvent = () => invoke.Invoke(currentNodeType);
 

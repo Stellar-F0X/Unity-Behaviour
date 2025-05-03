@@ -14,10 +14,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: -0.000015258789, y: 157.41399}
+  position: {x: 24, y: 213}
   guid: 1feed385d65844949a0a8ec6916cee51
   tag: 
   duration: 1
+--- !u!114 &-884593199743916435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baa169d2e4bf16d45b8f56c10eddcfef, type: 3}
+  m_Name: Repeat
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  position: {x: 23.999992, y: -55.782604}
+  guid: c942d05668a61fa4382222ed277dd46d
+  tag: 
+  child: {fileID: 9183040789676052550}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35,8 +53,10 @@ MonoBehaviour:
   nodeList:
   - {fileID: 5262584917895939464}
   - {fileID: -7382314284668128932}
-  <specificGuid>k__BackingField: 
-  <cloneGroupID>k__BackingField: 
+  - {fileID: 9183040789676052550}
+  - {fileID: -884593199743916435}
+  <specificGuid>k__BackingField: 67d95dadd782c9d40b292d04c8d5d5a9
+  <cloneGroupID>k__BackingField: 49072ce5ce80c7a4085dd8ced465f04e
 --- !u!114 &5262584917895939464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51,7 +71,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   started: 0
-  position: {x: 0, y: 0}
+  position: {x: 24, y: -176}
   guid: aafa2284578c5054baf7021cce531c80
   tag: 
-  child: {fileID: 0}
+  child: {fileID: -884593199743916435}
+--- !u!114 &9183040789676052550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ed0c02321058e24cabc1881149d1e4c, type: 3}
+  m_Name: Sequencer
+  m_EditorClassIdentifier: 
+  state: 0
+  started: 0
+  position: {x: 23.999992, y: 75.00001}
+  guid: 4417f68cd8fb1cd4e93e10f3d4935f52
+  tag: 
+  children:
+  - {fileID: -7382314284668128932}

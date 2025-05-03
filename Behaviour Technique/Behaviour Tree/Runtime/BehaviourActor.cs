@@ -37,11 +37,11 @@ public class BehaviourActor : MonoBehaviour
     private PlayerLoopSystem.UpdateFunction _behaviourTreeUpdate;
 
 
-    public Node FindBehaviourNodeByTag(string tag)
+    public Node FindBehaviourNodeByTag(in string nodeTag)
     {
         foreach (var node in runtimeTree.nodeList)
         {
-            if (string.Compare(node.tag, tag) == 0)
+            if (string.Compare(node.tag, nodeTag, StringComparison.Ordinal) == 0)
             {
                 return node;
             }
@@ -49,46 +49,6 @@ public class BehaviourActor : MonoBehaviour
 
         return null;
     }
-    
-    
-    #region RegistryBehaviourEvent
-
-    public void AddBehaviourEvent(BehaviourTreeEvent newEvent)
-    {
-        if (string.IsNullOrEmpty(newEvent.key) || _behaviourEvents.Contains(newEvent))
-        {
-            return;
-        }
-        
-        _behaviourEvents.Add(newEvent);
-    }
-
-
-    public void RemoveBehaviourEvent(string eventID)
-    {
-        BehaviourTreeEvent behaviourEvent = this.GetBehaviourEvent(eventID);
-
-        if (behaviourEvent != null)
-        {
-            _behaviourEvents.Remove(behaviourEvent);
-        }
-    }
-
-
-    public BehaviourTreeEvent GetBehaviourEvent(string eventID)
-    {
-        foreach (var eventElement in _behaviourEvents)
-        {
-            if (string.Compare(eventElement.key, eventID) == 0)
-            {
-                return eventElement;
-            }
-        }
-
-        return null;
-    }
-    
-    #endregion
     
 
     #region Activator Functions
