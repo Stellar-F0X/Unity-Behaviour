@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace BehaviourSystem.BT
 {
@@ -10,17 +11,21 @@ namespace BehaviourSystem.BT
         public class ConditionNode : DecoratorNode
         {
             [Space(10)]
-            public List<Condition> condition;
-
-            protected override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info) { }
+            public List<Condition> conditions;
+            
 
             protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
             {
-                Debug.Log("구현 해야 됨.");
-                return EState.Success;
+                for (int i = 0; i < conditions.Count; ++i)
+                {
+                    if (conditions[i].Execute() == false)
+                    {
+                        return EState.Failure;
+                    }
+                }
+                
+                return child.UpdateNode(behaviourTree, info);
             }
-
-            protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info) { }
         }
     }
 }

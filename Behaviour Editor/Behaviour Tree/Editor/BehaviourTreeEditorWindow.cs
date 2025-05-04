@@ -85,11 +85,13 @@ namespace BehaviourSystemEditor.BT
         }
         
         
+        /// <summary> 새로운 Behaviour Tree Asset이 추가되거나 제거될 때 호출됨. </summary>
         private void OnProjectChange()
         {
             if (_tree is not null && AssetDatabase.Contains(_tree) == false)
             {
-                this._blackboardPropList.ClearBlackboardPropertyViews();
+                //상호 연관이 적은 것부터 삭제.
+                this._blackboardPropList?.ClearBlackboardPropertyViews();
                 this._inspectorView?.Clear();
                 this._treeView?.ClearEditorViewer();
                 

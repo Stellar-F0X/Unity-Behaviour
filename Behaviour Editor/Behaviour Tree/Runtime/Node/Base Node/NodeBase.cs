@@ -58,11 +58,11 @@ namespace BehaviourSystem.BT
 
 
 
-        protected abstract void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info);
+        protected virtual void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info) { }
 
         protected abstract EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info);
 
-        protected abstract void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info);
+        protected virtual void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info) { }
 
 
         public virtual EState UpdateNode(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
@@ -70,22 +70,28 @@ namespace BehaviourSystem.BT
             switch (updateState)
             {
                 case ENodeCallState.OnEnter:
+                {
                     started = true;
                     this.OnEnter(behaviourTree, info);
                     updateState = ENodeCallState.OnUpdate;
                     return EState.Running;
+                }
 
                 case ENodeCallState.OnUpdate:
+                {
                     state = this.OnUpdate(behaviourTree, info);
                     EState resultState = state != EState.Running ? EState.Running : state;
                     updateState = state != EState.Running ? ENodeCallState.OnExit : updateState;
                     return resultState;
+                }
 
                 case ENodeCallState.OnExit:
+                {
                     this.OnExit(behaviourTree, info);
                     updateState = ENodeCallState.OnEnter;
                     started     = false;
                     return state;
+                }
 
                 default: throw new ArgumentOutOfRangeException("Not supported CallState Type");
             }

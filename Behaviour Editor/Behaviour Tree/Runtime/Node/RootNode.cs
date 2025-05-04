@@ -14,14 +14,11 @@ namespace BehaviourSystem.BT
             get { return ENodeType.Root; }
         }
 
-        protected override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info) { }
-
         protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
         {
             return child.UpdateNode(behaviourTree, new PreviusBehaviourInfo(tag, this.GetType(), baseType));
         }
-
-        protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info) { }
+        
 
         public override NodeBase Clone()
         {

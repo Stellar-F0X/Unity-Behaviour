@@ -14,10 +14,13 @@ namespace BehaviourSystemEditor.BT
         private static readonly string[] NumbericConditionTypes = Enum.GetNames(typeof(EConditionType));
 
         private readonly List<IBlackboardProperty> _cachedPropertyList = new List<IBlackboardProperty>();
-
-        private bool _canDraw = false;
-
+        
         private const int _propertyFieldWidth = 50;
+        
+        private bool _canDraw = false;
+        
+        private Rect _rect;
+        
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
@@ -34,12 +37,11 @@ namespace BehaviourSystemEditor.BT
             BlackboardData data = BehaviourTreeEditorWindow.Instance.Tree.blackboardData;
             SerializedProperty blackboardProp = property.FindPropertyRelative("property");
 
-            Rect rect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-            rect.width -= 10;
+            _rect = new Rect(position.x, position.y, position.width - 10, EditorGUIUtility.singleLineHeight);
 
-            Rect dropdownRect = new Rect(rect.x, rect.y + 2, rect.width / 3, rect.height);
-            Rect compareRect = new Rect(rect.x + rect.width / 3 + 3, rect.y + 2, rect.width / 3, rect.height);
-            Rect valueRect = new Rect(rect.x + 2 * rect.width / 3 + 6, rect.y + 2, rect.width / 3, rect.height);
+            Rect dropdownRect = new Rect(_rect.x, _rect.y + 2, _rect.width / 3, _rect.height);
+            Rect compareRect = new Rect(_rect.x + _rect.width / 3 + 3, _rect.y + 2, _rect.width / 3, _rect.height);
+            Rect valueRect = new Rect(_rect.x + 2 * _rect.width / 3 + 6, _rect.y + 2, _rect.width / 3, _rect.height);
 
             this.DrawBlackboardProperty(data, blackboardProp, dropdownRect);
 
@@ -53,7 +55,8 @@ namespace BehaviourSystemEditor.BT
         {
             if (data.Count == 0)
             {
-                EditorGUI.LabelField(dropdownRect, "No blackboard properties found.");
+                GUIContent warningIcon = EditorGUIUtility.IconContent("console.warnicon");
+                EditorGUI.LabelField(_rect, new GUIContent("No blackboard properties found.", warningIcon.image));
                 _canDraw = false;
                 return;
             }
@@ -62,7 +65,8 @@ namespace BehaviourSystemEditor.BT
 
             if (properties.Length == 0)
             {
-                EditorGUI.LabelField(dropdownRect, "Cannot find a blackboard property with the given key.");
+                GUIContent warningIcon = EditorGUIUtility.IconContent("console.warnicon");
+                EditorGUI.LabelField(_rect, new GUIContent("Cannot find a blackboard property with the given key ID.", warningIcon.image));
                 _canDraw = false;
                 return;
             }

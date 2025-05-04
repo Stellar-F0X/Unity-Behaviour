@@ -24,7 +24,5 @@ namespace BehaviourSystem.BT
 
             return EState.Running;
         }
-
-        protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info) { }
     }
 }
