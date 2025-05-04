@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace BehaviourTechnique.BehaviourTreeEditor
 {
@@ -19,12 +18,10 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private const int _propertyFieldWidth = 50;
 
-
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return 0;
+            return EditorGUIUtility.singleLineHeight + 4;
         }
-
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -35,25 +32,27 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
             BlackboardData data = BehaviourTreeEditorWindow.Instance.Tree.blackboardData;
             SerializedProperty blackboardProp = property.FindPropertyRelative("property");
-            //EditorGUILayout.LabelField("Condition", EditorStyles.boldLabel);
 
-            using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
+            Rect rect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+            rect.width -= 10;
+
+            Rect dropdownRect = new Rect(rect.x, rect.y + 2, rect.width / 3, rect.height);
+            Rect compareRect = new Rect(rect.x + rect.width / 3 + 3, rect.y + 2, rect.width / 3, rect.height);
+            Rect valueRect = new Rect(rect.x + 2 * rect.width / 3 + 6, rect.y + 2, rect.width / 3, rect.height);
+
+            this.DrawBlackboardProperty(data, blackboardProp, dropdownRect);
+
+            if (_canDraw)
             {
-                this.DrawBlackboardProperty(data, blackboardProp);
-
-                if (_canDraw)
-                {
-                    this.DrawCompareValueField(property, blackboardProp);
-                }
+                this.DrawCompareValueField(property, blackboardProp, compareRect, valueRect);
             }
         }
 
-
-        private void DrawBlackboardProperty(BlackboardData data, SerializedProperty blackboardProp)
+        private void DrawBlackboardProperty(BlackboardData data, SerializedProperty blackboardProp, Rect dropdownRect)
         {
             if (data.Count == 0)
             {
-                EditorGUILayout.LabelField("No blackboard properties found.");
+                EditorGUI.LabelField(dropdownRect, "No blackboard properties found.");
                 _canDraw = false;
                 return;
             }
@@ -62,7 +61,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
             if (properties.Length == 0)
             {
-                EditorGUILayout.LabelField("Cannot find a blackboard property with the given key.");
+                EditorGUI.LabelField(dropdownRect, "Cannot find a blackboard property with the given key.");
                 _canDraw = false;
                 return;
             }
@@ -82,21 +81,18 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             }
 
             selected                  = Mathf.Clamp(selected, 0, dropdownOptions.Length - 1);
-            selected                  = EditorGUILayout.Popup(selected, dropdownOptions);
+            selected                  = EditorGUI.Popup(dropdownRect, selected, dropdownOptions);
             blackboardProp.boxedValue = properties[selected];
             _canDraw                  = true;
         }
 
-
-        private void DrawCompareValueField(SerializedProperty property, SerializedProperty blackboardProp)
+        private void DrawCompareValueField(SerializedProperty property, SerializedProperty blackboardProp, Rect compareRect, Rect valueRect)
         {
             SerializedProperty sourceType = blackboardProp.FindPropertyRelative("_propertyType");
             SerializedProperty targetValue = property.FindPropertyRelative("comparableValue");
 
             if (targetValue.boxedValue is null)
             {
-                //source의 Type은 블랙보드의 프로퍼티 생성때 정해지는데 None 선택칸이 없으므로 None일 수 없다.
-                //더불어, DrawBlackboardProperty 함수에서 Object 타입을 필터링 하므로 Object 타입도 Condition의 타입으로 설정될 수 없음.
                 this.AllocateBlackboardProperty(sourceType, targetValue);
             }
             else
@@ -109,31 +105,27 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                 }
             }
 
-            this.DrawCompareCondition(property, sourceType);
+            this.DrawCompareCondition(property, sourceType, compareRect);
 
-            this.DrawComparablePropertyField(sourceType, targetValue.FindPropertyRelative("_value"));
+            this.DrawComparablePropertyField(sourceType, targetValue.FindPropertyRelative("_value"), valueRect);
         }
 
-
-        private void DrawCompareCondition(SerializedProperty property, SerializedProperty sourceType)
+        private void DrawCompareCondition(SerializedProperty property, SerializedProperty sourceType, Rect compareRect)
         {
-            EditorGUILayout.Space(3);
-
             SerializedProperty conditionType = property.FindPropertyRelative("conditionType");
             int selected = conditionType.enumValueIndex;
 
             if ((EBlackboardPropertyType)sourceType.enumValueIndex == EBlackboardPropertyType.Bool)
             {
                 selected                     = Mathf.Clamp(selected, 0, BoolConditionTypes.Length - 1);
-                conditionType.enumValueIndex = EditorGUILayout.Popup(selected, BoolConditionTypes);
+                conditionType.enumValueIndex = EditorGUI.Popup(compareRect, selected, BoolConditionTypes);
             }
             else
             {
                 selected                     = Mathf.Clamp(selected, 0, NumbericConditionTypes.Length - 1);
-                conditionType.enumValueIndex = EditorGUILayout.Popup(selected, NumbericConditionTypes);
+                conditionType.enumValueIndex = EditorGUI.Popup(compareRect, selected, NumbericConditionTypes);
             }
         }
-
 
         private IBlackboardProperty[] GetUsableBlackboardProperties(BlackboardData data)
         {
@@ -157,21 +149,17 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             return _cachedPropertyList.ToArray();
         }
 
-
-        private void DrawComparablePropertyField(SerializedProperty sourceType, SerializedProperty prop)
+        private void DrawComparablePropertyField(SerializedProperty sourceType, SerializedProperty prop, Rect valueRect)
         {
-            EditorGUILayout.Space(3);
-
             switch ((EBlackboardPropertyType)sourceType.enumValueIndex)
             {
-                case EBlackboardPropertyType.Int: prop.intValue = EditorGUILayout.IntField(prop.intValue, GUILayout.Width(_propertyFieldWidth)); break;
+                case EBlackboardPropertyType.Int: prop.intValue = EditorGUI.IntField(valueRect, prop.intValue); break;
 
-                case EBlackboardPropertyType.Bool: prop.boolValue = EditorGUILayout.Toggle(prop.boolValue, GUILayout.Width(_propertyFieldWidth)); break;
+                case EBlackboardPropertyType.Bool: prop.boolValue = EditorGUI.Toggle(valueRect, prop.boolValue); break;
 
-                case EBlackboardPropertyType.Float: prop.floatValue = EditorGUILayout.FloatField(prop.floatValue, GUILayout.Width(_propertyFieldWidth)); break;
+                case EBlackboardPropertyType.Float: prop.floatValue = EditorGUI.FloatField(valueRect, prop.floatValue); break;
             }
         }
-
 
         private void AllocateBlackboardProperty(SerializedProperty sourceType, SerializedProperty targetValue)
         {
