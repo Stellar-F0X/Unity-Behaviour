@@ -86,8 +86,8 @@ public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
             Undo.RecordObject(this, "Behaviour Tree (CreateNode)");
             Undo.RegisterCreatedObjectUndo(node, "Behaviour Tree (CreateNode)");
 
-            //AssetDatabase.AddObjectToAsset(node, this);
-            EditorUtility.SetDirty(this);
+            node.hideFlags = HideFlags.HideInHierarchy;
+            AssetDatabase.AddObjectToAsset(node, this);
             AssetDatabase.SaveAssets();
         }
 
@@ -101,7 +101,6 @@ public class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
         nodeList.Remove(node);
         
         Undo.DestroyObjectImmediate(node);
-        EditorUtility.SetDirty(this);
         AssetDatabase.SaveAssets();
     }
 
