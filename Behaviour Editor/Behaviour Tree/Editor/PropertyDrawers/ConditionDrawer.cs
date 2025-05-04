@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using BehaviourSystem.BT;
 using UnityEditor;
 using UnityEngine;
 
-namespace BehaviourTechnique.BehaviourTreeEditor
+namespace BehaviourSystemEditor.BT
 {
     [CustomPropertyDrawer(typeof(Condition))]
     public class ConditionDrawer : PropertyDrawer

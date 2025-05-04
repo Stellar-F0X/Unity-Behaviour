@@ -3,45 +3,47 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-
-public static class BTEditorUtility
+namespace BehaviourSystemEditor.BT
 {
-    public static string GetAssetFolderPath(string searchFilter, string folderPath = "")
+    public static class BTEditorUtility
     {
-        foreach (var guid in AssetDatabase.FindAssets(searchFilter) ?? Enumerable.Empty<string>())
+        public static string GetAssetFolderPath(string searchFilter, string folderPath = "")
         {
-            string parentPath = AssetDatabase.GUIDToAssetPath(guid);
-            string resultPath = $"{parentPath}{folderPath}";
-
-            if (Directory.Exists(resultPath))
+            foreach (var guid in AssetDatabase.FindAssets(searchFilter) ?? Enumerable.Empty<string>())
             {
-                return resultPath;
+                string parentPath = AssetDatabase.GUIDToAssetPath(guid);
+                string resultPath = $"{parentPath}{folderPath}";
+
+                if (Directory.Exists(resultPath))
+                {
+                    return resultPath;
+                }
             }
+
+            return string.Empty;
         }
 
-        return string.Empty;
-    }
 
-
-    public static T FindAssetByName<T>(string searchFilter) where T : Object
-    {
-        string[] guids = AssetDatabase.FindAssets(searchFilter);
-
-        if (guids is null || guids.Length == 0)
+        public static T FindAssetByName<T>(string searchFilter) where T : Object
         {
-            return null;
-        }
-        
-        foreach (var guid in guids)
-        {
-            string parentPath = AssetDatabase.GUIDToAssetPath(guid);
+            string[] guids = AssetDatabase.FindAssets(searchFilter);
 
-            if (File.Exists(parentPath))
+            if (guids is null || guids.Length == 0)
             {
-                return AssetDatabase.LoadAssetAtPath<T>(parentPath);
+                return null;
             }
-        }
 
-        throw new FileNotFoundException($"Asset not found at filter: {searchFilter}");
+            foreach (var guid in guids)
+            {
+                string parentPath = AssetDatabase.GUIDToAssetPath(guid);
+
+                if (File.Exists(parentPath))
+                {
+                    return AssetDatabase.LoadAssetAtPath<T>(parentPath);
+                }
+            }
+
+            throw new FileNotFoundException($"Asset not found at filter: {searchFilter}");
+        }
     }
 }

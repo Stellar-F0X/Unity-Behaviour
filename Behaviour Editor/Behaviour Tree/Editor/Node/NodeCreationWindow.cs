@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BehaviourSystem.BT;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Vector2 = UnityEngine.Vector2;
 
-namespace BehaviourTechnique.BehaviourTreeEditor
+namespace BehaviourSystemEditor.BT
 {
     public class NodeCreationWindow : ScriptableObject, ISearchWindowProvider
     {
@@ -50,7 +50,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         }
 
 
-        private SearchTreeEntry[] CreateSubSearchTreeEntry<T>(string title, Action<Type> invoke, int layerLevel = 1, Type[] filter = null) where T : Node
+        private SearchTreeEntry[] CreateSubSearchTreeEntry<T>(string title, Action<Type> invoke, int layerLevel = 1, Type[] filter = null) where T : NodeBase
         {
             TypeCache.TypeCollection typeList = TypeCache.GetTypesDerivedFrom<T>();
             SearchTreeEntry[] entries = new SearchTreeEntry[typeList.Count + 1];

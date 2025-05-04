@@ -3,28 +3,28 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class WaitNode : ActionNode
+namespace BehaviourSystem.BT
 {
-    public float duration = 1f;
-    private float _startTime;
-    
-    protected override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+    public class WaitNode : ActionNode
     {
-        _startTime = Time.time;
-    }
-    
-    protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
-    {
-        if (Time.time > _startTime + duration)
+        public float duration = 1f;
+        private float _startTime;
+
+        protected override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
         {
-            return EState.Success;
+            _startTime = Time.time;
         }
 
-        return EState.Running;
-    }
-    
-    protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
-    {
-        
+        protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+        {
+            if (Time.time > _startTime + duration)
+            {
+                return EState.Success;
+            }
+
+            return EState.Running;
+        }
+
+        protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info) { }
     }
 }

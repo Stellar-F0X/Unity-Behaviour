@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
 
-namespace BehaviourTechnique
+namespace BehaviourSystem.BT
 {
     [Serializable]
     public class BlackboardData

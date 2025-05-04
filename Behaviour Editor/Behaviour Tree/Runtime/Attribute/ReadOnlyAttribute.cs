@@ -1,8 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
-namespace BehaviourTechnique
-{ [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+namespace BehaviourSystem
+{
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class ReadOnlyAttribute : PropertyAttribute
     {
         public readonly bool isRuntimeOnly;

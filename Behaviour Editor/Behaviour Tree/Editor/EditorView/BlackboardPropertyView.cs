@@ -1,10 +1,10 @@
 using System;
+using BehaviourSystem.BT;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
-using UObject = UnityEngine.Object;
 
-namespace BehaviourTechnique.BehaviourTreeEditor
+namespace BehaviourSystemEditor.BT
 {
     public class BlackboardPropertyView : VisualElement
     {

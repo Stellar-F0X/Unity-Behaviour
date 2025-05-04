@@ -1,14 +1,15 @@
 using System;
+using BehaviourSystem.BT;
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using UnityEditor;
 
-namespace BehaviourTechnique.BehaviourTreeEditor
+namespace BehaviourSystemEditor.BT
 {
-    public class NodeView : UnityEditor.Experimental.GraphView.Node
+    public class NodeView : Node
     {
-        public NodeView(Node node, VisualTreeAsset nodeUxml) : base(AssetDatabase.GetAssetPath(nodeUxml))
+        public NodeView(NodeBase node, VisualTreeAsset nodeUxml) : base(AssetDatabase.GetAssetPath(nodeUxml))
         {
             this.node = node;
             this.title = node.name;
@@ -29,9 +30,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         public event Action<NodeView> OnNodeSelected;
         public event Action<NodeView> OnNodeUnselected;
-        public event Action<NodeView> OnNodeDeleted;
 
-        public Node node;
+        public NodeBase node;
         public Port input;
         public Port output;
 
@@ -52,20 +52,20 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         {
             switch (node.baseType)
             {
-                case Node.ENodeType.Root:
+                case NodeBase.ENodeType.Root:
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
                     break;
 
-                case Node.ENodeType.Action:
+                case NodeBase.ENodeType.Action:
                     input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     break;
 
-                case Node.ENodeType.Composite:
+                case NodeBase.ENodeType.Composite:
                     input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Multi, typeof(bool));
                     break;
 
-                case Node.ENodeType.Decorator:
+                case NodeBase.ENodeType.Decorator:
                     input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
                     break;
@@ -125,7 +125,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         public void SortChildren()
         {
-            if (this.node.baseType != Node.ENodeType.Composite)
+            if (this.node.baseType != NodeBase.ENodeType.Composite)
             {
                 return;
             }

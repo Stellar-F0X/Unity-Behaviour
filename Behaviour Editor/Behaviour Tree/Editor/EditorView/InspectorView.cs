@@ -1,15 +1,13 @@
 using UnityEditor;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
-using BehaviourTechnique.BehaviourTreeEditor;
 using UnityEditor.UIElements;
 
-namespace BehaviourTechnique.UIElements
+namespace BehaviourSystemEditor.BT
 {
-    public class InspectorView : InspectorElement
+    [UxmlElement]
+    public partial class InspectorView : InspectorElement
     {
-        public new class UxmlFactory : UxmlFactory<InspectorView, UxmlTraits> { }
-
         private Editor _editor;
 
         public InspectorView() { }

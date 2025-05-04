@@ -1,17 +1,13 @@
+using BehaviourSystem.BT;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace BehaviourTechnique.BehaviourTreeEditor
+namespace BehaviourSystemEditor.BT
 {
-    public class BlackboardPropertyViewList : ListView
+    [UxmlElement]
+    public partial class BlackboardPropertyViewList : ListView
     {
-        public new class UxmlFactory : UxmlFactory<BlackboardPropertyViewList, UxmlTraits> { }
-
-        public BlackboardPropertyViewList() { }
-
-        
         private ToolbarMenu _addButton;
         private BehaviourTree _tree;
 

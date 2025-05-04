@@ -1,17 +1,19 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 
-[Serializable]
-public struct PreviusBehaviourInfo
+namespace BehaviourSystem.BT
 {
-    public PreviusBehaviourInfo(string tag, Type nodeType, Node.ENodeType basedType)
+    [Serializable]
+    public struct PreviusBehaviourInfo
     {
-        this.tag = tag;
-        this.nodeType = nodeType;
-        this.basedType = basedType;
-    }
+        public PreviusBehaviourInfo(string tag, Type nodeType, NodeBase.ENodeType basedType)
+        {
+            this.tag       = tag;
+            this.nodeType  = nodeType;
+            this.basedType = basedType;
+        }
 
-    public string tag;
-    public Type nodeType;
-    public Node.ENodeType basedType;
+        public string tag;
+        public Type nodeType;
+        public NodeBase.ENodeType basedType;
+    }
 }

@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using BehaviourSystem.BT;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace BehaviourTechnique.BehaviourTreeEditor
+namespace BehaviourSystemEditor.BT
 {
     public class NodeEdgeHandler
     {
-        public void ConnectEdges(BehaviourTreeView treeView, Node parentNode, List<Node> childrenNodes)
+        public void ConnectEdges(BehaviourTreeView treeView, NodeBase parentNodeBase, List<NodeBase> childrenNodes)
         {
             foreach (var child in childrenNodes)
             {
-                NodeView parentView = treeView.FindNodeView(parentNode);
+                NodeView parentView = treeView.FindNodeView(parentNodeBase);
                 NodeView childView = treeView.FindNodeView(child);
 
                 if (parentView == null || childView == null)

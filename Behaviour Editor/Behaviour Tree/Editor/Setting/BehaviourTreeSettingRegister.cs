@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 
-namespace BehaviourTechnique.BehaviourTreeEditor.Setting
+namespace BehaviourSystemEditor.BT
 {
     //https://docs.unity3d.com/ScriptReference/SettingsProvider.html
     public class BehaviourTreeSettingRegister

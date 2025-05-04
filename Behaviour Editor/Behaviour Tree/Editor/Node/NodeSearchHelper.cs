@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using GraphNode = UnityEditor.Experimental.GraphView.Node;
 
-namespace BehaviourTechnique.BehaviourTreeEditor
+namespace BehaviourSystemEditor.BT
 {
     public class NodeSearchHelper
     {

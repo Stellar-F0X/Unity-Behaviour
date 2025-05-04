@@ -5,14 +5,14 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.Linq;
+using BehaviourSystem.BT;
 using UnityEditor.UIElements;
 
-namespace BehaviourTechnique.BehaviourTreeEditor
+namespace BehaviourSystemEditor.BT
 {
-    public class BehaviourTreeView : GraphView
+    [UxmlElement]
+    public partial class BehaviourTreeView : GraphView
     {
-        public new class UxmlFactory : UxmlFactory<BehaviourTreeView, UxmlTraits> { }
-
         public BehaviourTreeView()
         {
             base.Insert(0, new GridBackground());
@@ -51,6 +51,15 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private NodeCreationWindow _nodeCreationWindow;
 
 
+        public void ClearEditorViewer()
+        {
+            graphViewChanged -= OnGraphViewChanged;
+            DeleteElements(graphElements.ToList());
+            
+            nodes.ForEach(n => n.RemoveFromHierarchy());
+            edges.ForEach(e => e.RemoveFromHierarchy());
+        }
+        
 
         public void OnGraphEditorView(BehaviourTree tree)
         {
@@ -65,7 +74,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         }
 
 
-        public NodeView FindNodeView(Node node)
+        public NodeView FindNodeView(NodeBase node)
         {
             if (node == null || node.guid == null)
             {
@@ -121,7 +130,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         public NodeView CreateNodeAndView(Type type, Vector2 mousePosition)
         {
-            Node node = _tree.CreateNode(type);
+            NodeBase node = _tree.CreateNode(type);
             node.position = mousePosition;
             return this.CreateNodeView(node);
         }
@@ -151,9 +160,9 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             base.DeleteElements(graphElements.ToList());
             graphViewChanged += OnGraphViewChanged;
 
-            if (_tree.rootNode == null)
+            if (_tree.rootNodeBase == null)
             {
-                tree.rootNode = tree.CreateNode(typeof(RootNode)) as RootNode;
+                tree.rootNodeBase = tree.CreateNode(typeof(RootNode)) as RootNode;
                 UnityEditor.EditorUtility.SetDirty(tree);
                 AssetDatabase.SaveAssets();
             }
@@ -209,7 +218,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         }
 
 
-        private NodeView CreateNodeView(Node node)
+        private NodeView CreateNodeView(NodeBase node)
         {
             NodeView nodeView = new NodeView(node, BehaviourTreeEditorWindow.Settings.nodeViewXml);
             nodeView.OnNodeSelected += this.onNodeSelected;

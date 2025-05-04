@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-
-[Serializable]
-public abstract class DecoratorNode : Node
+namespace BehaviourSystem.BT
 {
-    [HideInInspector]
-    public Node child;
-
-    public override ENodeType baseType
+    [Serializable]
+    public abstract class DecoratorNode : NodeBase
     {
-        get { return ENodeType.Decorator; }
-    }
+        [HideInInspector]
+        public NodeBase child;
 
-    public override Node Clone()
-    {
-        DecoratorNode node = base.Clone() as DecoratorNode;
-        node.child = this.child.Clone();
-        return node;
+        public override ENodeType baseType
+        {
+            get { return ENodeType.Decorator; }
+        }
+
+        public override NodeBase Clone()
+        {
+            DecoratorNode node = base.Clone() as DecoratorNode;
+            node.child = this.child.Clone();
+            return node;
+        }
     }
 }

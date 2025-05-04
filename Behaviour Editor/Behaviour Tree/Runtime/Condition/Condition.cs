@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace BehaviourTechnique
+namespace BehaviourSystem.BT
 {
     [Serializable]
     public sealed class Condition

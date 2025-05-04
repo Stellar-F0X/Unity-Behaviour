@@ -1,11 +1,13 @@
 using System;
 
-
-[Serializable]
-public abstract class ActionNode : Node
+namespace BehaviourSystem.BT
 {
-    public override ENodeType baseType
+    [Serializable]
+    public abstract class ActionNode : NodeBase
     {
-        get { return ENodeType.Action; }
+        public override ENodeType baseType
+        {
+            get { return ENodeType.Action; }
+        }
     }
 }

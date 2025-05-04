@@ -1,7 +1,10 @@
-﻿public abstract class SubsetNode : Node
+﻿namespace BehaviourSystem.BT
 {
-    public override ENodeType baseType
+    public abstract class SubsetNode : NodeBase
     {
-        get { return ENodeType.Subset; }
+        public override ENodeType baseType
+        {
+            get { return ENodeType.Subset; }
+        }
     }
 }

@@ -1,4 +1,4 @@
-namespace BehaviourTechnique
+namespace BehaviourSystem.BT
 {
     public enum EConditionType
     {

@@ -7,156 +7,156 @@ using UnityEngine.PlayerLoop;
 using Update = UnityEngine.PlayerLoop.Update;
 using FixedUpdate = UnityEngine.PlayerLoop.FixedUpdate;
 
-
-public class BehaviourActor : MonoBehaviour
+namespace BehaviourSystem.BT
 {
-    public enum eUpdateMode
+    public class BehaviourActor : MonoBehaviour
     {
-        Update,
-        FixedUpdate,
-        LateUpdate
-    }
-
-    public enum eStartMode
-    {
-        Awake,
-        Enable,
-        Start
-    }
-    
-    public BehaviourTree runtimeTree;
-    public eUpdateMode updateMode;
-    public eStartMode startMode;
-    
-    private bool _canRegisterWhenEnable;
-    
-    [SerializeField, HideInInspector]
-    private List<BehaviourTreeEvent> _behaviourEvents = new List<BehaviourTreeEvent>();
-    
-    private PlayerLoopSystem _playerLoop;
-    private PlayerLoopSystem.UpdateFunction _behaviourTreeUpdate;
-
-
-    public Node FindBehaviourNodeByTag(in string nodeTag)
-    {
-        foreach (var node in runtimeTree.nodeList)
+        public enum eUpdateMode
         {
-            if (string.Compare(node.tag, nodeTag, StringComparison.Ordinal) == 0)
+            Update,
+            FixedUpdate,
+            LateUpdate
+        }
+
+        public enum eStartMode
+        {
+            Awake,
+            Enable,
+            Start
+        }
+
+        public BehaviourTree runtimeTree;
+        public eUpdateMode updateMode;
+        public eStartMode startMode;
+
+        private bool _canRegisterWhenEnable;
+
+        private PlayerLoopSystem _playerLoop;
+        private PlayerLoopSystem.UpdateFunction _behaviourTreeUpdate;
+
+
+        public NodeBase FindBehaviourNodeByTag(in string nodeTag)
+        {
+            foreach (var node in runtimeTree.nodeList)
             {
-                return node;
+                if (string.Compare(node.tag, nodeTag, StringComparison.Ordinal) == 0)
+                {
+                    return node;
+                }
+            }
+
+            return null;
+        }
+
+
+        #region Activator Functions
+
+        private void Awake()
+        {
+            this.runtimeTree = runtimeTree.Clone();
+
+            if (startMode == eStartMode.Awake)
+            {
+                RegisterUpdateCallback(eStartMode.Awake);
             }
         }
 
-        return null;
-    }
-    
-
-    #region Activator Functions
-    
-    private void Awake()
-    {
-        this.runtimeTree = runtimeTree.Clone();
-
-        if (startMode == eStartMode.Awake)
+        private void Start()
         {
-            RegisterUpdateCallback(eStartMode.Awake);
-        }
-    }
+            if (startMode == eStartMode.Start)
+            {
+                RegisterUpdateCallback(eStartMode.Start);
+            }
 
-    private void Start()
-    {
-        if (startMode == eStartMode.Start)
-        {
-            RegisterUpdateCallback(eStartMode.Start);
+            _canRegisterWhenEnable = true;
         }
 
-        _canRegisterWhenEnable = true;
-    }
-
-    private void OnEnable()
-    {
-        if (startMode == eStartMode.Enable || _canRegisterWhenEnable)
+        private void OnEnable()
         {
-            this.RegisterUpdateCallback(eStartMode.Enable);
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (_behaviourTreeUpdate?.GetInvocationList().Length > 0)
-        {
-            this.RemoveUpdateCallback();
-        }
-    }
-
-    #endregion
-
-
-    #region RegistryUpdateCallback
-
-    private void RemoveUpdateCallback()
-    {
-        Type updateType = GetUpdateType();
-        var loopSystem = _playerLoop.subSystemList.FirstOrDefault(s => s.type == updateType);
-        int index = Array.IndexOf(_playerLoop.subSystemList, loopSystem);
-
-        if (index != -1)
-        {
-            loopSystem.subSystemList = loopSystem.subSystemList
-                .Where(system => system.updateDelegate != _behaviourTreeUpdate)
-                .ToArray();
-
-            _playerLoop.subSystemList[index] = loopSystem;
-            PlayerLoop.SetPlayerLoop(_playerLoop);
+            if (startMode == eStartMode.Enable || _canRegisterWhenEnable)
+            {
+                this.RegisterUpdateCallback(eStartMode.Enable);
+            }
         }
 
-        this._behaviourTreeUpdate -= BehaviourTreeUpdate;
-    }
-
-
-    private void RegisterUpdateCallback(eStartMode mode)
-    {
-        this._playerLoop = PlayerLoop.GetCurrentPlayerLoop();
-        this._behaviourTreeUpdate -= BehaviourTreeUpdate;
-        this._behaviourTreeUpdate += BehaviourTreeUpdate;
-        
-        Type updateType = this.GetUpdateType();
-        var loopSystem = _playerLoop.subSystemList.FirstOrDefault(s => s.type == updateType);
-        int index = Array.IndexOf(_playerLoop.subSystemList, loopSystem);
-        
-        if (index != -1)
+        private void OnDisable()
         {
-            var newSystems = loopSystem.subSystemList.Append(new PlayerLoopSystem {
-                updateDelegate = _behaviourTreeUpdate,
-                type = updateType,
-            });
-
-            loopSystem.subSystemList = newSystems.ToArray();
-            _playerLoop.subSystemList[index] = loopSystem;
-            PlayerLoop.SetPlayerLoop(_playerLoop);
+            if (_behaviourTreeUpdate?.GetInvocationList().Length > 0)
+            {
+                this.RemoveUpdateCallback();
+            }
         }
-    }
+
+        #endregion
 
 
-    private Type GetUpdateType()
-    {
-        switch (updateMode)
+        #region RegistryUpdateCallback
+
+        private void RemoveUpdateCallback()
         {
-            case eUpdateMode.Update: return typeof(Update);
+            Type updateType = GetUpdateType();
+            var loopSystem = _playerLoop.subSystemList.FirstOrDefault(s => s.type == updateType);
+            int index = Array.IndexOf(_playerLoop.subSystemList, loopSystem);
 
-            case eUpdateMode.FixedUpdate: return typeof(FixedUpdate);
+            if (index != -1)
+            {
+                loopSystem.subSystemList = loopSystem.subSystemList
+                                                     .Where(system => system.updateDelegate != _behaviourTreeUpdate)
+                                                     .ToArray();
 
-            case eUpdateMode.LateUpdate: return typeof(PostLateUpdate);
+                _playerLoop.subSystemList[index] = loopSystem;
+                PlayerLoop.SetPlayerLoop(_playerLoop);
+            }
 
-            default: return null;
+            this._behaviourTreeUpdate -= BehaviourTreeUpdate;
         }
-    }
 
-    #endregion
-    
-    
-    private void BehaviourTreeUpdate()
-    {
-        runtimeTree.UpdateTree(this);
+
+        private void RegisterUpdateCallback(eStartMode mode)
+        {
+            this._playerLoop          =  PlayerLoop.GetCurrentPlayerLoop();
+            this._behaviourTreeUpdate -= BehaviourTreeUpdate;
+            this._behaviourTreeUpdate += BehaviourTreeUpdate;
+
+            Type updateType = this.GetUpdateType();
+            var loopSystem = _playerLoop.subSystemList.FirstOrDefault(s => s.type == updateType);
+            int index = Array.IndexOf(_playerLoop.subSystemList, loopSystem);
+
+            if (index != -1)
+            {
+                var newSystems = loopSystem.subSystemList.Append(new PlayerLoopSystem
+                {
+                    updateDelegate = _behaviourTreeUpdate,
+                    type           = updateType,
+                });
+
+                loopSystem.subSystemList         = newSystems.ToArray();
+                _playerLoop.subSystemList[index] = loopSystem;
+                PlayerLoop.SetPlayerLoop(_playerLoop);
+            }
+        }
+
+
+        private Type GetUpdateType()
+        {
+            switch (updateMode)
+            {
+                case eUpdateMode.Update: return typeof(Update);
+
+                case eUpdateMode.FixedUpdate: return typeof(FixedUpdate);
+
+                case eUpdateMode.LateUpdate: return typeof(PostLateUpdate);
+
+                default: return null;
+            }
+        }
+
+        #endregion
+
+
+        private void BehaviourTreeUpdate()
+        {
+            runtimeTree.UpdateTree(this);
+        }
     }
 }

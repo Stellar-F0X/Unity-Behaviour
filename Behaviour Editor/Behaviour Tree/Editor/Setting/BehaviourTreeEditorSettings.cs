@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace BehaviourTechnique.BehaviourTreeEditor.Setting
+namespace BehaviourSystemEditor.BT
 {
     [CreateAssetMenu]
     public class BehaviourTreeEditorSettings : ScriptableObject

@@ -1,13 +1,13 @@
+using System;
 using System.Linq;
-using BehaviourTechnique.BehaviourTreeEditor.Setting;
+using BehaviourSystem.BT;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.Callbacks;
-using BehaviourTechnique.UIElements;
 using UnityEditor.UIElements;
 
-namespace BehaviourTechnique.BehaviourTreeEditor
+namespace BehaviourSystemEditor.BT
 {
     public class BehaviourTreeEditorWindow : EditorWindow
     {
@@ -30,6 +30,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
             return false;
         }
+        
 
         private static BehaviourTreeEditorSettings _settings;
 
@@ -82,6 +83,26 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         {
             EditorApplication.playModeStateChanged -= this.OnPlayNodeStateChanged;
         }
+        
+        
+        private void OnProjectChange()
+        {
+            if (_tree is not null && AssetDatabase.Contains(_tree) == false)
+            {
+                this._blackboardPropList.ClearBlackboardPropertyViews();
+                this._inspectorView?.Clear();
+                this._treeView?.ClearEditorViewer();
+                
+                this.CanEditTree = false;
+                this._actor = null;
+                this._tree = null;
+            }
+            else
+            {
+                this.OnSelectionChange();
+            }
+        }
+
 
 
         private void Update()
@@ -137,6 +158,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
                 case BehaviourTree treeObj: _tree = treeObj; break;
 
                 case GameObject gameObj: _tree = gameObj.TryGetComponent(out _actor) ? _actor.runtimeTree : null; break;
+                
+                default: return;
             }
 
             CanEditTree = false;

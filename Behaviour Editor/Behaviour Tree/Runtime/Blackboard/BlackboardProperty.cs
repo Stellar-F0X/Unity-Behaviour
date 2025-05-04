@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace BehaviourTechnique
+namespace BehaviourSystem.BT
 {
     [Serializable]
     public class BlackboardProperty<T> : IBlackboardProperty

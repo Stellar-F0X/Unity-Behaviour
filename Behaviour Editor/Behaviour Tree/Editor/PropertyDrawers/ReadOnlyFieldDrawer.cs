@@ -1,7 +1,8 @@
-﻿using UnityEditor;
+﻿using BehaviourSystem;
+using UnityEditor;
 using UnityEngine;
 
-namespace BehaviourTechnique.BehaviourTreeEditor
+namespace BehaviourSystemEditor.BT
 {
     [CustomPropertyDrawer(typeof(ReadOnlyAttribute), true)]
     public class ReadOnlyFieldDrawer : PropertyDrawer
