@@ -1,13 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
-using BehaviourTechnique.BehaviourTreeEditor.Setting;
 using UnityEngine.UIElements;
 using UnityEngine;
 using UnityEditor;
 using System;
 using System.Linq;
-using BehaviourTechnique.UIElements;
+using UnityEditor.UIElements;
 
 namespace BehaviourTechnique.BehaviourTreeEditor
 {
@@ -17,7 +15,7 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         public BehaviourTreeView()
         {
-            Insert(0, new GridBackground());
+            base.Insert(0, new GridBackground());
 
             ContentZoomer zoomer = new ContentZoomer()
             {
@@ -32,7 +30,8 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
             styleSheets.Add(BehaviourTreeEditorWindow.Settings.behaviourTreeStyle);
 
-            _nodeEdgeHandler = new NodeEdgeHandler();
+            _nodeEdgeHandler  = new NodeEdgeHandler();
+            _nodeSearchHelper = new NodeSearchHelper();
 
             Undo.undoRedoPerformed = () =>
             {
@@ -44,21 +43,24 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         public Action onGraphViewChange;
         public Action<NodeView> onNodeSelected;
+        public ToolbarPopupSearchField popupSearchField;
 
         private BehaviourTree _tree;
+        private NodeSearchHelper _nodeSearchHelper;
         private NodeEdgeHandler _nodeEdgeHandler;
         private NodeCreationWindow _nodeCreationWindow;
 
 
+
         public void OnGraphEditorView(BehaviourTree tree)
         {
-            if (tree == null)
+            if (tree is null)
             {
                 return;
             }
 
             this._tree = tree;
-            this.Intialize(tree);
+            this.Initialize(tree);
             this.IntegrityCheckNodeList(tree);
         }
 
@@ -125,16 +127,6 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         }
 
 
-        public void ClearEditorViwer()
-        {
-            graphViewChanged -= OnGraphViewChanged;
-            DeleteElements(graphElements.ToList());
-
-            nodes.ForEach(n => n.RemoveFromHierarchy());
-            edges.ForEach(e => e.RemoveFromHierarchy());
-        }
-
-
         public void UpdateNodeView()
         {
             int length = nodes.Count();
@@ -151,12 +143,12 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         }
 
 
-        private void Intialize(BehaviourTree tree)
+        private void Initialize(BehaviourTree tree)
         {
             onGraphViewChange?.Invoke();
 
             graphViewChanged -= OnGraphViewChanged;
-            DeleteElements(graphElements.ToList());
+            base.DeleteElements(graphElements.ToList());
             graphViewChanged += OnGraphViewChanged;
 
             if (_tree.rootNode == null)
@@ -220,10 +212,50 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private NodeView CreateNodeView(Node node)
         {
             NodeView nodeView = new NodeView(node, BehaviourTreeEditorWindow.Settings.nodeViewXml);
-            nodeView.OnNodeSelected   += this.onNodeSelected;
+            nodeView.OnNodeSelected += this.onNodeSelected;
 
             base.AddElement(nodeView); //nodes라는 GraphElement 컨테이너에 추가.
             return nodeView;
+        }
+
+        
+        public void SearchNodeByNameOrTag(ChangeEvent<string> evt)
+        {
+            if (_nodeSearchHelper.HasSyntaxes(evt.newValue, out var syntaxes))
+            {
+                popupSearchField.menu.ClearItems();
+                
+                NodeView[] views = null;
+
+                if (syntaxes.Length == 1)
+                {
+                    views = _nodeSearchHelper.GetNodeView(syntaxes[0], NodeSearchHelper.ESearchOptions.Both, nodes);
+                }
+                else if (string.Compare(syntaxes[0], "t:", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    views = _nodeSearchHelper.GetNodeView(syntaxes[1], NodeSearchHelper.ESearchOptions.Tag, nodes);
+                }
+                else if (string.Compare(syntaxes[0], "n:", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    views = _nodeSearchHelper.GetNodeView(syntaxes[1], NodeSearchHelper.ESearchOptions.Name, nodes);
+                }
+
+                if (views is not null)
+                {
+                    foreach (NodeView view in views)
+                    {
+                        string menuName = $"name: [{view.node.name}]   tag: [{view.node.tag}]";
+                        
+                        popupSearchField.menu.AppendAction(menuName, _ =>
+                        {
+                            this.SelectNode(view);
+                            base.FrameSelection();
+                        });
+                    }
+                    
+                    popupSearchField.ShowMenu();
+                }
+            }
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace BehaviourTechnique
@@ -10,7 +11,7 @@ namespace BehaviourTechnique
             set;
         }
 
-        public EBlackboardElement elementType
+        public EBlackboardPropertyType propertyType
         {
             get;
         }

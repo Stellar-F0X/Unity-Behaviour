@@ -4,42 +4,42 @@ using UnityEngine;
 namespace BehaviourTechnique
 {
     [Serializable]
-    public class BlackboardProperty<T> : IBlackboardProperty where T : struct
+    public class BlackboardProperty<T> : IBlackboardProperty
     {
-        public BlackboardProperty(string key, T value, EBlackboardElement type)
+        public BlackboardProperty(string key, T value, EBlackboardPropertyType type)
         {
-            _key         = key;
-            _value       = value;
-            _elementType = type;
+            _key          = key;
+            _value        = value;
+            _propertyType = type;
         }
-        
+
         [SerializeField]
         private string _key;
-        
+
         [SerializeField]
         private T _value;
 
         [SerializeField]
-        private EBlackboardElement _elementType;
+        private EBlackboardPropertyType _propertyType;
 
-        
+
         public string key
         {
             get { return _key; }
             set { _key = value; }
         }
-        
-        public T value 
+
+        public T value
         {
             get { return _value; }
         }
-        
-        public EBlackboardElement elementType
+
+        public EBlackboardPropertyType propertyType
         {
-            get { return _elementType; }
+            get { return _propertyType; }
         }
 
-        
+
         public void InitializeBeforePlaymode()
         {
             _value = default(T);

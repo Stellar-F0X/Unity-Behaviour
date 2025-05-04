@@ -1,8 +1,8 @@
 using System;
 using UnityEditor;
 using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 using UnityEngine;
+using UObject = UnityEngine.Object;
 
 namespace BehaviourTechnique.BehaviourTreeEditor
 {
@@ -50,27 +50,34 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         private void DrawInspectorGUI()
         {
-            GUI.enabled = false;
             
-            switch (_property.elementType)
+            switch (_property.propertyType)
             {
-                case EBlackboardElement.Int:
+                case EBlackboardPropertyType.Int:
+                    GUI.enabled = false;
                     var intProperty = (BlackboardProperty<int>)_property;
                     EditorGUILayout.IntField(intProperty.value);
+                    GUI.enabled = true;
                     break;
 
-                case EBlackboardElement.Float:
+                case EBlackboardPropertyType.Float:
+                    GUI.enabled = false;
                     var floatProperty = (BlackboardProperty<float>)_property;
                     EditorGUILayout.FloatField(floatProperty.value);
+                    GUI.enabled = true;
                     break;
 
-                case EBlackboardElement.Bool:
+                case EBlackboardPropertyType.Bool:
+                    GUI.enabled = false;
                     var boolProperty = (BlackboardProperty<bool>)_property;
                     EditorGUILayout.Toggle(boolProperty.value);
+                    GUI.enabled = true;
+                    break;
+                
+                case EBlackboardPropertyType.Object:
+                    EditorGUILayout.LabelField("UObject");
                     break;
             }
-
-            GUI.enabled = true;
         }
 
 

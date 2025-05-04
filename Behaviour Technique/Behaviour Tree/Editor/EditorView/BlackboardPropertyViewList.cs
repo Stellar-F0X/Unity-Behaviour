@@ -1,5 +1,6 @@
-using System;
+using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace BehaviourTechnique.BehaviourTreeEditor
@@ -12,16 +13,17 @@ namespace BehaviourTechnique.BehaviourTreeEditor
 
         
         private ToolbarMenu _addButton;
-        private BlackboardData _blackboardData;
+        private BehaviourTree _tree;
 
 
         public void SetUp(ToolbarMenu button)
         {
             _addButton = button;
             
-            _addButton.menu.AppendAction(EBlackboardElement.Int.ToString(), _ => this.MakeProperty<int>(EBlackboardElement.Int));
-            _addButton.menu.AppendAction(EBlackboardElement.Bool.ToString(), _ => this.MakeProperty<bool>(EBlackboardElement.Bool));
-            _addButton.menu.AppendAction(EBlackboardElement.Float.ToString(), _ => this.MakeProperty<float>(EBlackboardElement.Float));
+            _addButton.menu.AppendAction(EBlackboardPropertyType.Int.ToString(), _ => this.MakeProperty<int>(EBlackboardPropertyType.Int));
+            _addButton.menu.AppendAction(EBlackboardPropertyType.Bool.ToString(), _ => this.MakeProperty<bool>(EBlackboardPropertyType.Bool));
+            _addButton.menu.AppendAction(EBlackboardPropertyType.Float.ToString(), _ => this.MakeProperty<float>(EBlackboardPropertyType.Float));
+            _addButton.menu.AppendAction(EBlackboardPropertyType.Object.ToString(), _ => this.MakeProperty<UnityEngine.Object>(EBlackboardPropertyType.Object));
         }
         
         
@@ -33,13 +35,13 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         
 
 
-        public void ChangeBlackboardData(BlackboardData blackboardData)
+        public void ChangeBehaviourTree(BehaviourTree tree)
         {
-            this._blackboardData = blackboardData;
+            this._tree = tree;
 
-            for (int i = 0; i < _blackboardData.Count; ++i)
+            for (int i = 0; i < _tree.blackboardData.Count; ++i)
             {
-                this.AddProperty(_blackboardData.GetProperty(i));
+                this.AddProperty(_tree.blackboardData.GetProperty(i));
             }
         }
 
@@ -55,21 +57,25 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         }
         
         
-        private void MakeProperty<T> (EBlackboardElement type) where T : struct
+        private void MakeProperty<T> (EBlackboardPropertyType type)
         {
             BlackboardProperty<T> prop = new BlackboardProperty<T>(string.Empty, default(T), type);
             
-            this._blackboardData.AddProperty(prop);
+            this._tree.blackboardData.AddProperty(prop);
 
             this.AddProperty(prop);
+
+            EditorUtility.SetDirty(this._tree);
         }
 
 
         private void OnPropertyRemoved(BlackboardPropertyView property)
         {
             this.hierarchy.Remove(property);
-            this._blackboardData.Remove(property.property);
+            this._tree.blackboardData.Remove(property.property);
             base.RefreshItems();
+            
+            EditorUtility.SetDirty(this._tree);
         }
     }
 }

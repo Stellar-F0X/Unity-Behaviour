@@ -13,11 +13,6 @@ public class SequencerNode : CompositeNode
     {
         _current = 0;
     }
-
-    protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
-    {
-        
-    }
     
     
     protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
@@ -37,5 +32,11 @@ public class SequencerNode : CompositeNode
         {
             return EState.Running;
         }
+    }
+    
+    
+    protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+    {
+        
     }
 }

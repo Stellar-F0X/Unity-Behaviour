@@ -15,8 +15,10 @@ namespace BehaviourTechnique.BehaviourTreeEditor
         private BehaviourTreeView _treeView;
 
 
-        public void Initialize(BehaviourTreeView editorWindowView) => _treeView = editorWindowView;
-        
+        public void Initialize(BehaviourTreeView editorWindowView) 
+        {
+            _treeView = editorWindowView;
+        }
         
 
         public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context)

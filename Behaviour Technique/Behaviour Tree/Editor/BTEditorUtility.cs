@@ -25,7 +25,14 @@ public static class BTEditorUtility
 
     public static T FindAssetByName<T>(string searchFilter) where T : Object
     {
-        foreach (var guid in AssetDatabase.FindAssets(searchFilter) ?? Enumerable.Empty<string>())
+        string[] guids = AssetDatabase.FindAssets(searchFilter);
+
+        if (guids is null || guids.Length == 0)
+        {
+            return null;
+        }
+        
+        foreach (var guid in guids)
         {
             string parentPath = AssetDatabase.GUIDToAssetPath(guid);
 

@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace BehaviourTechnique.BehaviourTreeEditor
 {
-    public class NodeView : UnityEditor.Experimental.GraphView.Node, INodeViewDeletable
+    public class NodeView : UnityEditor.Experimental.GraphView.Node
     {
         public NodeView(Node node, VisualTreeAsset nodeUxml) : base(AssetDatabase.GetAssetPath(nodeUxml))
         {
@@ -134,16 +134,6 @@ namespace BehaviourTechnique.BehaviourTreeEditor
             {
                 compositeNode.children.Sort((l, r) => l.position.x < r.position.x ? -1 : 1);
             }
-        }
-
-
-        /// <summary>
-        /// BehaviourTreeView의 DeleteEventDetector에서 선택된 노드가 제거될때 호출된다.
-        /// </summary>
-        /// <param name="actor"> 현재 Editor에 그려진 BehaviourTree가 등록된 Actor </param>
-        public void OnNodeDeletedEvent(BehaviourActor actor)
-        {
-            OnNodeDeleted?.Invoke(this);
         }
     }
 }

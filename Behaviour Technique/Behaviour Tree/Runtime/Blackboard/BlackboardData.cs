@@ -52,5 +52,19 @@ namespace BehaviourTechnique
         {
             return _properties[index];
         }
+
+        
+        public IBlackboardProperty GetProperty(string name)
+        {
+            for (int i = 0; i < _properties.Count; i++)
+            {
+                if (string.Compare(_properties[i].key, name, StringComparison.OrdinalIgnoreCase) == 0) 
+                {
+                    return _properties[i];
+                }
+            }
+
+            return null;
+        }
     }
 }
