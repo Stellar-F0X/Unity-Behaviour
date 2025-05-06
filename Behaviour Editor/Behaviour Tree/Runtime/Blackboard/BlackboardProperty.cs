@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace BehaviourSystem.BT
 {
@@ -22,7 +23,6 @@ namespace BehaviourSystem.BT
         [SerializeField]
         private EBlackboardPropertyType _propertyType;
 
-
         public string key
         {
             get { return _key; }
@@ -32,6 +32,7 @@ namespace BehaviourSystem.BT
         public T value
         {
             get { return _value; }
+            set { _value = value; }
         }
 
         public EBlackboardPropertyType propertyType
@@ -39,10 +40,10 @@ namespace BehaviourSystem.BT
             get { return _propertyType; }
         }
 
-
-        public void InitializeBeforePlaymode()
+        
+        public IBlackboardProperty Clone()
         {
-            _value = default(T);
+            return new BlackboardProperty<T>(string.Copy(key), default, _propertyType);
         }
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 namespace BehaviourSystem.BT
 {
     [Serializable]
-    public sealed class Condition
+    public sealed class BlackboardBasedCondition
     {
         [SerializeReference]
         public IBlackboardProperty property;

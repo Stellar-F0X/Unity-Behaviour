@@ -20,7 +20,7 @@ namespace BehaviourSystemEditor.BT
 
             _nodeBorder = this.Q<VisualElement>("node-border");
 
-            string nodeType = node.baseType.ToString();
+            string nodeType = node.nodeType.ToString();
             _nodeType = node.GetType();
 
             this.AddToClassList(nodeType.ToLower());
@@ -50,7 +50,7 @@ namespace BehaviourSystemEditor.BT
 
         private void CreatePorts()
         {
-            switch (node.baseType)
+            switch (node.nodeType)
             {
                 case NodeBase.ENodeType.Root:
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
@@ -105,7 +105,7 @@ namespace BehaviourSystemEditor.BT
         {
             if (Application.isPlaying)
             {
-                if (node.started)
+                if (node.callState == NodeBase.ENodeCallState.Updating)
                 {
                     _nodeBorder.style.borderBottomColor = _runningColor;
                     _nodeBorder.style.borderLeftColor = _runningColor;
@@ -125,7 +125,7 @@ namespace BehaviourSystemEditor.BT
 
         public void SortChildren()
         {
-            if (this.node.baseType != NodeBase.ENodeType.Composite)
+            if (this.node.nodeType != NodeBase.ENodeType.Composite)
             {
                 return;
             }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace BehaviourSystemEditor.BT
 {
-    [CustomPropertyDrawer(typeof(Condition))]
+    [CustomPropertyDrawer(typeof(BlackboardBasedCondition))]
     public class ConditionDrawer : PropertyDrawer
     {
         private static readonly string[] BoolConditionTypes = new[] { nameof(EConditionType.Equal), nameof(EConditionType.NotEqual) };

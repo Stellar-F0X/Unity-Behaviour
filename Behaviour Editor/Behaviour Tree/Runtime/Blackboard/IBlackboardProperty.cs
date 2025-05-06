@@ -16,6 +16,6 @@ namespace BehaviourSystem.BT
             get;
         }
 
-        public void InitializeBeforePlaymode();
+        public IBlackboardProperty Clone();
     }
 }

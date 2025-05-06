@@ -10,17 +10,18 @@ namespace BehaviourSystem.BT
     {
         [HideInInspector]
         public List<NodeBase> children = new List<NodeBase>();
+        
+        protected int _currentChildIndex;
 
-        public override ENodeType baseType
+        
+        public override ENodeType nodeType
         {
             get { return ENodeType.Composite; }
         }
 
-        public override NodeBase Clone()
+        public int currentChildIndexChildIndex
         {
-            CompositeNode node = base.Clone() as CompositeNode;
-            node.children = children.ConvertAll(c => c.Clone());
-            return node;
+            get { return _currentChildIndex; }
         }
     }
 }

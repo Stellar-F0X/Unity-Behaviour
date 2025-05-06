@@ -160,9 +160,9 @@ namespace BehaviourSystemEditor.BT
             base.DeleteElements(graphElements.ToList());
             graphViewChanged += OnGraphViewChanged;
 
-            if (_tree.rootNodeBase == null)
+            if (_tree.rootNode == null)
             {
-                tree.rootNodeBase = tree.CreateNode(typeof(RootNode)) as RootNode;
+                tree.rootNode = tree.CreateNode(typeof(RootNode)) as RootNode;
                 UnityEditor.EditorUtility.SetDirty(tree);
                 AssetDatabase.SaveAssets();
             }

@@ -3,10 +3,10 @@ namespace BehaviourSystem.BT
 {
     public class RepeatNode : DecoratorNode
     {
-        protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+        protected override EBehaviourResult OnUpdate()
         {
-            child.UpdateNode(behaviourTree, new PreviusBehaviourInfo(tag, GetType(), baseType));
-            return EState.Running;
+            child.UpdateNode();
+            return EBehaviourResult.Running;
         }
     }
 }

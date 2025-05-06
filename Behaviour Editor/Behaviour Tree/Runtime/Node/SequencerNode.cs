@@ -1,43 +1,34 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace BehaviourSystem.BT
 {
     public class SequencerNode : CompositeNode
     {
-        private int _current;
-        private readonly Type _type = typeof(SequencerNode);
-
-        protected override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+        protected override void OnEnter()
         {
-            _current = 0;
+            _currentChildIndex = 0;
         }
 
 
-        protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+        protected override EBehaviourResult OnUpdate()
         {
-            switch (children[_current].UpdateNode(behaviourTree, new PreviusBehaviourInfo(tag, _type, baseType)))
+            switch (children[_currentChildIndex].UpdateNode())
             {
-                case EState.Running: return EState.Running;
+                case EBehaviourResult.Running: return EBehaviourResult.Running;
 
-                case EState.Failure: return EState.Failure;
+                case EBehaviourResult.Failure: return EBehaviourResult.Failure;
 
-                case EState.Success: _current++; break;
+                case EBehaviourResult.Success: _currentChildIndex++; break;
             }
 
-            if (_current == children.Count)
+            if (_currentChildIndex == children.Count)
             {
-                return EState.Success;
+                return EBehaviourResult.Success;
             }
             else
             {
-                return EState.Running;
+                return EBehaviourResult.Running;
             }
         }
-
-
-        protected override void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info) { }
     }
 }

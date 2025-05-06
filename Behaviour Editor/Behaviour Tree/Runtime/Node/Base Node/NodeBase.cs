@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -9,12 +10,12 @@ namespace BehaviourSystem.BT
     {
         public enum ENodeCallState
         {
-            OnEnter,
-            OnUpdate,
-            OnExit
+            Idle,
+            Updating,
+            Exited,
         };
 
-        public enum EState
+        public enum EBehaviourResult
         {
             Running,
             Failure,
@@ -30,77 +31,93 @@ namespace BehaviourSystem.BT
             Subset
         };
 
+#if UNITY_EDITOR
         [HideInInspector]
-        public EState state = EState.Running;
-
-        [HideInInspector]
-        public bool started = false;
-
-        [HideInInspector]
-        public Vector2 position; //나중에 nodeView로 옮김
+        public Vector2 position;
+#endif
 
         [ReadOnly]
         public string guid;
 
         public string tag;
 
+        [NonSerialized]
+        public NodeBase parent;
 
-        public ENodeCallState updateState
+        [NonSerialized]
+        public BehaviourTree tree;
+
+        [NonSerialized]
+        public BehaviourActor actor;
+
+
+        public Stack<NodeBase> callStack
+        {
+            protected get;
+            set;
+        }
+
+        public EBehaviourResult behaviourResult
         {
             get;
             private set;
         }
 
-        public abstract ENodeType baseType
+        public ENodeCallState callState
+        {
+            get;
+            private set;
+        }
+
+        public abstract ENodeType nodeType
         {
             get;
         }
 
-
-
-        protected virtual void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info) { }
-
-        protected abstract EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info);
-
-        protected virtual void OnExit(BehaviourActor behaviourTree, PreviusBehaviourInfo info) { }
-
-
-        public virtual EState UpdateNode(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+        
+        public void AbortNode()
         {
-            switch (updateState)
+            this.callState = ENodeCallState.Exited;
+            this.UpdateNode();
+        } 
+
+
+        public EBehaviourResult UpdateNode()
+        {
+            switch (callState)
             {
-                case ENodeCallState.OnEnter:
+                case ENodeCallState.Idle:
                 {
-                    started = true;
-                    this.OnEnter(behaviourTree, info);
-                    updateState = ENodeCallState.OnUpdate;
-                    return EState.Running;
+                    callStack.Push(this);
+                    this.OnEnter();
+                    callState = ENodeCallState.Updating;
+                    return EBehaviourResult.Running;
                 }
 
-                case ENodeCallState.OnUpdate:
+                case ENodeCallState.Updating:
                 {
-                    state = this.OnUpdate(behaviourTree, info);
-                    EState resultState = state != EState.Running ? EState.Running : state;
-                    updateState = state != EState.Running ? ENodeCallState.OnExit : updateState;
-                    return resultState;
+                    behaviourResult = this.OnUpdate();
+                    callState       = (behaviourResult != EBehaviourResult.Running ? ENodeCallState.Exited : callState);
+                    return (behaviourResult != EBehaviourResult.Running ? EBehaviourResult.Running : behaviourResult);
                 }
 
-                case ENodeCallState.OnExit:
+                case ENodeCallState.Exited:
                 {
-                    this.OnExit(behaviourTree, info);
-                    updateState = ENodeCallState.OnEnter;
-                    started     = false;
-                    return state;
+                    this.OnExit();
+                    callStack.Pop();
+                    callState = ENodeCallState.Idle;
+                    return behaviourResult;
                 }
-
-                default: throw new ArgumentOutOfRangeException("Not supported CallState Type");
+                
+                default: return EBehaviourResult.Failure;
             }
         }
 
+        
+        protected virtual void OnEnter() { }
 
-        public virtual NodeBase Clone()
-        {
-            return Object.Instantiate(this);
-        }
+        protected virtual void OnExit() { }
+        
+        protected abstract EBehaviourResult OnUpdate();
     }
 }

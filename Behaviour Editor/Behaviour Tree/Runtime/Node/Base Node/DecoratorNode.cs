@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -11,16 +9,9 @@ namespace BehaviourSystem.BT
         [HideInInspector]
         public NodeBase child;
 
-        public override ENodeType baseType
+        public override ENodeType nodeType
         {
             get { return ENodeType.Decorator; }
-        }
-
-        public override NodeBase Clone()
-        {
-            DecoratorNode node = base.Clone() as DecoratorNode;
-            node.child = this.child.Clone();
-            return node;
         }
     }
 }

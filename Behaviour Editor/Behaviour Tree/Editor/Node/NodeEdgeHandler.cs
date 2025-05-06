@@ -10,6 +10,11 @@ namespace BehaviourSystemEditor.BT
     {
         public void ConnectEdges(BehaviourTreeView treeView, NodeBase parentNodeBase, List<NodeBase> childrenNodes)
         {
+            if (childrenNodes is null || childrenNodes.Count == 0)
+            {
+                return;
+            }
+            
             foreach (var child in childrenNodes)
             {
                 NodeView parentView = treeView.FindNodeView(parentNodeBase);
@@ -27,6 +32,11 @@ namespace BehaviourSystemEditor.BT
 
         public void ConnectEdges(BehaviourTree tree, List<Edge> edges)
         {
+            if (edges is null || edges.Count == 0)
+            {
+                return;
+            }
+            
             foreach (var edge in edges)
             {
                 NodeView parentView = edge.output.node as NodeView;
@@ -37,7 +47,7 @@ namespace BehaviourSystemEditor.BT
                     continue;
                 }
                 
-                tree.AddChild(parentView?.node, childView?.node);
+                tree.AddChild(parentView.node, childView.node);
             }
         }
 

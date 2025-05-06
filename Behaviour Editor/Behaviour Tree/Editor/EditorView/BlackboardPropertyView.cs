@@ -50,7 +50,6 @@ namespace BehaviourSystemEditor.BT
 
         private void DrawInspectorGUI()
         {
-            
             switch (_property.propertyType)
             {
                 case EBlackboardPropertyType.Int:

@@ -2,7 +2,7 @@
 {
     public abstract class SubsetNode : NodeBase
     {
-        public override ENodeType baseType
+        public override ENodeType nodeType
         {
             get { return ENodeType.Subset; }
         }

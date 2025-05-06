@@ -10,19 +10,19 @@ namespace BehaviourSystem.BT
         public float duration = 1f;
         private float _startTime;
 
-        protected override void OnEnter(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+        protected override void OnEnter()
         {
             _startTime = Time.time;
         }
 
-        protected override EState OnUpdate(BehaviourActor behaviourTree, PreviusBehaviourInfo info)
+        protected override EBehaviourResult OnUpdate()
         {
             if (Time.time > _startTime + duration)
             {
-                return EState.Success;
+                return EBehaviourResult.Success;
             }
 
-            return EState.Running;
+            return EBehaviourResult.Running;
         }
     }
 }

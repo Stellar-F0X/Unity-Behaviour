@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.Serialization;
 
 namespace BehaviourSystem.BT
 {
@@ -16,14 +15,22 @@ namespace BehaviourSystem.BT
         {
             get { return _properties.Count; }
         }
-
-
-        public void Initialize()
-        {
-            _properties?.ForEach(p => p.InitializeBeforePlaymode());
-        }
         
 
+        public static BlackboardData Clone(BlackboardData origin)
+        {
+            BlackboardData newData = new BlackboardData();
+            newData._properties = new List<IBlackboardProperty>(origin.Count);
+            
+            for (int i = 0; i < origin.Count; ++i)
+            {
+                newData._properties[i] = origin._properties[i].Clone();
+            }
+            
+            return newData;
+        }
+        
+        
         public void AddProperty(IBlackboardProperty property)
         {
             _properties?.Add(property);

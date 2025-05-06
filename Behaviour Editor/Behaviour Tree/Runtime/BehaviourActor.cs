@@ -3,132 +3,53 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.LowLevel;
-using UnityEngine.PlayerLoop;
-using Update = UnityEngine.PlayerLoop.Update;
-using FixedUpdate = UnityEngine.PlayerLoop.FixedUpdate;
+using Object = UnityEngine.Object;
 
 namespace BehaviourSystem.BT
 {
     public class BehaviourActor : MonoBehaviour
     {
-        public enum eUpdateMode
-        {
-            Update,
-            FixedUpdate,
-            LateUpdate
-        }
+        public event Action OnDone;
 
-        public enum eStartMode
-        {
-            Awake,
-            Enable,
-            Start
-        }
+        [SerializeReference]
+        private Type _updateType;
 
-        public BehaviourTree runtimeTree;
-        public eUpdateMode updateMode;
-        public eStartMode startMode;
+        [SerializeField]
+        private BehaviourTree _runtimeTree;
 
-        private bool _canRegisterWhenEnable;
+        private Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
 
         private PlayerLoopSystem _playerLoop;
-        private PlayerLoopSystem.UpdateFunction _behaviourTreeUpdate;
+        private PlayerLoopSystem.UpdateFunction _btUpdater;
 
-
-        public NodeBase FindBehaviourNodeByTag(in string nodeTag)
+        public BehaviourTree runtimeTree
         {
-            foreach (var node in runtimeTree.nodeList)
-            {
-                if (string.Compare(node.tag, nodeTag, StringComparison.Ordinal) == 0)
-                {
-                    return node;
-                }
-            }
-
-            return null;
+            get { return _runtimeTree; }
         }
 
-
-        #region Activator Functions
 
         private void Awake()
         {
-            this.runtimeTree = runtimeTree.Clone();
-
-            if (startMode == eStartMode.Awake)
-            {
-                RegisterUpdateCallback(eStartMode.Awake);
-            }
+            this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree);
         }
 
-        private void Start()
-        {
-            if (startMode == eStartMode.Start)
-            {
-                RegisterUpdateCallback(eStartMode.Start);
-            }
-
-            _canRegisterWhenEnable = true;
-        }
 
         private void OnEnable()
         {
-            if (startMode == eStartMode.Enable || _canRegisterWhenEnable)
-            {
-                this.RegisterUpdateCallback(eStartMode.Enable);
-            }
-        }
+            this._playerLoop =  PlayerLoop.GetCurrentPlayerLoop();
+            this._btUpdater  -= this.UpdateTree;
+            this._btUpdater  += this.UpdateTree;
 
-        private void OnDisable()
-        {
-            if (_behaviourTreeUpdate?.GetInvocationList().Length > 0)
-            {
-                this.RemoveUpdateCallback();
-            }
-        }
-
-        #endregion
-
-
-        #region RegistryUpdateCallback
-
-        private void RemoveUpdateCallback()
-        {
-            Type updateType = GetUpdateType();
-            var loopSystem = _playerLoop.subSystemList.FirstOrDefault(s => s.type == updateType);
+            PlayerLoopSystem loopSystem = _playerLoop.subSystemList.First(s => s.type == _updateType);
             int index = Array.IndexOf(_playerLoop.subSystemList, loopSystem);
 
             if (index != -1)
             {
-                loopSystem.subSystemList = loopSystem.subSystemList
-                                                     .Where(system => system.updateDelegate != _behaviourTreeUpdate)
-                                                     .ToArray();
+                PlayerLoopSystem newPlayerLoop = new PlayerLoopSystem();
+                newPlayerLoop.updateDelegate = _btUpdater;
+                newPlayerLoop.type           = _updateType;
 
-                _playerLoop.subSystemList[index] = loopSystem;
-                PlayerLoop.SetPlayerLoop(_playerLoop);
-            }
-
-            this._behaviourTreeUpdate -= BehaviourTreeUpdate;
-        }
-
-
-        private void RegisterUpdateCallback(eStartMode mode)
-        {
-            this._playerLoop          =  PlayerLoop.GetCurrentPlayerLoop();
-            this._behaviourTreeUpdate -= BehaviourTreeUpdate;
-            this._behaviourTreeUpdate += BehaviourTreeUpdate;
-
-            Type updateType = this.GetUpdateType();
-            var loopSystem = _playerLoop.subSystemList.FirstOrDefault(s => s.type == updateType);
-            int index = Array.IndexOf(_playerLoop.subSystemList, loopSystem);
-
-            if (index != -1)
-            {
-                var newSystems = loopSystem.subSystemList.Append(new PlayerLoopSystem
-                {
-                    updateDelegate = _behaviourTreeUpdate,
-                    type           = updateType,
-                });
+                var newSystems = loopSystem.subSystemList.Append(newPlayerLoop);
 
                 loopSystem.subSystemList         = newSystems.ToArray();
                 _playerLoop.subSystemList[index] = loopSystem;
@@ -137,26 +58,86 @@ namespace BehaviourSystem.BT
         }
 
 
-        private Type GetUpdateType()
+        private void OnDisable()
         {
-            switch (updateMode)
+            if (_btUpdater is not null && _btUpdater.GetInvocationList().Length > 0)
             {
-                case eUpdateMode.Update: return typeof(Update);
+                PlayerLoopSystem loopSystem = _playerLoop.subSystemList.First(s => s.type == _updateType);
+                int index = Array.IndexOf(_playerLoop.subSystemList, loopSystem);
 
-                case eUpdateMode.FixedUpdate: return typeof(FixedUpdate);
+                if (index != -1)
+                {
+                    loopSystem.subSystemList = loopSystem.subSystemList
+                                                         .Where(s => s.updateDelegate != _btUpdater)
+                                                         .ToArray();
 
-                case eUpdateMode.LateUpdate: return typeof(PostLateUpdate);
+                    _playerLoop.subSystemList[index] = loopSystem;
+                    PlayerLoop.SetPlayerLoop(_playerLoop);
+                }
 
-                default: return null;
+                this._btUpdater -= this.UpdateTree;
             }
         }
 
-        #endregion
+
+        public void AbortTree(bool callOnExit = true) { }
 
 
-        private void BehaviourTreeUpdate()
+        public void SetBlackboardProperty<TProperty>(in string key, TProperty property)
         {
-            runtimeTree.UpdateTree(this);
+            if (_properties.TryGetValue(key, out var existingProperty))
+            {
+                if (existingProperty is BlackboardProperty<TProperty> prop)
+                {
+                    prop.value = property;
+                    return;
+                }
+            }
+            else
+            {
+                IBlackboardProperty newProperty = _runtimeTree.blackboardData.GetProperty(key);
+
+                if (newProperty is not null)
+                {
+                    _properties.Add(key, newProperty);
+                    return;
+                }
+            }
+
+            throw new Exception($"Blackboard property with key '{key}' was not found.");
+        }
+
+        
+        public TProperty GetBlackboardProperty<TProperty>(in string key)
+        {
+            if (_properties.TryGetValue(key, out var existingProperty))
+            {
+                if (existingProperty is BlackboardProperty<TProperty> castedProperty)
+                {
+                    return castedProperty.value;
+                }
+            }
+            else
+            {
+                IBlackboardProperty newProperty = _runtimeTree.blackboardData.GetProperty(key);
+
+                if (newProperty is BlackboardProperty<TProperty> castedProperty)
+                {
+                    _properties.Add(key, newProperty);
+                    return castedProperty.value;
+                }
+            }
+
+            throw new Exception($"Blackboard property with key '{key}' was not found.");
+        }
+
+
+        private void UpdateTree()
+        {
+            if (_runtimeTree.UpdateTree() == NodeBase.EBehaviourResult.Running)
+            {
+                OnDone?.Invoke();
+            }
         }
     }
 }
