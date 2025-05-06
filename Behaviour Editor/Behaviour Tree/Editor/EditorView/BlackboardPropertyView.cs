@@ -3,6 +3,7 @@ using BehaviourSystem.BT;
 using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace BehaviourSystemEditor.BT
 {
@@ -74,7 +75,8 @@ namespace BehaviourSystemEditor.BT
                     break;
                 
                 case EBlackboardPropertyType.Object:
-                    EditorGUILayout.LabelField("UObject");
+                    var objProperty = (BlackboardProperty<Object>)_property;
+                    EditorGUILayout.LabelField(objProperty.value is null ? "UObject" : objProperty.GetType().Name); 
                     break;
             }
         }

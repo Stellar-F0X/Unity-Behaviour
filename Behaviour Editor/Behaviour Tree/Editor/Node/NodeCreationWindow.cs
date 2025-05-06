@@ -52,7 +52,7 @@ namespace BehaviourSystemEditor.BT
 
         private SearchTreeEntry[] CreateSubSearchTreeEntry<T>(string title, Action<Type> invoke, int layerLevel = 1, Type[] filter = null) where T : NodeBase
         {
-            TypeCache.TypeCollection typeList = TypeCache.GetTypesDerivedFrom<T>();
+            TypeCache.TypeCollection typeList = TypeCache.GetTypesDerivedFrom<T>(); //하위 자식들 가져오는 방법인듯
             SearchTreeEntry[] entries = new SearchTreeEntry[typeList.Count + 1];
             entries[0] = new SearchTreeGroupEntry(new GUIContent(title)) {
                 level = layerLevel,

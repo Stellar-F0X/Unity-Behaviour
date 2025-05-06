@@ -35,7 +35,7 @@ namespace BehaviourSystem.BT
 
                 case EBlackboardPropertyType.Bool: return this.Compare((BlackboardProperty<bool>)property, (BlackboardProperty<bool>)comparableValue);
                 
-                default: throw new NotImplementedException();
+                default: return false;
             }
         }
         

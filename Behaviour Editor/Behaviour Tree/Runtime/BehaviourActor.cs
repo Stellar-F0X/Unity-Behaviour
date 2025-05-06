@@ -1,21 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.LowLevel;
+using UnityEngine.PlayerLoop;
 using Object = UnityEngine.Object;
 
 namespace BehaviourSystem.BT
 {
     public class BehaviourActor : MonoBehaviour
     {
+        public enum BehaviourUpdateMode
+        {
+            Update,
+            FixedUpdate,
+            LateUpdate
+        };
+        
         public event Action OnDone;
 
-        [SerializeReference]
-        private Type _updateType;
+        public BehaviourUpdateMode updateMode;
 
         [SerializeField]
         private BehaviourTree _runtimeTree;
+        private Type _updateType;
 
         private Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
 
@@ -36,6 +45,15 @@ namespace BehaviourSystem.BT
 
         private void OnEnable()
         {
+            switch (updateMode)
+            {
+                case BehaviourUpdateMode.Update: _updateType = typeof(Update); break;
+                
+                case BehaviourUpdateMode.FixedUpdate: _updateType = typeof(FixedUpdate); break;
+                
+                case BehaviourUpdateMode.LateUpdate: _updateType = typeof(PostLateUpdate); break;
+            }
+            
             this._playerLoop =  PlayerLoop.GetCurrentPlayerLoop();
             this._btUpdater  -= this.UpdateTree;
             this._btUpdater  += this.UpdateTree;
@@ -83,11 +101,12 @@ namespace BehaviourSystem.BT
         public void AbortTree(bool callOnExit = true) { }
 
 
-        public void SetBlackboardProperty<TProperty>(in string key, TProperty property)
+
+        public void SetBlackboardProperty<TValue>(in string key, TValue property)
         {
             if (_properties.TryGetValue(key, out var existingProperty))
             {
-                if (existingProperty is BlackboardProperty<TProperty> prop)
+                if (existingProperty is BlackboardProperty<TValue> prop)
                 {
                     prop.value = property;
                     return;
@@ -97,9 +116,10 @@ namespace BehaviourSystem.BT
             {
                 IBlackboardProperty newProperty = _runtimeTree.blackboardData.GetProperty(key);
 
-                if (newProperty is not null)
+                if (newProperty is BlackboardProperty<TValue> prop)
                 {
-                    _properties.Add(key, newProperty);
+                    prop.value = property;
+                    _properties.Add(key, prop);
                     return;
                 }
             }
@@ -107,8 +127,8 @@ namespace BehaviourSystem.BT
             throw new Exception($"Blackboard property with key '{key}' was not found.");
         }
 
-        
-        public TProperty GetBlackboardProperty<TProperty>(in string key)
+
+        public TProperty GetBlackboardProperty<TProperty>(in string key) where TProperty : class
         {
             if (_properties.TryGetValue(key, out var existingProperty))
             {
@@ -130,6 +150,7 @@ namespace BehaviourSystem.BT
 
             throw new Exception($"Blackboard property with key '{key}' was not found.");
         }
+
 
 
         private void UpdateTree()
