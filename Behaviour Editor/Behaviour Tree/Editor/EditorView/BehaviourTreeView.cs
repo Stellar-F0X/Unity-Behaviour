@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using BehaviourSystem.BT;
 using UnityEditor.UIElements;
+using UnityEngine.EventSystems;
 
 namespace BehaviourSystemEditor.BT
 {
@@ -19,8 +20,7 @@ namespace BehaviourSystemEditor.BT
 
             ContentZoomer zoomer = new ContentZoomer()
             {
-                maxScale = BehaviourTreeEditorWindow.Settings.enlargementScale,
-                minScale = BehaviourTreeEditorWindow.Settings.reductionScale
+                maxScale = BehaviourTreeEditorWindow.Settings.enlargementScale, minScale = BehaviourTreeEditorWindow.Settings.reductionScale
             };
 
             this.AddManipulator(zoomer);
@@ -55,11 +55,11 @@ namespace BehaviourSystemEditor.BT
         {
             graphViewChanged -= OnGraphViewChanged;
             DeleteElements(graphElements.ToList());
-            
+
             nodes.ForEach(n => n.RemoveFromHierarchy());
             edges.ForEach(e => e.RemoveFromHierarchy());
         }
-        
+
 
         public void OnGraphEditorView(BehaviourTree tree)
         {
@@ -227,13 +227,13 @@ namespace BehaviourSystemEditor.BT
             return nodeView;
         }
 
-        
-        public void SearchNodeByNameOrTag(ChangeEvent<string> evt)
+
+        public void SearchNodeByNameOrTag(ChangeEvent<string> changeEvent)
         {
-            if (_nodeSearchHelper.HasSyntaxes(evt.newValue, out var syntaxes))
+            if (_nodeSearchHelper.HasSyntaxes(changeEvent.newValue, out var syntaxes))
             {
                 popupSearchField.menu.ClearItems();
-                
+
                 NodeView[] views = null;
 
                 if (syntaxes.Length == 1)
@@ -249,21 +249,24 @@ namespace BehaviourSystemEditor.BT
                     views = _nodeSearchHelper.GetNodeView(syntaxes[1], NodeSearchHelper.ESearchOptions.Name, nodes);
                 }
 
-                if (views is not null)
+                if (views is null)
                 {
-                    foreach (NodeView view in views)
-                    {
-                        string menuName = $"name: [{view.node.name}]   tag: [{view.node.tag}]";
-                        
-                        popupSearchField.menu.AppendAction(menuName, _ =>
-                        {
-                            this.SelectNode(view);
-                            base.FrameSelection();
-                        });
-                    }
-                    
-                    popupSearchField.ShowMenu();
+                    return;
                 }
+
+                foreach (NodeView view in views)
+                {
+                    string menuName = $"name: [{view.node.name}]   tag: [{view.node.tag}]";
+
+                    popupSearchField.menu.AppendAction(menuName, delegate
+                    {
+                        this.SelectNode(view);
+                        base.FrameSelection();
+                    });
+                }
+
+                EditorApplication.delayCall -= popupSearchField.ShowMenu;
+                EditorApplication.delayCall += popupSearchField.ShowMenu;
             }
         }
     }
