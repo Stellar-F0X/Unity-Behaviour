@@ -10,12 +10,25 @@ namespace BehaviourSystemEditor.BT
     public class ConditionDrawer : PropertyDrawer
     {
         private readonly List<IBlackboardProperty> _cachedPropertyList = new List<IBlackboardProperty>();
-        
-        private const int _propertyFieldWidth = 50;
-        
+
+        private readonly List<string> _conditionTypes = new List<string>();
+
         private bool _canDraw = false;
-        
+
+        private bool _initialized = false;
+
         private Rect _rect;
+
+        private GUIStyle _popupStyle;
+
+
+        private void Initialize()
+        {
+            _initialized = true;
+            
+            _popupStyle = new GUIStyle(EditorStyles.popup);
+            _popupStyle.fontSize = 17;
+        }
         
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -23,7 +36,7 @@ namespace BehaviourSystemEditor.BT
             return EditorGUIUtility.singleLineHeight + 4;
         }
 
-        
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             if (BehaviourTreeEditorWindow.Instance is null || BehaviourTreeEditorWindow.Instance.CanEditTree == false)
@@ -31,14 +44,19 @@ namespace BehaviourSystemEditor.BT
                 return;
             }
 
-            BlackboardData data = BehaviourTreeEditorWindow.Instance.Tree.blackboardData;
+            if (_initialized == false)
+            {
+                this.Initialize();
+            }
+
+            BlackboardData     data           = BehaviourTreeEditorWindow.Instance.Tree.blackboardData;
             SerializedProperty blackboardProp = property.FindPropertyRelative("property");
 
             _rect = new Rect(position.x, position.y, position.width - 10, EditorGUIUtility.singleLineHeight);
 
-            Rect dropdownRect = new Rect(_rect.x, _rect.y + 2, _rect.width / 3, _rect.height);
-            Rect compareRect = new Rect(_rect.x + _rect.width / 3 + 3, _rect.y + 2, _rect.width / 3, _rect.height);
-            Rect valueRect = new Rect(_rect.x + 2 * _rect.width / 3 + 6, _rect.y + 2, _rect.width / 3, _rect.height);
+            Rect dropdownRect = new Rect(_rect.x, _rect.y + 2, _rect.width / 5, _rect.height);
+            Rect compareRect  = new Rect(_rect.x + _rect.width / 5 + 5, _rect.y + 2, _rect.width / 5, _rect.height);
+            Rect valueRect    = new Rect(_rect.x + _rect.width / 5 * 2 + 10, _rect.y + 2, _rect.width / 5 * 3, _rect.height);
 
             this.DrawBlackboardProperty(data, blackboardProp, dropdownRect);
 
@@ -48,7 +66,7 @@ namespace BehaviourSystemEditor.BT
             }
         }
 
-        
+
         private void DrawBlackboardProperty(BlackboardData data, SerializedProperty blackboardProp, Rect dropdownRect)
         {
             if (data.Count == 0)
@@ -89,7 +107,7 @@ namespace BehaviourSystemEditor.BT
             _canDraw                  = true;
         }
 
-        
+
         private void DrawCompareValueField(SerializedProperty property, SerializedProperty blackboardProp, Rect compareRect, Rect valueRect)
         {
             SerializedProperty targetValue         = property.FindPropertyRelative("comparableValue");
@@ -117,22 +135,41 @@ namespace BehaviourSystemEditor.BT
 
         private void DrawCompareCondition(SerializedProperty property, IBlackboardProperty sourceType, Rect compareRect)
         {
+            if ((sourceType.comparableConditions & EConditionType.None) == EConditionType.None)
+            {
+                return;
+            }
+
             SerializedProperty conditionType  = property.FindPropertyRelative("conditionType");
             int                selected       = conditionType.enumValueIndex;
-            List<string>       conditionTypes = new List<string>();
             
+            _conditionTypes.Clear();
+
             for (int i = (int)EConditionType.None; i < (int)sourceType.comparableConditions; i <<= 1)
             {
                 EConditionType condition = (EConditionType)i;
-                
+
                 if ((condition & sourceType.comparableConditions) == condition)
                 {
-                    conditionTypes.Add(condition.ToString());
+                    switch (condition)
+                    {
+                        case EConditionType.Equal: _conditionTypes.Add("="); break;
+
+                        case EConditionType.NotEqual: _conditionTypes.Add("≠"); break;
+
+                        case EConditionType.GreaterThan: _conditionTypes.Add(">"); break;
+
+                        case EConditionType.GreaterThanOrEqual: _conditionTypes.Add("≥"); break;
+
+                        case EConditionType.LessThan: _conditionTypes.Add("<"); break;
+
+                        case EConditionType.LessThanOrEqual: _conditionTypes.Add("≤"); break;
+                    }
                 }
             }
-
-            selected                     = Mathf.Clamp(selected, 0, conditionTypes.Count - 1);
-            conditionType.enumValueIndex = EditorGUI.Popup(compareRect, selected, conditionTypes.ToArray());
+            
+            selected                     = Mathf.Clamp(selected, 0, _conditionTypes.Count - 1);
+            conditionType.enumValueIndex = EditorGUI.Popup(compareRect, selected, _conditionTypes.ToArray(), _popupStyle);
         }
 
 
