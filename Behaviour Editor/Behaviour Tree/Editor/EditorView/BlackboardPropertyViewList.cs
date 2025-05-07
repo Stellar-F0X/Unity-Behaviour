@@ -13,27 +13,13 @@ namespace BehaviourSystemEditor.BT
         private SerializedObject   _serializedObject;
         private SerializedProperty _serializedListProperty;
 
-        private ToolbarMenu _addButton;
+        private ToolbarMenu    _addButton;
+        private BlackboardData _blackboardData;
 
 
         public void SetUp(ToolbarMenu button)
         {
             _addButton = button;
-
-            var types = TypeCache.GetTypesDerivedFrom<IBlackboardProperty>();
-
-            if (types.Count == 0)
-            {
-                return;
-            }
-
-            foreach (Type type in types)
-            {
-                if (type.IsAbstract == false)
-                {
-                    _addButton.menu.AppendAction(type.Name, _ => this.MakeProperty(type));
-                }
-            }
         }
 
 
@@ -41,18 +27,38 @@ namespace BehaviourSystemEditor.BT
         public void ClearBlackboardPropertyViews()
         {
             this.hierarchy.Clear();
+            _addButton.menu.ClearItems();
         }
 
 
 
         public void ChangeBehaviourTree(BehaviourTree tree)
         {
+            if (BehaviourTreeEditorWindow.Instance is null || BehaviourTreeEditorWindow.Instance.CanEditTree == false)
+            {
+                return;
+            }
+
+            _blackboardData         = tree.blackboardData;
             _serializedObject       = new SerializedObject(tree.blackboardData);
             _serializedListProperty = _serializedObject.FindProperty("_properties");
+            
+            var types = TypeCache.GetTypesDerivedFrom<IBlackboardProperty>();
 
-            for (int i = 0; i < _serializedListProperty.arraySize; ++i)
+            if (types.Count > 0)
             {
-                this.AddProperty(_serializedListProperty.GetArrayElementAtIndex(i));
+                foreach (Type type in types)
+                {
+                    if (type.IsAbstract == false)
+                    {
+                        _addButton.menu.AppendAction(type.Name, _ => this.MakeProperty(type));
+                    }
+                }
+
+                for (int i = 0; i < _serializedListProperty.arraySize; ++i)
+                {
+                    this.AddProperty(_serializedListProperty.GetArrayElementAtIndex(i));
+                }
             }
         }
 
@@ -68,37 +74,31 @@ namespace BehaviourSystemEditor.BT
 
             _serializedObject.ApplyModifiedProperties();
         }
-        
-        
-        public void AddProperty(SerializedProperty prop)
+
+
+        private void AddProperty(SerializedProperty prop)
         {
             var propertyView = new BlackboardPropertyView(prop, BehaviourTreeEditorWindow.Settings.blackboardPropertyViewXml);
 
-            propertyView.onRemove += this.OnPropertyRemoved;
+            propertyView.RegisterButtonEvent(() => this.OnPropertyRemoved(propertyView));
 
             this.hierarchy.Add(propertyView);
             base.RefreshItems();
         }
 
 
-        private void OnPropertyRemoved(BlackboardPropertyView property)
+        private void OnPropertyRemoved(BlackboardPropertyView propertyView)
         {
-            for (int propertyIndex = 0; propertyIndex < _serializedListProperty.arraySize; ++propertyIndex)
-            {
-                var prop = _serializedListProperty.GetArrayElementAtIndex(propertyIndex);
+            var prop        = propertyView.property.boxedValue as IBlackboardProperty;
+            int targetIndex = _blackboardData.IndexOf(prop);
 
-                if (string.Compare(prop.propertyPath, property.property.propertyPath, StringComparison.Ordinal) == 0)
-                {
-                    this.hierarchy.Remove(property);
-                    base.RefreshItems();
-                    
-                    this._serializedListProperty.DeleteArrayElementAtIndex(propertyIndex);
-                    _serializedListProperty.serializedObject.ApplyModifiedProperties();
-                    return;
-                }
-            }
+            _blackboardData.RemoveAt(targetIndex);
             
-            Debug.LogError("The property to be removed was not found in blackboardData.");
+            this.hierarchy.Remove(propertyView);
+            base.RefreshItems();
+            
+            EditorUtility.SetDirty(_blackboardData);
+            _serializedObject.ApplyModifiedProperties();
         }
     }
 }

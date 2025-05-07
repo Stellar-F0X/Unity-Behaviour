@@ -139,8 +139,9 @@ namespace BehaviourSystemEditor.BT
             _treeView.popupSearchField.RegisterValueChangedCallback(_treeView.SearchNodeByNameOrTag);
             _treeView.onNodeSelected += _inspectorView.UpdateSelection;
 
-            this.OnSelectionChange();
             this._blackboardPropList.SetUp(rootVisualElement.Q<ToolbarMenu>("add-element-button"));
+            
+            this.OnSelectionChange();
         }
 
 
