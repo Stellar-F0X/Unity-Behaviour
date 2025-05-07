@@ -1,19 +1,16 @@
 using System;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace BehaviourSystem.BT
 {
     [Serializable]
-    public class BlackboardProperty<T> : IBlackboardProperty
+    public abstract class BlackboardProperty<T> : IBlackboardProperty, ISerializationCallbackReceiver, IComparable<IBlackboardProperty>
     {
-        public BlackboardProperty(string key, T value, EBlackboardPropertyType type)
+        public BlackboardProperty()
         {
-            _key          = key;
-            _value        = value;
-            _propertyType = type;
+            
         }
-
+        
         [SerializeField]
         private string _key;
 
@@ -21,7 +18,8 @@ namespace BehaviourSystem.BT
         private T _value;
 
         [SerializeField]
-        private EBlackboardPropertyType _propertyType;
+        private string _propertyTypeName;
+        private Type _propertyType;
 
         public string key
         {
@@ -35,18 +33,37 @@ namespace BehaviourSystem.BT
             set { _value = value; }
         }
 
-        public EBlackboardPropertyType propertyType
+        public Type propertyType
         {
             get { return _propertyType; }
+            set { _propertyType = value; }
         }
 
-        public Type propertyType2;
-
-        
-        public IBlackboardProperty Clone()
+        public abstract EConditionType comparableConditions
         {
-            //TODO: return Activator.CreateInstance(propertyType2) as IBlackboardProperty;
-            return new BlackboardProperty<T>(string.Copy(key), default, _propertyType);
+            get;
         }
+
+        public void OnBeforeSerialize()
+        {
+            _propertyTypeName = _propertyType.AssemblyQualifiedName;
+        }
+
+        public void OnAfterDeserialize()
+        {
+            _propertyType = Type.GetType(_propertyTypeName);
+        }
+
+        public IBlackboardProperty Clone(Type type)
+        {
+            BlackboardProperty<T> newProperty = IBlackboardProperty.Create(type) as BlackboardProperty<T>;
+            newProperty._key              = string.Copy(_key);
+            newProperty._value            = default;
+            newProperty._propertyTypeName = type.AssemblyQualifiedName;
+            newProperty._propertyType     = _propertyType;
+            return newProperty;
+        }
+        
+        public abstract int CompareTo(IBlackboardProperty other);
     }
 }

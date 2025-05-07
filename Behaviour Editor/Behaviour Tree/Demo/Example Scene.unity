@@ -129,26 +129,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1015184278}
   - component: {fileID: 1015184279}
-  - component: {fileID: 1015184277}
+  - component: {fileID: 1015184280}
   m_Layer: 0
-  m_Name: Logger
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1015184277
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1015184276}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9e38989272424340803ab67dd08baab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1015184278
 Transform:
   m_ObjectHideFlags: 0
@@ -177,7 +165,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   updateMode: 0
-  _runtimeTree: {fileID: 0}
+  _runtimeTree: {fileID: 11400000, guid: 526a1e08aa469a040a3c25bc84a7d1bd, type: 2}
+--- !u!95 &1015184280
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015184276}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d67cc8c7cda94ed4b85829b42e3b448e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!4 &1864815955023588656
 Transform:
   m_ObjectHideFlags: 0

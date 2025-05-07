@@ -174,7 +174,7 @@ namespace BehaviourSystemEditor.BT
             for (int i = 0; i < tree.nodeList.Count; ++i)
             {
                 //Undo로 생성이 취소된 노드를 여기서 처리.
-                if (tree.nodeList[i] == null)
+                if (tree.nodeList[i] is null)
                 {
                     tree.nodeList.RemoveAt(i);
                 }

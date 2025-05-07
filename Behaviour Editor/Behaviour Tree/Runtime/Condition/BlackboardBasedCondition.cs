@@ -27,34 +27,30 @@ namespace BehaviourSystem.BT
 
         public bool Execute()
         {
-            switch (property.propertyType)
+            if ((property.comparableConditions & conditionType) == conditionType)
             {
-                case EBlackboardPropertyType.Int: return this.Compare((BlackboardProperty<int>)property, (BlackboardProperty<int>)comparableValue);
-
-                case EBlackboardPropertyType.Float: return this.Compare((BlackboardProperty<float>)property, (BlackboardProperty<float>)comparableValue);
-
-                case EBlackboardPropertyType.Bool: return this.Compare((BlackboardProperty<bool>)property, (BlackboardProperty<bool>)comparableValue);
-                
-                default: return false;
+                this.Compare((IComparable<IBlackboardProperty>)property, comparableValue);
             }
+
+            return false;
         }
         
 
-        private bool Compare<T>(BlackboardProperty<T> a, BlackboardProperty<T> b) where T : struct, IComparable<T>
+        private bool Compare(IComparable<IBlackboardProperty> a, IBlackboardProperty b)
         {
             switch (conditionType)
             {
-                case EConditionType.Equal: return a.value.CompareTo(b.value) == _EQUAL;
+                case EConditionType.Equal: return a.CompareTo(b) == _EQUAL;
 
-                case EConditionType.NotEqual: return a.value.CompareTo(b.value) != _EQUAL;
+                case EConditionType.NotEqual: return a.CompareTo(b) != _EQUAL;
 
-                case EConditionType.GreaterThan: return a.value.CompareTo(b.value) == _GREATER;
+                case EConditionType.GreaterThan: return a.CompareTo(b) == _GREATER;
 
-                case EConditionType.GreaterThanOrEqual: return a.value.CompareTo(b.value) is _GREATER or _EQUAL;
+                case EConditionType.GreaterThanOrEqual: return a.CompareTo(b) is _GREATER or _EQUAL;
 
-                case EConditionType.LessThan: return a.value.CompareTo(b.value) == _LESS;
+                case EConditionType.LessThan: return a.CompareTo(b) == _LESS;
 
-                case EConditionType.LessThanOrEqual: return a.value.CompareTo(b.value) is _LESS or _EQUAL;
+                case EConditionType.LessThanOrEqual: return a.CompareTo(b) is _LESS or _EQUAL;
                 
                 default: throw new NotImplementedException();
             }

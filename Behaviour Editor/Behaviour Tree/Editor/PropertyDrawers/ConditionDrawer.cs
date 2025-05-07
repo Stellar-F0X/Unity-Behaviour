@@ -9,10 +9,6 @@ namespace BehaviourSystemEditor.BT
     [CustomPropertyDrawer(typeof(BlackboardBasedCondition))]
     public class ConditionDrawer : PropertyDrawer
     {
-        private static readonly string[] BoolConditionTypes = new[] { nameof(EConditionType.Equal), nameof(EConditionType.NotEqual) };
-
-        private static readonly string[] NumbericConditionTypes = Enum.GetNames(typeof(EConditionType));
-
         private readonly List<IBlackboardProperty> _cachedPropertyList = new List<IBlackboardProperty>();
         
         private const int _propertyFieldWidth = 50;
@@ -27,6 +23,7 @@ namespace BehaviourSystemEditor.BT
             return EditorGUIUtility.singleLineHeight + 4;
         }
 
+        
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             if (BehaviourTreeEditorWindow.Instance is null || BehaviourTreeEditorWindow.Instance.CanEditTree == false)
@@ -51,6 +48,7 @@ namespace BehaviourSystemEditor.BT
             }
         }
 
+        
         private void DrawBlackboardProperty(BlackboardData data, SerializedProperty blackboardProp, Rect dropdownRect)
         {
             if (data.Count == 0)
@@ -91,46 +89,52 @@ namespace BehaviourSystemEditor.BT
             _canDraw                  = true;
         }
 
+        
         private void DrawCompareValueField(SerializedProperty property, SerializedProperty blackboardProp, Rect compareRect, Rect valueRect)
         {
-            SerializedProperty sourceType = blackboardProp.FindPropertyRelative("_propertyType");
-            SerializedProperty targetValue = property.FindPropertyRelative("comparableValue");
+            SerializedProperty targetValue         = property.FindPropertyRelative("comparableValue");
+            SerializedProperty sourceValueTypeName = blackboardProp.FindPropertyRelative("_propertyTypeName");
 
             if (targetValue.boxedValue is null)
             {
-                this.AllocateBlackboardProperty(sourceType, targetValue);
+                targetValue.boxedValue = IBlackboardProperty.Create(Type.GetType(sourceValueTypeName.stringValue));
             }
             else
             {
-                SerializedProperty targetValueType = targetValue.FindPropertyRelative("_propertyType");
+                SerializedProperty targetValueTypeName = targetValue.FindPropertyRelative("_propertyTypeName");
 
-                if (targetValueType.enumValueIndex != sourceType.enumValueIndex)
+                if (string.Compare(targetValueTypeName.stringValue, sourceValueTypeName.stringValue, StringComparison.Ordinal) != 0)
                 {
-                    this.AllocateBlackboardProperty(sourceType, targetValue);
+                    targetValue.boxedValue = IBlackboardProperty.Create(Type.GetType(sourceValueTypeName.stringValue));
                 }
             }
 
-            this.DrawCompareCondition(property, sourceType, compareRect);
+            this.DrawCompareCondition(property, blackboardProp.boxedValue as IBlackboardProperty, compareRect);
 
-            this.DrawComparablePropertyField(sourceType, targetValue.FindPropertyRelative("_value"), valueRect);
+            EditorGUI.PropertyField(valueRect, targetValue.FindPropertyRelative("_value"), GUIContent.none);
         }
 
-        private void DrawCompareCondition(SerializedProperty property, SerializedProperty sourceType, Rect compareRect)
+
+        private void DrawCompareCondition(SerializedProperty property, IBlackboardProperty sourceType, Rect compareRect)
         {
-            SerializedProperty conditionType = property.FindPropertyRelative("conditionType");
-            int selected = conditionType.enumValueIndex;
+            SerializedProperty conditionType  = property.FindPropertyRelative("conditionType");
+            int                selected       = conditionType.enumValueIndex;
+            List<string>       conditionTypes = new List<string>();
+            
+            for (int i = (int)EConditionType.None; i < (int)sourceType.comparableConditions; i <<= 1)
+            {
+                EConditionType condition = (EConditionType)i;
+                
+                if ((condition & sourceType.comparableConditions) == condition)
+                {
+                    conditionTypes.Add(condition.ToString());
+                }
+            }
 
-            if ((EBlackboardPropertyType)sourceType.enumValueIndex == EBlackboardPropertyType.Bool)
-            {
-                selected                     = Mathf.Clamp(selected, 0, BoolConditionTypes.Length - 1);
-                conditionType.enumValueIndex = EditorGUI.Popup(compareRect, selected, BoolConditionTypes);
-            }
-            else
-            {
-                selected                     = Mathf.Clamp(selected, 0, NumbericConditionTypes.Length - 1);
-                conditionType.enumValueIndex = EditorGUI.Popup(compareRect, selected, NumbericConditionTypes);
-            }
+            selected                     = Mathf.Clamp(selected, 0, conditionTypes.Count - 1);
+            conditionType.enumValueIndex = EditorGUI.Popup(compareRect, selected, conditionTypes.ToArray());
         }
+
 
         private IBlackboardProperty[] GetUsableBlackboardProperties(BlackboardData data)
         {
@@ -140,7 +144,7 @@ namespace BehaviourSystemEditor.BT
             {
                 IBlackboardProperty prop = data.GetProperty(i);
 
-                if (prop.propertyType is EBlackboardPropertyType.None or EBlackboardPropertyType.Object)
+                if ((prop.comparableConditions & EConditionType.None) == EConditionType.None)
                 {
                     continue;
                 }
@@ -152,30 +156,6 @@ namespace BehaviourSystemEditor.BT
             }
 
             return _cachedPropertyList.ToArray();
-        }
-
-        private void DrawComparablePropertyField(SerializedProperty sourceType, SerializedProperty prop, Rect valueRect)
-        {
-            switch ((EBlackboardPropertyType)sourceType.enumValueIndex)
-            {
-                case EBlackboardPropertyType.Int: prop.intValue = EditorGUI.IntField(valueRect, prop.intValue); break;
-
-                case EBlackboardPropertyType.Bool: prop.boolValue = EditorGUI.Toggle(valueRect, prop.boolValue); break;
-
-                case EBlackboardPropertyType.Float: prop.floatValue = EditorGUI.FloatField(valueRect, prop.floatValue); break;
-            }
-        }
-
-        private void AllocateBlackboardProperty(SerializedProperty sourceType, SerializedProperty targetValue)
-        {
-            switch ((EBlackboardPropertyType)sourceType.enumValueIndex)
-            {
-                case EBlackboardPropertyType.Int: targetValue.boxedValue = new BlackboardProperty<int>("", 0, EBlackboardPropertyType.Int); break;
-
-                case EBlackboardPropertyType.Bool: targetValue.boxedValue = new BlackboardProperty<bool>("", false, EBlackboardPropertyType.Bool); break;
-
-                case EBlackboardPropertyType.Float: targetValue.boxedValue = new BlackboardProperty<float>("", 0f, EBlackboardPropertyType.Float); break;
-            }
         }
     }
 }

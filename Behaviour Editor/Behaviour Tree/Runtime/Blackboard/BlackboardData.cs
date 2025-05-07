@@ -25,7 +25,8 @@ namespace BehaviourSystem.BT
             
             for (int i = 0; i < origin.Count; ++i)
             {
-                newData._properties[i] = origin._properties[i].Clone();
+                IBlackboardProperty prop = origin._properties[i];
+                newData._properties[i] = prop.Clone(prop.propertyType);
             }
             
             return newData;
@@ -44,15 +45,20 @@ namespace BehaviourSystem.BT
         }
         
         
-        public void RemoveAt(int index)
+        public int IndexOf(IBlackboardProperty property)
         {
-            _properties?.RemoveAt(index);
+            if (_properties is not null)
+            {
+                return _properties.IndexOf(property);
+            }
+
+            return -1;
         }
 
 
-        public void Remove(IBlackboardProperty property)
+        public void RemoveAt(int index)
         {
-            _properties?.Remove(property);
+            _properties.RemoveAt(index);
         }
 
         

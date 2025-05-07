@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.Callbacks;
+using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 
 namespace BehaviourSystemEditor.BT
@@ -30,7 +31,7 @@ namespace BehaviourSystemEditor.BT
 
             return false;
         }
-        
+
 
         private static BehaviourTreeEditorSettings _settings;
 
@@ -47,11 +48,11 @@ namespace BehaviourSystemEditor.BT
 
 
 
-        private BehaviourTree _tree;
+        private BehaviourTree  _tree;
         private BehaviourActor _actor;
 
-        private BehaviourTreeView _treeView;
-        private InspectorView _inspectorView;
+        private BehaviourTreeView          _treeView;
+        private InspectorView              _inspectorView;
         private BlackboardPropertyViewList _blackboardPropList;
 
 
@@ -60,7 +61,7 @@ namespace BehaviourSystemEditor.BT
             get;
             private set;
         }
-        
+
         public BehaviourTree Tree
         {
             get { return _tree; }
@@ -83,8 +84,8 @@ namespace BehaviourSystemEditor.BT
         {
             EditorApplication.playModeStateChanged -= this.OnPlayNodeStateChanged;
         }
-        
-        
+
+
         /// <summary> 새로운 Behaviour Tree Asset이 추가되거나 제거될 때 호출됨. </summary>
         private void OnProjectChange()
         {
@@ -94,14 +95,15 @@ namespace BehaviourSystemEditor.BT
                 this._blackboardPropList?.ClearBlackboardPropertyViews();
                 this._inspectorView?.Clear();
                 this._treeView?.ClearEditorViewer();
-                
+
                 this.CanEditTree = false;
-                this._actor = null;
-                this._tree = null;
+                this._actor      = null;
+                this._tree       = null;
             }
             else
             {
-                this.OnSelectionChange();
+                EditorApplication.delayCall -= this.OnSelectionChange;
+                EditorApplication.delayCall += this.OnSelectionChange;
             }
         }
 
@@ -160,7 +162,7 @@ namespace BehaviourSystemEditor.BT
                 case BehaviourTree treeObj: _tree = treeObj; break;
 
                 case GameObject gameObj: _tree = gameObj.TryGetComponent(out _actor) ? _actor.runtimeTree : null; break;
-                
+
                 default: return;
             }
 

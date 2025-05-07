@@ -78,7 +78,7 @@ namespace BehaviourSystem.BT
         }
 
 
-        public void OnEnable()
+        public void Awake()
         {
             if (string.IsNullOrEmpty(_cloneGroupID))
             {

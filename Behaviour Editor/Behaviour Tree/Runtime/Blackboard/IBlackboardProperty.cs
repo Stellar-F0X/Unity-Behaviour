@@ -11,11 +11,24 @@ namespace BehaviourSystem.BT
             set;
         }
 
-        public EBlackboardPropertyType propertyType
+        public Type propertyType
+        {
+            get;
+            set;
+        }
+
+        public EConditionType comparableConditions
         {
             get;
         }
 
-        public IBlackboardProperty Clone();
+        public static IBlackboardProperty Create(Type propertyType)
+        {
+            var prop = Activator.CreateInstance(propertyType) as IBlackboardProperty;
+            prop.propertyType = propertyType;
+            return prop;
+        }
+
+        public IBlackboardProperty Clone(Type type);
     }
 }
