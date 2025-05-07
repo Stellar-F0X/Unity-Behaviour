@@ -16,7 +16,7 @@ namespace BehaviourSystem.BT
         public List<NodeBase> nodeList = new List<NodeBase>();
 
         [HideInInspector]
-        public BlackboardData blackboardData = new BlackboardData();
+        public BlackboardData blackboardData;
 
         [SerializeField, ReadOnly, Tooltip("개별 트리를 구분하기 위한 고유 ID")]
         private string _specificGuid;
@@ -80,8 +80,28 @@ namespace BehaviourSystem.BT
 
         public void OnEnable()
         {
-            _cloneGroupID = GUID.Generate().ToString();
-            _specificGuid = GUID.Generate().ToString();
+            if (string.IsNullOrEmpty(_cloneGroupID))
+            {
+                _cloneGroupID = GUID.Generate().ToString();
+            }
+
+            if (string.IsNullOrEmpty(_specificGuid))
+            {
+                _specificGuid = GUID.Generate().ToString();
+            }
+
+            if (blackboardData is null)
+            {
+                this.blackboardData           = CreateInstance<BlackboardData>();
+                this.blackboardData.hideFlags = HideFlags.HideInHierarchy;
+
+#if UNITY_EDITOR
+                EditorUtility.SetDirty(this.blackboardData);
+                AssetDatabase.AddObjectToAsset(this.blackboardData, this);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+#endif
+            }
         }
 
 

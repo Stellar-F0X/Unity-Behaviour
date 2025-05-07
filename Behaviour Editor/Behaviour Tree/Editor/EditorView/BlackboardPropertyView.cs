@@ -9,6 +9,7 @@ namespace BehaviourSystemEditor.BT
 {
     public class BlackboardPropertyView : VisualElement
     {
+        //TODO: SerializedProperty를 받아서 하든 함.
         public BlackboardPropertyView(IBlackboardProperty property, VisualTreeAsset visualTreeAsset)
         {
             visualTreeAsset.CloneTree(this);

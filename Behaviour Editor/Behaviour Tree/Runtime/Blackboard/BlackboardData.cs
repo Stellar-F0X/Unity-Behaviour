@@ -1,11 +1,12 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEditor;
 
 namespace BehaviourSystem.BT
 {
     [Serializable]
-    public class BlackboardData
+    public class BlackboardData : ScriptableObject
     {
         [SerializeReference]
         private List<IBlackboardProperty> _properties = new List<IBlackboardProperty>();
@@ -19,7 +20,7 @@ namespace BehaviourSystem.BT
 
         public static BlackboardData Clone(BlackboardData origin)
         {
-            BlackboardData newData = new BlackboardData();
+            BlackboardData newData = CreateInstance<BlackboardData>();
             newData._properties = new List<IBlackboardProperty>(origin.Count);
             
             for (int i = 0; i < origin.Count; ++i)

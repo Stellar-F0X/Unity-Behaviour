@@ -1,6 +1,7 @@
 using BehaviourSystem.BT;
 using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace BehaviourSystemEditor.BT
@@ -35,6 +36,9 @@ namespace BehaviourSystemEditor.BT
         {
             this._tree = tree;
 
+            var a = new SerializedObject(_tree.blackboardData);
+            Debug.Log(a.FindProperty("_properties").name);
+
             for (int i = 0; i < _tree.blackboardData.Count; ++i)
             {
                 this.AddProperty(_tree.blackboardData.GetProperty(i));
@@ -61,7 +65,7 @@ namespace BehaviourSystemEditor.BT
 
             this.AddProperty(prop);
 
-            EditorUtility.SetDirty(this._tree);
+            EditorUtility.SetDirty(this._tree.blackboardData);
         }
 
 
@@ -71,7 +75,7 @@ namespace BehaviourSystemEditor.BT
             this._tree.blackboardData.Remove(property.property);
             base.RefreshItems();
             
-            EditorUtility.SetDirty(this._tree);
+            EditorUtility.SetDirty(this._tree.blackboardData);
         }
     }
 }

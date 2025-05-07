@@ -40,9 +40,12 @@ namespace BehaviourSystem.BT
             get { return _propertyType; }
         }
 
+        public Type propertyType2;
+
         
         public IBlackboardProperty Clone()
         {
+            //TODO: return Activator.CreateInstance(propertyType2) as IBlackboardProperty;
             return new BlackboardProperty<T>(string.Copy(key), default, _propertyType);
         }
     }
