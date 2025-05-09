@@ -39,7 +39,7 @@ namespace BehaviourSystemEditor.BT
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (BehaviourTreeEditorWindow.Instance is null || BehaviourTreeEditorWindow.Instance.CanEditTree == false)
+            if (BehaviourTreeEditorWindow.Instance is null)
             {
                 return;
             }
@@ -141,7 +141,7 @@ namespace BehaviourSystemEditor.BT
             }
 
             SerializedProperty conditionType  = property.FindPropertyRelative("conditionType");
-            int                selected       = conditionType.enumValueIndex;
+            int                selected       = conditionType.enumValueIndex - 1;
             
             _conditionTypes.Clear();
 
@@ -169,7 +169,7 @@ namespace BehaviourSystemEditor.BT
             }
             
             selected                     = Mathf.Clamp(selected, 0, _conditionTypes.Count - 1);
-            conditionType.enumValueIndex = EditorGUI.Popup(compareRect, selected, _conditionTypes.ToArray(), _popupStyle);
+            conditionType.enumValueIndex = EditorGUI.Popup(compareRect, selected, _conditionTypes.ToArray(), _popupStyle) + 1;
         }
 
 

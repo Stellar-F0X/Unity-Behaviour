@@ -29,7 +29,7 @@ namespace BehaviourSystem.BT
         {
             if ((property.comparableConditions & conditionType) == conditionType)
             {
-                this.Compare((IComparable<IBlackboardProperty>)property, comparableValue);
+                return this.Compare((IComparable<IBlackboardProperty>)property, comparableValue);
             }
 
             return false;

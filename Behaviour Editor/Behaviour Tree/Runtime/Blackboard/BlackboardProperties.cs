@@ -13,7 +13,9 @@ namespace BehaviourSystem.BT
 
         public override int CompareTo(IBlackboardProperty other)
         {
-            return this.value.CompareTo(other);
+            var property = other as BlackboardProperty<int>;
+            
+            return this.value.CompareTo(property.value);
         }
     }
 
