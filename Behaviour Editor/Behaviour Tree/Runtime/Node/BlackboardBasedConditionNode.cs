@@ -11,6 +11,8 @@ namespace BehaviourSystem.BT
         [Space(10)]
         public List<BlackboardBasedCondition> conditions;
 
+        private Queue<NodeBase> _pendingAbortNodes = new Queue<NodeBase>();
+
 
         protected override EBehaviourResult OnUpdate()
         {
@@ -19,16 +21,25 @@ namespace BehaviourSystem.BT
                 return EBehaviourResult.Failure;
             }
 
+            if (_pendingAbortNodes.Count > 0)
+            {
+                if (_pendingAbortNodes.TryDequeue(out var node))
+                {
+                    node.AbortNode();
+                }
+
+                return _pendingAbortNodes.Count == 0 ? EBehaviourResult.Failure : EBehaviourResult.Running;
+            }
+
             for (int i = 0; i < conditions.Count; ++i)
             {
                 if (conditions[i].Execute() == false)
                 {
                     while (callStack.Peek() != this)
                     {
-                        NodeBase node = callStack.Pop();
-                        node.AbortNode();
+                        _pendingAbortNodes.Enqueue(callStack.Pop());
                     }
-                    
+
                     return EBehaviourResult.Failure;
                 }
             }

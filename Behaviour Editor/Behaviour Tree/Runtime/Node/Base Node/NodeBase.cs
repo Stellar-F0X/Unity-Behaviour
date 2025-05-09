@@ -78,7 +78,8 @@ namespace BehaviourSystem.BT
         public void AbortNode()
         {
             this.callState = ENodeCallState.Exited;
-            this.UpdateNode();
+            this.OnExit();
+            this.callState = ENodeCallState.Idle;
         } 
 
 

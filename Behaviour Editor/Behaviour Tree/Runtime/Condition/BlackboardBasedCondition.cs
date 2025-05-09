@@ -51,9 +51,9 @@ namespace BehaviourSystem.BT
                 case EConditionType.LessThan: return a.CompareTo(b) == _LESS;
 
                 case EConditionType.LessThanOrEqual: return a.CompareTo(b) is _LESS or _EQUAL;
-                
-                default: throw new NotImplementedException();
             }
+
+            return false;
         }
     }
 }
