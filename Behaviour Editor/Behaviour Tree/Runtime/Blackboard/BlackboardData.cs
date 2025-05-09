@@ -26,7 +26,7 @@ namespace BehaviourSystem.BT
             for (int i = 0; i < origin.Count; ++i)
             {
                 IBlackboardProperty prop = origin._properties[i];
-                newData._properties[i] = prop.Clone(prop);
+                newData._properties.Add(prop.Clone(prop));
             }
             
             return newData;

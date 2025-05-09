@@ -35,30 +35,35 @@ namespace BehaviourSystemEditor.BT
 
         public void ChangeBehaviourTree(BehaviourTree tree)
         {
-            if (BehaviourTreeEditorWindow.Instance is null || BehaviourTreeEditorWindow.Instance.CanEditTree == false)
+            if (BehaviourTreeEditorWindow.Instance is null)
             {
                 return;
             }
-
+            
             _blackboardData         = tree.blackboardData;
             _serializedObject       = new SerializedObject(tree.blackboardData);
             _serializedListProperty = _serializedObject.FindProperty("_properties");
-            
-            var types = TypeCache.GetTypesDerivedFrom<IBlackboardProperty>();
 
-            if (types.Count > 0)
+            for (int i = 0; i < _serializedListProperty.arraySize; ++i)
             {
+                this.AddProperty(_serializedListProperty.GetArrayElementAtIndex(i));
+            }
+
+            if (BehaviourTreeEditorWindow.Instance.CanEditTree)
+            {
+                var types = TypeCache.GetTypesDerivedFrom<IBlackboardProperty>();
+
+                if (types.Count == 0)
+                {
+                    return;
+                }
+
                 foreach (Type type in types)
                 {
                     if (type.IsAbstract == false)
                     {
                         _addButton.menu.AppendAction(type.Name, _ => this.MakeProperty(type));
                     }
-                }
-
-                for (int i = 0; i < _serializedListProperty.arraySize; ++i)
-                {
-                    this.AddProperty(_serializedListProperty.GetArrayElementAtIndex(i));
                 }
             }
         }
@@ -82,6 +87,7 @@ namespace BehaviourSystemEditor.BT
             var propertyView = new BlackboardPropertyView(prop, BehaviourTreeEditorWindow.Settings.blackboardPropertyViewXml);
 
             propertyView.RegisterButtonEvent(() => this.OnPropertyRemoved(propertyView));
+            propertyView.activeDeleteButton = BehaviourTreeEditorWindow.Instance.CanEditTree;
 
             this.hierarchy.Add(propertyView);
             base.RefreshItems();
@@ -90,14 +96,14 @@ namespace BehaviourSystemEditor.BT
 
         private void OnPropertyRemoved(BlackboardPropertyView propertyView)
         {
-            var prop        = propertyView.property.boxedValue as IBlackboardProperty;
+            var prop = propertyView.property.boxedValue as IBlackboardProperty;
             int targetIndex = _blackboardData.IndexOf(prop);
 
             _blackboardData.RemoveAt(targetIndex);
-            
+
             this.hierarchy.Remove(propertyView);
             base.RefreshItems();
-            
+
             EditorUtility.SetDirty(_blackboardData);
             _serializedObject.ApplyModifiedProperties();
         }

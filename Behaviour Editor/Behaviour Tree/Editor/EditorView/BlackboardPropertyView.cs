@@ -9,7 +9,6 @@ namespace BehaviourSystemEditor.BT
 {
     public class BlackboardPropertyView : VisualElement
     {
-        //TODO: SerializedProperty를 받아서 하든 함.
         public BlackboardPropertyView(SerializedProperty property, VisualTreeAsset visualTreeAsset)
         {
             visualTreeAsset.CloneTree(this);
@@ -43,6 +42,12 @@ namespace BehaviourSystemEditor.BT
         {
             get { return this._property; }
         }
+
+        public bool activeDeleteButton
+        {
+            get { return _button.enabledSelf; }
+            set { _button.enabledSelf = value; }
+        } 
         
         
         public void RegisterButtonEvent(Action action)

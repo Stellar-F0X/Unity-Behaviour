@@ -177,11 +177,11 @@ namespace BehaviourSystemEditor.BT
 
                 if (_actor is not null && Application.isPlaying || openedEditorWindow)
                 {
-                    _blackboardPropList?.ClearBlackboardPropertyViews();
-                    _blackboardPropList?.ChangeBehaviourTree(_tree);
-
                     _inspectorView?.Clear();
                     _treeView?.OnGraphEditorView(_tree);
+                    
+                    _blackboardPropList?.ClearBlackboardPropertyViews();
+                    _blackboardPropList?.ChangeBehaviourTree(_tree);
                 }
             }
         }
