@@ -72,7 +72,7 @@ namespace BehaviourSystemEditor.BT
             {
                 if (nodes.ElementAt(index) is NodeView nodeView)
                 {
-                    if (HasFoundNode(nodeView, name, options))
+                    if (this.HasTargetNode(nodeView, name, options))
                     {
                         _viewList.Add(nodeView);
                     }
@@ -83,7 +83,7 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-        private bool HasFoundNode(NodeView nodeView, string name, ESearchOptions options)
+        private bool HasTargetNode(NodeView nodeView, string name, ESearchOptions options)
         {
             switch (options)
             {

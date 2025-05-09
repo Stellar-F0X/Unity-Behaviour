@@ -41,7 +41,7 @@ namespace BehaviourSystem.BT
 
         public string tag;
 
-        [NonSerialized]
+        [HideInInspector]
         public NodeBase parent;
 
         [NonSerialized]
@@ -97,8 +97,13 @@ namespace BehaviourSystem.BT
                 case ENodeCallState.Updating:
                 {
                     behaviourResult = this.OnUpdate();
-                    callState       = (behaviourResult != EBehaviourResult.Running ? ENodeCallState.Exited : callState);
-                    return (behaviourResult != EBehaviourResult.Running ? EBehaviourResult.Running : behaviourResult);
+                    
+                    if (behaviourResult != EBehaviourResult.Running)
+                    {
+                        callState = ENodeCallState.Exited;
+                    }
+                    
+                    return behaviourResult;
                 }
 
                 case ENodeCallState.Exited:
@@ -112,7 +117,12 @@ namespace BehaviourSystem.BT
                 default: return EBehaviourResult.Failure;
             }
         }
+        
+        public virtual void OnInitialize() { }
 
+        public virtual void FixedUpdateNode() { }
+
+        public virtual void GizmosUpdateNode() { }
         
         protected virtual void OnEnter() { }
 

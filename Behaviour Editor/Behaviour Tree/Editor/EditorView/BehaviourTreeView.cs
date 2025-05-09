@@ -41,13 +41,13 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-        public Action onGraphViewChange;
-        public Action<NodeView> onNodeSelected;
+        public Action                  onGraphViewChange;
+        public Action<NodeView>        onNodeSelected;
         public ToolbarPopupSearchField popupSearchField;
 
-        private BehaviourTree _tree;
-        private NodeSearchHelper _nodeSearchHelper;
-        private NodeEdgeHandler _nodeEdgeHandler;
+        private BehaviourTree      _tree;
+        private NodeSearchHelper   _nodeSearchHelper;
+        private NodeEdgeHandler    _nodeEdgeHandler;
         private NodeCreationWindow _nodeCreationWindow;
 
 
@@ -110,8 +110,8 @@ namespace BehaviourSystemEditor.BT
                 _nodeCreationWindow.Initialize(this);
             }
 
-            Vector2 screenPoint = GUIUtility.GUIToScreenPoint(evt.mousePosition);
-            SearchWindowContext context = new SearchWindowContext(screenPoint, 200, 240);
+            Vector2             screenPoint = GUIUtility.GUIToScreenPoint(evt.mousePosition);
+            SearchWindowContext context     = new SearchWindowContext(screenPoint, 200, 240);
 
             SearchWindow.Open(context, _nodeCreationWindow);
         }
@@ -142,9 +142,7 @@ namespace BehaviourSystemEditor.BT
 
             for (int i = 0; i < length; i++)
             {
-                var node = nodes.AtIndex(i);
-
-                if (node is NodeView nodeView)
+                if (nodes.AtIndex(i) is NodeView nodeView)
                 {
                     nodeView.UpdateState();
                 }
@@ -160,7 +158,7 @@ namespace BehaviourSystemEditor.BT
             base.DeleteElements(graphElements.ToList());
             graphViewChanged += OnGraphViewChanged;
 
-            if (_tree.rootNode == null)
+            if (_tree.rootNode is null)
             {
                 tree.rootNode = tree.CreateNode(typeof(RootNode)) as RootNode;
                 UnityEditor.EditorUtility.SetDirty(tree);
@@ -254,9 +252,11 @@ namespace BehaviourSystemEditor.BT
                     return;
                 }
 
-                foreach (NodeView view in views)
+                for (int i = 0; i < views.Length; ++i)
                 {
-                    string menuName = $"name: [{view.node.name}]   tag: [{view.node.tag}]";
+                    NodeView view = views[i];
+
+                    string menuName = $"[{i+1}]   name: [{view.node.name}]   tag: [{view.node.tag}]";
 
                     popupSearchField.menu.AppendAction(menuName, delegate
                     {

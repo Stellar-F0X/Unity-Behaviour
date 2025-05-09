@@ -21,7 +21,6 @@ namespace BehaviourSystemEditor.BT
             _nodeBorder = this.Q<VisualElement>("node-border");
 
             string nodeType = node.nodeType.ToString();
-            _nodeType = node.GetType();
 
             this.AddToClassList(nodeType.ToLower());
             this.CreatePorts();
@@ -34,8 +33,7 @@ namespace BehaviourSystemEditor.BT
         public NodeBase node;
         public Port input;
         public Port output;
-
-        private readonly Type _nodeType;
+        
         private readonly VisualElement _nodeBorder;
 
         private readonly Color _runningColor = new Color32(54, 154, 204, 255);

@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace BehaviourSystem.BT
@@ -17,12 +14,12 @@ namespace BehaviourSystem.BT
 
         protected override EBehaviourResult OnUpdate()
         {
-            if (Time.time > _startTime + duration)
+            if (Time.time < _startTime + duration)
             {
-                return EBehaviourResult.Success;
+                return EBehaviourResult.Running;
             }
-
-            return EBehaviourResult.Running;
+            
+            return EBehaviourResult.Success;
         }
     }
 }

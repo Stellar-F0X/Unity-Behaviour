@@ -163,7 +163,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea6898e15b6b09a408580d2dbf4e8ae7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  updateMode: 0
   _runtimeTree: {fileID: 11400000, guid: 740a7bd918ceb01489ac287059924614, type: 2}
 --- !u!4 &1864815955023588656
 Transform:

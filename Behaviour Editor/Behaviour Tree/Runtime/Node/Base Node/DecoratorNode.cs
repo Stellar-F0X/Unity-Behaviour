@@ -13,5 +13,21 @@ namespace BehaviourSystem.BT
         {
             get { return ENodeType.Decorator; }
         }
+
+        public override sealed void FixedUpdateNode()
+        {
+            if (child is not null)
+            {
+                child.FixedUpdateNode();
+            }
+        }
+
+        public override sealed void GizmosUpdateNode()
+        {
+            if (child is not null)
+            {
+                child.GizmosUpdateNode();
+            }
+        }
     }
 }

@@ -1,25 +1,22 @@
 using System;
+using NUnit.Framework.Internal;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace BehaviourSystem.BT
 {
     [Serializable]
     public abstract class BlackboardProperty<T> : IBlackboardProperty, ISerializationCallbackReceiver, IComparable<IBlackboardProperty>
     {
-        public BlackboardProperty()
-        {
-            
-        }
-        
         [SerializeField]
         private string _key;
 
         [SerializeField]
         private T _value;
-
+        
         [SerializeField]
-        private string _propertyTypeName;
-        private Type _propertyType;
+        private string _typeName;
+        private Type _type;
 
         public string key
         {
@@ -33,10 +30,10 @@ namespace BehaviourSystem.BT
             set { _value = value; }
         }
 
-        public Type propertyType
+        public Type type
         {
-            get { return _propertyType; }
-            set { _propertyType = value; }
+            get { return _type; }
+            set { _type = value; }
         }
 
         public abstract EConditionType comparableConditions
@@ -46,21 +43,31 @@ namespace BehaviourSystem.BT
 
         public void OnBeforeSerialize()
         {
-            _propertyTypeName = _propertyType.AssemblyQualifiedName;
+            _typeName = _type.AssemblyQualifiedName;
         }
 
         public void OnAfterDeserialize()
         {
-            _propertyType = Type.GetType(_propertyTypeName);
+            _type = Type.GetType(_typeName);
         }
 
-        public IBlackboardProperty Clone(Type type)
+        public IBlackboardProperty Clone(IBlackboardProperty origin)
         {
-            BlackboardProperty<T> newProperty = IBlackboardProperty.Create(type) as BlackboardProperty<T>;
-            newProperty._key              = string.Copy(_key);
-            newProperty._value            = default;
-            newProperty._propertyTypeName = type.AssemblyQualifiedName;
-            newProperty._propertyType     = _propertyType;
+            BlackboardProperty<T> newProperty = IBlackboardProperty.Create(origin.type) as BlackboardProperty<T>;
+
+            if (newProperty is null)
+            {
+                throw new TypeAccessException("Failed to clone a property. The new property is null.");
+            }
+            
+            if (origin is BlackboardProperty<T> originalProp)
+            {
+                newProperty._key      = originalProp._key;
+                newProperty._value    = originalProp._value;
+                newProperty._typeName = originalProp._type.AssemblyQualifiedName;
+                newProperty._type     = originalProp._type;
+            }
+
             return newProperty;
         }
         

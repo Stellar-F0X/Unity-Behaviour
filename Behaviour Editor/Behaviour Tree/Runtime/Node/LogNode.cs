@@ -1,42 +1,55 @@
+using System;
 using UnityEngine;
 
 namespace BehaviourSystem.BT
 {
     public class LogNode : ActionNode
     {
-        [Space]
-        public string onEnterMessage;
-        public string onUpdateMessage;
-        public string onExitMessage;
-        
+        [Space(5)]
+        public string[] onEnterMessages;
+        public string[] onUpdateMessages;
+        public string[] onExitMessages;
+
+
         protected override void OnEnter()
         {
-            if (string.IsNullOrEmpty(onEnterMessage))
+            if (onEnterMessages is null || onEnterMessages.Length == 0)
             {
                 return;
             }
-            
-            Debug.Log(onEnterMessage);
+
+            for (int i = 0; i < onEnterMessages.Length; ++i)
+            {
+                Debug.Log(onEnterMessages[i]);
+            }
         }
 
+        
         protected override EBehaviourResult OnUpdate()
         {
-            if (string.IsNullOrEmpty(onUpdateMessage) == false)
+            if (onUpdateMessages is not null && onUpdateMessages.Length > 0)
             {
-                Debug.Log(onUpdateMessage);
+                for (int i = 0; i < onUpdateMessages.Length; ++i)
+                {
+                    Debug.Log(onUpdateMessages[i]);
+                }
             }
-            
+
             return EBehaviourResult.Success;
         }
 
+        
         protected override void OnExit()
         {
-            if (string.IsNullOrEmpty(onExitMessage))
+            if (onExitMessages is null || onExitMessages.Length == 0)
             {
                 return;
             }
             
-            Debug.Log(onExitMessage);
+            for (int i = 0; i < onExitMessages.Length; ++i)
+            {
+                Debug.Log(onExitMessages[i]);
+            }
         }
     }
 }

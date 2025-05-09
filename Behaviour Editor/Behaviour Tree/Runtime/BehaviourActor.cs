@@ -1,39 +1,32 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.LowLevel;
-using UnityEngine.PlayerLoop;
-using Object = UnityEngine.Object;
 
 namespace BehaviourSystem.BT
 {
     public class BehaviourActor : MonoBehaviour
     {
-        public enum BehaviourUpdateMode
-        {
-            Update,
-            FixedUpdate,
-            LateUpdate
-        };
-        
         public event Action OnDone;
-
-        public BehaviourUpdateMode updateMode;
-
+        
         [SerializeField]
         private BehaviourTree _runtimeTree;
         private Type _updateType;
 
-        private Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
+        private readonly Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
 
-        private PlayerLoopSystem _playerLoop;
+        private PlayerLoopSystem                _playerLoop;
         private PlayerLoopSystem.UpdateFunction _btUpdater;
+        private NodeBase.EBehaviourResult       _lastExecutingResult;
 
         public BehaviourTree runtimeTree
         {
             get { return _runtimeTree; }
+        }
+
+        public NodeBase.EBehaviourResult lastExecutingResult
+        {
+            get { return _lastExecutingResult; }
         }
 
 
@@ -42,67 +35,43 @@ namespace BehaviourSystem.BT
             this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree);
         }
 
-
-        private void OnEnable()
+        
+        private void Update()
         {
-            switch (updateMode)
-            {
-                case BehaviourUpdateMode.Update: _updateType = typeof(Update); break;
-                
-                case BehaviourUpdateMode.FixedUpdate: _updateType = typeof(FixedUpdate); break;
-                
-                case BehaviourUpdateMode.LateUpdate: _updateType = typeof(PostLateUpdate); break;
-            }
+            _lastExecutingResult = _runtimeTree.UpdateTree(); 
             
-            this._playerLoop =  PlayerLoop.GetCurrentPlayerLoop();
-            this._btUpdater  -= this.UpdateTree;
-            this._btUpdater  += this.UpdateTree;
-
-            PlayerLoopSystem loopSystem = _playerLoop.subSystemList.First(s => s.type == _updateType);
-            int index = Array.IndexOf(_playerLoop.subSystemList, loopSystem);
-
-            if (index != -1)
+            if (_lastExecutingResult != NodeBase.EBehaviourResult.Running)
             {
-                PlayerLoopSystem newPlayerLoop = new PlayerLoopSystem();
-                newPlayerLoop.updateDelegate = _btUpdater;
-                newPlayerLoop.type           = _updateType;
-
-                var newSystems = loopSystem.subSystemList.Append(newPlayerLoop);
-
-                loopSystem.subSystemList         = newSystems.ToArray();
-                _playerLoop.subSystemList[index] = loopSystem;
-                PlayerLoop.SetPlayerLoop(_playerLoop);
+                OnDone?.Invoke();
             }
         }
 
 
-        private void OnDisable()
+        private void FixedUpdate()
         {
-            if (_btUpdater is not null && _btUpdater.GetInvocationList().Length > 0)
-            {
-                PlayerLoopSystem loopSystem = _playerLoop.subSystemList.First(s => s.type == _updateType);
-                int index = Array.IndexOf(_playerLoop.subSystemList, loopSystem);
+            _runtimeTree.FixedUpdateTree(); 
+        }
 
-                if (index != -1)
-                {
-                    loopSystem.subSystemList = loopSystem.subSystemList
-                                                         .Where(s => s.updateDelegate != _btUpdater)
-                                                         .ToArray();
 
-                    _playerLoop.subSystemList[index] = loopSystem;
-                    PlayerLoop.SetPlayerLoop(_playerLoop);
-                }
 
-                this._btUpdater -= this.UpdateTree;
-            }
+        private void OnDrawGizmos()
+        {
+            _runtimeTree.GizmosUpdateTree();
+        }
+
+
+        public void PauseTree()
+        {
+            
         }
 
 
         public void AbortTree(bool callOnExit = true) { }
+        
 
 
 
-        public void SetBlackboardProperty<TValue>(in string key, TValue property)
+        public void SetProperty<TValue>(in string key, TValue property)
         {
             if (_properties.TryGetValue(key, out var existingProperty))
             {
@@ -128,11 +97,11 @@ namespace BehaviourSystem.BT
         }
 
 
-        public TProperty GetBlackboardProperty<TProperty>(in string key) where TProperty : class
+        public TValue GetProperty<TValue>(in string key)
         {
             if (_properties.TryGetValue(key, out var existingProperty))
             {
-                if (existingProperty is BlackboardProperty<TProperty> castedProperty)
+                if (existingProperty is BlackboardProperty<TValue> castedProperty)
                 {
                     return castedProperty.value;
                 }
@@ -141,7 +110,7 @@ namespace BehaviourSystem.BT
             {
                 IBlackboardProperty newProperty = _runtimeTree.blackboardData.GetProperty(key);
 
-                if (newProperty is BlackboardProperty<TProperty> castedProperty)
+                if (newProperty is BlackboardProperty<TValue> castedProperty)
                 {
                     _properties.Add(key, newProperty);
                     return castedProperty.value;
@@ -149,16 +118,6 @@ namespace BehaviourSystem.BT
             }
 
             throw new Exception($"Blackboard property with key '{key}' was not found.");
-        }
-
-
-
-        private void UpdateTree()
-        {
-            if (_runtimeTree.UpdateTree() == NodeBase.EBehaviourResult.Running)
-            {
-                OnDone?.Invoke();
-            }
         }
     }
 }

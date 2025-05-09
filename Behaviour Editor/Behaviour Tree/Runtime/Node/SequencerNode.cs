@@ -1,8 +1,9 @@
 using System;
+using UnityEngine;
 
 namespace BehaviourSystem.BT
 {
-    public class SequencerNode : CompositeNode
+    public sealed class SequencerNode : CompositeNode
     {
         protected override void OnEnter()
         {
@@ -12,6 +13,11 @@ namespace BehaviourSystem.BT
 
         protected override EBehaviourResult OnUpdate()
         {
+            if (children is null || children.Count == 0)
+            {
+                return EBehaviourResult.Failure;
+            }
+
             switch (children[_currentChildIndex].UpdateNode())
             {
                 case EBehaviourResult.Running: return EBehaviourResult.Running;
@@ -25,10 +31,8 @@ namespace BehaviourSystem.BT
             {
                 return EBehaviourResult.Success;
             }
-            else
-            {
-                return EBehaviourResult.Running;
-            }
+
+            return EBehaviourResult.Running;
         }
     }
 }

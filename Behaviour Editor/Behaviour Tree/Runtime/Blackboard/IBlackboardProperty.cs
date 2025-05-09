@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 namespace BehaviourSystem.BT
 {
@@ -11,7 +10,7 @@ namespace BehaviourSystem.BT
             set;
         }
 
-        public Type propertyType
+        public Type type
         {
             get;
             set;
@@ -24,11 +23,15 @@ namespace BehaviourSystem.BT
 
         public static IBlackboardProperty Create(Type propertyType)
         {
-            var prop = Activator.CreateInstance(propertyType) as IBlackboardProperty;
-            prop.propertyType = propertyType;
-            return prop;
+            if (Activator.CreateInstance(propertyType) is IBlackboardProperty property)
+            {
+                property.type = propertyType;
+                return property;
+            }
+
+            throw new Exception($"Failed to create property of type {propertyType}");
         }
 
-        public IBlackboardProperty Clone(Type type);
+        public IBlackboardProperty Clone(IBlackboardProperty origin);
     }
 }

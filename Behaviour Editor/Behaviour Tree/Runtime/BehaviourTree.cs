@@ -34,43 +34,76 @@ namespace BehaviourSystem.BT
         {
             get { return _cloneGroupID; }
         }
-        
-        
+
+
         public static BehaviourTree MakeRuntimeTree(BehaviourActor actor, BehaviourTree targetTree)
         {
-            Stack<(NodeBase parent, NodeBase child)> stack = new Stack<(NodeBase parent, NodeBase child)>();
+            Stack<(NodeBase instance, NodeBase origin)> stack = new Stack<(NodeBase instance, NodeBase origin)>();
             Stack<NodeBase> callStack = new Stack<NodeBase>(targetTree.nodeList.Count);
             BehaviourTree runtimeTree = Instantiate(targetTree);
+
             runtimeTree._specificGuid  = GUID.Generate().ToString();
             runtimeTree._cloneGroupID  = targetTree._cloneGroupID;
             runtimeTree.nodeList       = new List<NodeBase>(targetTree.nodeList.Count);
             runtimeTree.blackboardData = BlackboardData.Clone(targetTree.blackboardData);
 
-            stack.Push((Instantiate(targetTree.rootNode), ((RootNode)targetTree.rootNode).child));
-
-            while (stack.Count > 0)
+            if (Instantiate(targetTree.rootNode) is RootNode newRootNode)
             {
-                (NodeBase parent, NodeBase child) traversal = stack.Pop();
-                NodeBase clonedNode = Instantiate(traversal.child);
+                runtimeTree.rootNode = newRootNode;
+                stack.Push((newRootNode, targetTree.rootNode));
 
-                clonedNode.tree       = runtimeTree;
-                clonedNode.actor      = actor;
-                clonedNode.parent     = traversal.parent;
-                clonedNode.callStack = callStack;
-
-                runtimeTree.nodeList.Add(clonedNode);
-                runtimeTree.AddChild(traversal.parent, clonedNode);
-
-                List<NodeBase> children = targetTree.GetChildren(traversal.child);
-
-                if (children is null || children.Count == 0)
+                while (stack.Count > 0)
                 {
-                    continue;
-                }
+                    (NodeBase instance, NodeBase origin) traversal = stack.Pop();
 
-                for (int i = children.Count - 1; i >= 0; --i)
-                {
-                    stack.Push((clonedNode, children[i]));
+                    traversal.instance.name      = traversal.instance.name.Remove(traversal.origin.name.Length, 7);
+                    traversal.instance.tree      = runtimeTree;
+                    traversal.instance.actor     = actor;
+                    traversal.instance.callStack = callStack;
+
+                    runtimeTree.nodeList.Add(traversal.instance);
+
+                    switch (traversal.origin.nodeType)
+                    {
+                        case NodeBase.ENodeType.Root:
+                        {
+                            RootNode instance = (RootNode)traversal.instance;
+                            RootNode origin = (RootNode)traversal.origin;
+                            NodeBase childInstance = Instantiate(origin.child);
+                            childInstance.parent = instance;
+                            instance.child       = childInstance;
+                            stack.Push((childInstance, origin.child));
+                            break;
+                        }
+
+                        case NodeBase.ENodeType.Decorator:
+                        {
+                            DecoratorNode instance = (DecoratorNode)traversal.instance;
+                            DecoratorNode origin = (DecoratorNode)traversal.origin;
+                            NodeBase childInstance = Instantiate(origin.child);
+                            childInstance.parent = instance;
+                            instance.child       = childInstance;
+                            stack.Push((childInstance, origin.child));
+                            break;
+                        }
+
+                        case NodeBase.ENodeType.Composite:
+                        {
+                            CompositeNode instance = (CompositeNode)traversal.instance;
+                            CompositeNode origin = (CompositeNode)traversal.origin;
+
+                            for (int i = 0; i < origin.children.Count; ++i)
+                            {
+                                NodeBase childInstance = Instantiate(origin.children[i]);
+                                childInstance.parent = instance;
+                                instance.children[i] = childInstance;
+                                stack.Push((childInstance, origin.children[i]));
+                            }
+                            break;
+                        }
+                    }
+
+                    traversal.instance.OnInitialize();
                 }
             }
 
@@ -112,8 +145,32 @@ namespace BehaviourSystem.BT
                 Debug.LogError("Root node is NullReference");
                 return NodeBase.EBehaviourResult.Failure;
             }
-            
+
             return this.rootNode.UpdateNode();
+        }
+
+
+        public void FixedUpdateTree()
+        {
+            if (this.rootNode is null)
+            {
+                Debug.LogError("Root node is NullReference");
+                return;
+            }
+
+            this.rootNode.FixedUpdateNode();
+        }
+
+
+        public void GizmosUpdateTree()
+        {
+            if (this.rootNode is null)
+            {
+                Debug.LogError("Root node is NullReference");
+                return;
+            }
+
+            this.rootNode.GizmosUpdateNode();
         }
 
 
@@ -126,9 +183,9 @@ namespace BehaviourSystem.BT
                 case NodeBase.ENodeType.Decorator: return new List<NodeBase> { ((DecoratorNode)parent).child };
 
                 case NodeBase.ENodeType.Composite: return ((CompositeNode)parent).children;
-
-                default: return null;
             }
+
+            return null;
         }
 
 
@@ -149,32 +206,37 @@ namespace BehaviourSystem.BT
         }
 
 
+#if UNITY_EDITOR
         public void AddChild(NodeBase parent, NodeBase child)
         {
-#if UNITY_EDITOR
             Undo.RecordObject(parent, "Behaviour Tree (AddChild)");
-#endif
 
             switch (parent.nodeType)
             {
-                case NodeBase.ENodeType.Root: ((RootNode)parent).child = child; break;
+                case NodeBase.ENodeType.Root:
+                    ((RootNode)parent).child = child;
+                    child.parent             = parent;
+                    break;
 
-                case NodeBase.ENodeType.Decorator: ((DecoratorNode)parent).child = child; break;
+                case NodeBase.ENodeType.Decorator:
+                    ((DecoratorNode)parent).child = child;
+                    child.parent                  = parent;
+                    break;
 
-                case NodeBase.ENodeType.Composite: ((CompositeNode)parent).children.Add(child); break;
+                case NodeBase.ENodeType.Composite:
+                    ((CompositeNode)parent).children.Add(child);
+                    child.parent = parent;
+                    break;
             }
 
-#if UNITY_EDITOR
             EditorUtility.SetDirty(child);
-#endif
         }
 
 
         public void RemoveChild(NodeBase parent, NodeBase child)
         {
-#if UNITY_EDITOR
             Undo.RecordObject(parent, "Behaviour Tree (RemoveChild)");
-#endif
+
             switch (parent.nodeType)
             {
                 case NodeBase.ENodeType.Root: ((RootNode)parent).child = null; break;
@@ -184,13 +246,10 @@ namespace BehaviourSystem.BT
                 case NodeBase.ENodeType.Composite: ((CompositeNode)parent).children.Remove(child); break;
             }
 
-#if UNITY_EDITOR
             EditorUtility.SetDirty(child);
-#endif
         }
 
 
-#if UNITY_EDITOR
         public NodeBase CreateNode(Type nodeType)
         {
             NodeBase node = CreateInstance(nodeType) as NodeBase;

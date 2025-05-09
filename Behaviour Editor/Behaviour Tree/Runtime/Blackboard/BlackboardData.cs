@@ -26,7 +26,7 @@ namespace BehaviourSystem.BT
             for (int i = 0; i < origin.Count; ++i)
             {
                 IBlackboardProperty prop = origin._properties[i];
-                newData._properties[i] = prop.Clone(prop.propertyType);
+                newData._properties[i] = prop.Clone(prop);
             }
             
             return newData;
@@ -62,13 +62,13 @@ namespace BehaviourSystem.BT
         }
 
         
-        public IBlackboardProperty GetProperty(int index)
+        public IBlackboardProperty GetProperty(in int index)
         {
             return _properties[index];
         }
 
         
-        public IBlackboardProperty GetProperty(string name)
+        public IBlackboardProperty GetProperty(in string name)
         {
             for (int i = 0; i < _properties.Count; i++)
             {

@@ -16,7 +16,7 @@ namespace BehaviourSystem.BT
             return this.value.CompareTo(other);
         }
     }
-    
+
     [Serializable]
     public class FloatProperty : BlackboardProperty<float>
     {
@@ -51,7 +51,7 @@ namespace BehaviourSystem.BT
             return this.value == (other as BlackboardProperty<bool>).value ? 0 : -1;
         }
     }
-    
+
     [Serializable]
     public class Vector3Property : BlackboardProperty<Vector3>
     {
@@ -63,7 +63,7 @@ namespace BehaviourSystem.BT
         public override int CompareTo(IBlackboardProperty other)
         {
             BlackboardProperty<Vector3> otherValue = other as BlackboardProperty<Vector3>;
-            
+
             if (Mathf.Approximately(this.value.sqrMagnitude, otherValue.value.sqrMagnitude))
             {
                 return 0;
@@ -84,7 +84,7 @@ namespace BehaviourSystem.BT
         public override int CompareTo(IBlackboardProperty other)
         {
             BlackboardProperty<Vector2> otherValue = other as BlackboardProperty<Vector2>;
-            
+
             if (Mathf.Approximately(this.value.sqrMagnitude, otherValue.value.sqrMagnitude))
             {
                 return 0;
@@ -105,7 +105,7 @@ namespace BehaviourSystem.BT
         public override int CompareTo(IBlackboardProperty other)
         {
             BlackboardProperty<Quaternion> otherValue = other as BlackboardProperty<Quaternion>;
-            
+
             if (Mathf.Approximately(this.value.eulerAngles.sqrMagnitude, otherValue.value.eulerAngles.sqrMagnitude))
             {
                 return 0;
@@ -128,7 +128,7 @@ namespace BehaviourSystem.BT
             return -1;
         }
     }
-    
+
     [Serializable]
     public class AnimatorProperty : BlackboardProperty<Animator>
     {
@@ -139,7 +139,7 @@ namespace BehaviourSystem.BT
 
         public override int CompareTo(IBlackboardProperty other)
         {
-            return - 1;
+            return -1;
         }
     }
 
@@ -172,6 +172,20 @@ namespace BehaviourSystem.BT
                 return (this.value & layerMask.value) > 0 ? 0 : -1;
             }
 
+            return -1;
+        }
+    }
+
+    [Serializable]
+    public class GameObjectProperty : BlackboardProperty<GameObject>
+    {
+        public override EConditionType comparableConditions
+        {
+            get { return EConditionType.None; }
+        }
+
+        public override int CompareTo(IBlackboardProperty other)
+        {
             return -1;
         }
     }

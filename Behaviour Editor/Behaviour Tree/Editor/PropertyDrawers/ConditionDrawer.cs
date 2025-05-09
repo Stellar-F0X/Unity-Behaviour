@@ -111,7 +111,7 @@ namespace BehaviourSystemEditor.BT
         private void DrawCompareValueField(SerializedProperty property, SerializedProperty blackboardProp, Rect compareRect, Rect valueRect)
         {
             SerializedProperty targetValue         = property.FindPropertyRelative("comparableValue");
-            SerializedProperty sourceValueTypeName = blackboardProp.FindPropertyRelative("_propertyTypeName");
+            SerializedProperty sourceValueTypeName = blackboardProp.FindPropertyRelative("_typeName");
 
             if (targetValue.boxedValue is null)
             {
@@ -119,7 +119,7 @@ namespace BehaviourSystemEditor.BT
             }
             else
             {
-                SerializedProperty targetValueTypeName = targetValue.FindPropertyRelative("_propertyTypeName");
+                SerializedProperty targetValueTypeName = targetValue.FindPropertyRelative("_typeName");
 
                 if (string.Compare(targetValueTypeName.stringValue, sourceValueTypeName.stringValue, StringComparison.Ordinal) != 0)
                 {

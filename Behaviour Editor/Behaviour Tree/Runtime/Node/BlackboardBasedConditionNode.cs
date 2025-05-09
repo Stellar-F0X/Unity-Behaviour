@@ -1,26 +1,27 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace BehaviourSystem.BT
 {
     [Serializable]
-    public class BlackboardBasedConditionNode : DecoratorNode
+    public sealed class BlackboardBasedConditionNode : DecoratorNode
     {
-        [Space(10), SerializeField]
-        protected List<BlackboardBasedCondition> _conditions;
+        [Space(10)]
+        public List<BlackboardBasedCondition> conditions;
 
 
         protected override EBehaviourResult OnUpdate()
         {
-            if (_conditions is null || _conditions.Count == 0)
+            if (conditions is null || conditions.Count == 0)
             {
                 return EBehaviourResult.Failure;
             }
 
-            for (int i = 0; i < _conditions.Count; ++i)
+            for (int i = 0; i < conditions.Count; ++i)
             {
-                if (_conditions[i].Execute() == false)
+                if (conditions[i].Execute() == false)
                 {
                     while (callStack.Peek() != this)
                     {
