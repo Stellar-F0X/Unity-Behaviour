@@ -8,16 +8,17 @@ namespace BehaviourSystem.BT
     public class BehaviourActor : MonoBehaviour
     {
         public event Action OnDone;
-        
+
         [SerializeField]
         private BehaviourTree _runtimeTree;
+
         private Type _updateType;
 
         private readonly Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
 
-        private PlayerLoopSystem                _playerLoop;
+        private PlayerLoopSystem _playerLoop;
         private PlayerLoopSystem.UpdateFunction _btUpdater;
-        private NodeBase.EBehaviourResult       _lastExecutingResult;
+        private NodeBase.EBehaviourResult _lastExecutingResult;
 
         public BehaviourTree runtimeTree
         {
@@ -35,11 +36,17 @@ namespace BehaviourSystem.BT
             this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree);
         }
 
-        
+
         private void Update()
         {
-            _lastExecutingResult = _runtimeTree.UpdateTree(); 
-            
+            if (_runtimeTree is null)
+            {
+                Debug.LogError("Behaviour Tree is null");
+                return;
+            }
+
+            _lastExecutingResult = _runtimeTree.UpdateTree();
+
             if (_lastExecutingResult != NodeBase.EBehaviourResult.Running)
             {
                 OnDone?.Invoke();
@@ -49,25 +56,38 @@ namespace BehaviourSystem.BT
 
         private void FixedUpdate()
         {
-            _runtimeTree.FixedUpdateTree(); 
-        }
+            if (_runtimeTree is null)
+            {
+                Debug.LogError("Behaviour Tree is null");
+                return;
+            }
 
+            _runtimeTree.FixedUpdateTree();
+        }
 
 
         private void OnDrawGizmos()
         {
+            if (Application.isPlaying == false)
+            {
+                return;
+            }
+            
+            if (_runtimeTree is null)
+            {
+                Debug.LogError("Behaviour Tree is null");
+                return;
+            }
+
             _runtimeTree.GizmosUpdateTree();
         }
 
 
-        public void PauseTree()
-        {
-            
-        }
+        public void PauseTree() { }
 
 
         public void AbortTree(bool callOnExit = true) { }
-        
+
 
 
 

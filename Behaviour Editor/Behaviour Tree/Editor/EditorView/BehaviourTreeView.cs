@@ -5,9 +5,9 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.Linq;
+using BehaviourSystem;
 using BehaviourSystem.BT;
 using UnityEditor.UIElements;
-using UnityEngine.EventSystems;
 
 namespace BehaviourSystemEditor.BT
 {
@@ -20,7 +20,8 @@ namespace BehaviourSystemEditor.BT
 
             ContentZoomer zoomer = new ContentZoomer()
             {
-                maxScale = BehaviourTreeEditorWindow.Settings.enlargementScale, minScale = BehaviourTreeEditorWindow.Settings.reductionScale
+                maxScale = BehaviourTreeEditorWindow.Settings.enlargementScale,
+                minScale = BehaviourTreeEditorWindow.Settings.reductionScale
             };
 
             this.AddManipulator(zoomer);
@@ -30,7 +31,7 @@ namespace BehaviourSystemEditor.BT
 
             styleSheets.Add(BehaviourTreeEditorWindow.Settings.behaviourTreeStyle);
 
-            _nodeEdgeHandler  = new NodeEdgeHandler();
+            _nodeEdgeHandler = new NodeEdgeHandler();
             _nodeSearchHelper = new NodeSearchHelper();
 
             Undo.undoRedoPerformed = () =>
@@ -40,15 +41,14 @@ namespace BehaviourSystemEditor.BT
             };
         }
 
-
-        public Action                  onGraphViewChange;
-        public Action<NodeView>        onNodeSelected;
+        public Action onGraphViewChange;
+        public Action<NodeView> onNodeSelected;
         public ToolbarPopupSearchField popupSearchField;
 
-        private BehaviourTree      _tree;
-        private NodeSearchHelper   _nodeSearchHelper;
-        private NodeEdgeHandler    _nodeEdgeHandler;
-        private NodeCreationWindow _nodeCreationWindow;
+        private BehaviourTree _tree;
+        private NodeSearchHelper _nodeSearchHelper;
+        private NodeEdgeHandler _nodeEdgeHandler;
+        private CreationWindow _creationWindow;
 
 
         public void ClearEditorViewer()
@@ -71,6 +71,7 @@ namespace BehaviourSystemEditor.BT
             this._tree = tree;
             this.Initialize(tree);
             this.IntegrityCheckNodeList(tree);
+            this.CreateNodeViewGroups(tree);
         }
 
 
@@ -104,16 +105,16 @@ namespace BehaviourSystemEditor.BT
                 return;
             }
 
-            if (_nodeCreationWindow == null)
+            if (_creationWindow is null)
             {
-                _nodeCreationWindow = ScriptableObject.CreateInstance<NodeCreationWindow>();
-                _nodeCreationWindow.Initialize(this);
+                _creationWindow = ScriptableObject.CreateInstance<CreationWindow>();
+                _creationWindow.Initialize(this);
             }
 
-            Vector2             screenPoint = GUIUtility.GUIToScreenPoint(evt.mousePosition);
-            SearchWindowContext context     = new SearchWindowContext(screenPoint, 200, 240);
+            Vector2 screenPoint = GUIUtility.GUIToScreenPoint(evt.mousePosition);
+            SearchWindowContext context = new SearchWindowContext(screenPoint, 200, 240);
 
-            SearchWindow.Open(context, _nodeCreationWindow);
+            SearchWindow.Open(context, _creationWindow);
         }
 
 
@@ -161,7 +162,7 @@ namespace BehaviourSystemEditor.BT
             if (_tree.rootNode is null)
             {
                 tree.rootNode = tree.CreateNode(typeof(RootNode)) as RootNode;
-                UnityEditor.EditorUtility.SetDirty(tree);
+                EditorUtility.SetDirty(tree);
                 AssetDatabase.SaveAssets();
             }
         }
@@ -186,30 +187,34 @@ namespace BehaviourSystemEditor.BT
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
         {
-            if (graphViewChange.elementsToRemove != null)
+            if (graphViewChange.elementsToRemove is not null)
             {
                 foreach (var element in graphViewChange.elementsToRemove)
                 {
-                    if (element is NodeView view)
+                    switch (element)
                     {
-                        this._tree.DeleteNode(view.node);
-                    }
+                        case NodeView view: this._tree.DeleteNode(view.node); break;
 
-                    if (element is Edge edge)
-                    {
-                        this._nodeEdgeHandler.DeleteEdges(_tree, edge);
+                        case Edge edge: this._nodeEdgeHandler.DeleteEdges(_tree, edge); break;
                     }
                 }
             }
 
-            if (graphViewChange.edgesToCreate != null)
+            if (graphViewChange.edgesToCreate is not null)
             {
                 this._nodeEdgeHandler.ConnectEdges(_tree, graphViewChange.edgesToCreate);
             }
 
-            if (graphViewChange.movedElements != null)
+            if (graphViewChange.movedElements is not null)
             {
                 base.nodes.ForEach(n => (n as NodeView)?.SortChildren());
+            }
+
+            if (_tree.groupViewDataCollection is not null)
+            {
+                //foreach (var data in _tree.groupViewDataCollection) { }
+
+                //TODO: 그룹뷰 데이터가 null일 때 처리.
             }
 
             return graphViewChange;
@@ -223,6 +228,32 @@ namespace BehaviourSystemEditor.BT
 
             base.AddElement(nodeView); //nodes라는 GraphElement 컨테이너에 추가.
             return nodeView;
+        }
+
+
+        private void CreateNodeViewGroups(BehaviourTree tree)
+        {
+            for (int i = 0; i < tree.groupViewDataCollection.count; ++i)
+            {
+                GroupViewData data = tree.groupViewDataCollection.ElementAt(i);
+                NodeGroupView nodeGroupView = new NodeGroupView(tree.groupViewDataCollection, data);
+
+                nodeGroupView.title = data.groupTitle;
+                nodeGroupView.SetPosition(new Rect(data.position, Vector2.zero));
+
+                base.AddElement(nodeGroupView);
+
+                foreach (string guid in data.nodeGuids)
+                {
+                    foreach (Node node in nodes)
+                    {
+                        if (node is NodeView view && string.CompareOrdinal(guid, view.node.guid) == 0)
+                        {
+                            nodeGroupView.AddElement(view);
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -256,7 +287,7 @@ namespace BehaviourSystemEditor.BT
                 {
                     NodeView view = views[i];
 
-                    string menuName = $"[{i+1}]   name: [{view.node.name}]   tag: [{view.node.tag}]";
+                    string menuName = $"[{i + 1}]   name: [{view.node.name}]   tag: [{view.node.tag}]";
 
                     popupSearchField.menu.AppendAction(menuName, delegate
                     {

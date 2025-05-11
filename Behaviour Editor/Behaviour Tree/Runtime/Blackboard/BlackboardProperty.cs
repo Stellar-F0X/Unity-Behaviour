@@ -1,7 +1,5 @@
 using System;
-using NUnit.Framework.Internal;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace BehaviourSystem.BT
 {

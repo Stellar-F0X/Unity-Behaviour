@@ -1,7 +1,9 @@
 {
     "name": "BehaviourSystem-BT",
     "rootNamespace": "BehaviourSystem.BT",
-    "references": [],
+    "references": [
+        "GUID:ed5cf72165df0bc40a89736a7ca8f582"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

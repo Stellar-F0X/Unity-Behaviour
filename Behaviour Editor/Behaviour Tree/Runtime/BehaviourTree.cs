@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
+
 using UnityEngine;
 
 namespace BehaviourSystem.BT
@@ -17,6 +21,9 @@ namespace BehaviourSystem.BT
 
         [HideInInspector]
         public BlackboardData blackboardData;
+
+        [HideInInspector]
+        public GroupViewDataCollection groupViewDataCollection;
 
         [SerializeField, ReadOnly, Tooltip("개별 트리를 구분하기 위한 고유 ID")]
         private string _specificGuid;
@@ -36,15 +43,17 @@ namespace BehaviourSystem.BT
         }
 
 
+        #region Make Runtime Tree
+
         public static BehaviourTree MakeRuntimeTree(BehaviourActor actor, BehaviourTree targetTree)
         {
             Stack<(NodeBase instance, NodeBase origin)> stack = new Stack<(NodeBase instance, NodeBase origin)>();
             Stack<NodeBase> callStack = new Stack<NodeBase>(targetTree.nodeList.Count);
             BehaviourTree runtimeTree = Instantiate(targetTree);
 
-            runtimeTree._specificGuid  = GUID.Generate().ToString();
-            runtimeTree._cloneGroupID  = targetTree._cloneGroupID;
-            runtimeTree.nodeList       = new List<NodeBase>(targetTree.nodeList.Count);
+            runtimeTree._specificGuid = Guid.NewGuid().ToString();
+            runtimeTree._cloneGroupID = targetTree._cloneGroupID;
+            runtimeTree.nodeList = new List<NodeBase>(targetTree.nodeList.Count);
             runtimeTree.blackboardData = BlackboardData.Clone(targetTree.blackboardData);
 
             if (Instantiate(targetTree.rootNode) is RootNode newRootNode)
@@ -56,9 +65,9 @@ namespace BehaviourSystem.BT
                 {
                     (NodeBase instance, NodeBase origin) traversal = stack.Pop();
 
-                    traversal.instance.name      = traversal.instance.name.Remove(traversal.origin.name.Length, 7);
-                    traversal.instance.tree      = runtimeTree;
-                    traversal.instance.actor     = actor;
+                    traversal.instance.name = traversal.instance.name.Remove(traversal.origin.name.Length, 7);
+                    traversal.instance.tree = runtimeTree;
+                    traversal.instance.actor = actor;
                     traversal.instance.callStack = callStack;
 
                     runtimeTree.nodeList.Add(traversal.instance);
@@ -71,7 +80,7 @@ namespace BehaviourSystem.BT
                             RootNode origin = (RootNode)traversal.origin;
                             NodeBase childInstance = Instantiate(origin.child);
                             childInstance.parent = instance;
-                            instance.child       = childInstance;
+                            instance.child = childInstance;
                             stack.Push((childInstance, origin.child));
                             break;
                         }
@@ -82,7 +91,7 @@ namespace BehaviourSystem.BT
                             DecoratorNode origin = (DecoratorNode)traversal.origin;
                             NodeBase childInstance = Instantiate(origin.child);
                             childInstance.parent = instance;
-                            instance.child       = childInstance;
+                            instance.child = childInstance;
                             stack.Push((childInstance, origin.child));
                             break;
                         }
@@ -99,6 +108,7 @@ namespace BehaviourSystem.BT
                                 instance.children[i] = childInstance;
                                 stack.Push((childInstance, origin.children[i]));
                             }
+
                             break;
                         }
                     }
@@ -110,31 +120,31 @@ namespace BehaviourSystem.BT
             return runtimeTree;
         }
 
+        #endregion
+
 
         public void Awake()
         {
-            if (string.IsNullOrEmpty(_cloneGroupID))
-            {
-                _cloneGroupID = GUID.Generate().ToString();
-            }
-
-            if (string.IsNullOrEmpty(_specificGuid))
-            {
-                _specificGuid = GUID.Generate().ToString();
-            }
-
-            if (blackboardData is null)
-            {
-                this.blackboardData           = CreateInstance<BlackboardData>();
-                this.blackboardData.hideFlags = HideFlags.HideInHierarchy;
+            _cloneGroupID ??= Guid.NewGuid().ToString();
+            _specificGuid ??= Guid.NewGuid().ToString();
 
 #if UNITY_EDITOR
-                EditorUtility.SetDirty(this.blackboardData);
+            if (blackboardData is null)
+            {
+                this.blackboardData = CreateInstance<BlackboardData>();
+                this.blackboardData.hideFlags = HideFlags.HideInHierarchy;
                 AssetDatabase.AddObjectToAsset(this.blackboardData, this);
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-#endif
             }
+
+            if (groupViewDataCollection is null)
+            {
+                groupViewDataCollection = CreateInstance<GroupViewDataCollection>();
+                groupViewDataCollection.hideFlags = HideFlags.HideInHierarchy;
+                AssetDatabase.AddObjectToAsset(groupViewDataCollection, this);
+                AssetDatabase.SaveAssets();
+            }
+#endif
         }
 
 
@@ -206,7 +216,7 @@ namespace BehaviourSystem.BT
         }
 
 
-#if UNITY_EDITOR
+
         public void AddChild(NodeBase parent, NodeBase child)
         {
             Undo.RecordObject(parent, "Behaviour Tree (AddChild)");
@@ -215,12 +225,12 @@ namespace BehaviourSystem.BT
             {
                 case NodeBase.ENodeType.Root:
                     ((RootNode)parent).child = child;
-                    child.parent             = parent;
+                    child.parent = parent;
                     break;
 
                 case NodeBase.ENodeType.Decorator:
                     ((DecoratorNode)parent).child = child;
-                    child.parent                  = parent;
+                    child.parent = parent;
                     break;
 
                 case NodeBase.ENodeType.Composite:
@@ -229,6 +239,7 @@ namespace BehaviourSystem.BT
                     break;
             }
 
+            EditorUtility.SetDirty(parent);
             EditorUtility.SetDirty(child);
         }
 
@@ -286,6 +297,5 @@ namespace BehaviourSystem.BT
             Undo.DestroyObjectImmediate(node);
             AssetDatabase.SaveAssets();
         }
-#endif
     }
 }
