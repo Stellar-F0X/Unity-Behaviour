@@ -9,10 +9,10 @@ namespace BehaviourSystem
         [SerializeField]
         private List<GroupViewData> _groupViewDataList = new List<GroupViewData>();
 
-        
+
         public int count
         {
-            get { return _groupViewDataList.Count; }
+            get { return _groupViewDataList?.Count ?? 0; }
         }
 
 
@@ -22,36 +22,36 @@ namespace BehaviourSystem
             {
                 return _groupViewDataList[index];
             }
-            
+
             return null;
         }
-        
-        
+
+
         public void AddGroup(GroupViewData newData)
         {
             if (_groupViewDataList.Contains(newData))
             {
                 return;
             }
-            
+
             _groupViewDataList.Add(newData);
 #if UNITY_EDITOR
             EditorUtility.SetDirty(this);
+            AssetDatabase.SaveAssets();
 #endif
         }
 
 
         public void RemoveGroup(GroupViewData data)
         {
-            if (_groupViewDataList.Contains(data) == false)
+            if (_groupViewDataList.Contains(data))
             {
-                return;
-            }
-
-            _groupViewDataList.Remove(data);
+                _groupViewDataList.Remove(data);
 #if UNITY_EDITOR
-            EditorUtility.SetDirty(this);
+                EditorUtility.SetDirty(this);
+                AssetDatabase.SaveAssets();
 #endif
+            }
         }
     }
 }

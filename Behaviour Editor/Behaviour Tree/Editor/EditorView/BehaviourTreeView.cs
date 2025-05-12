@@ -193,9 +193,11 @@ namespace BehaviourSystemEditor.BT
                 {
                     switch (element)
                     {
-                        case NodeView view: this._tree.DeleteNode(view.node); break;
-
                         case Edge edge: this._nodeEdgeHandler.DeleteEdges(_tree, edge); break;
+                        
+                        case NodeView nodeView: this._tree.DeleteNode(nodeView.node); break;
+
+                        case NodeGroupView groupView: this._tree.groupViewDataCollection.RemoveGroup(groupView.viewData); break;
                     }
                 }
             }
@@ -208,13 +210,6 @@ namespace BehaviourSystemEditor.BT
             if (graphViewChange.movedElements is not null)
             {
                 base.nodes.ForEach(n => (n as NodeView)?.SortChildren());
-            }
-
-            if (_tree.groupViewDataCollection is not null)
-            {
-                //foreach (var data in _tree.groupViewDataCollection) { }
-
-                //TODO: 그룹뷰 데이터가 null일 때 처리.
             }
 
             return graphViewChange;

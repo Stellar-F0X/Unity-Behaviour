@@ -20,6 +20,12 @@ namespace BehaviourSystemEditor.BT
         private readonly GroupViewData _viewData;
 
 
+        public GroupViewData viewData
+        {
+            get { return _viewData; }
+        }
+
+
         protected override void OnGroupRenamed(string oldName, string newName)
         {
             base.OnGroupRenamed(oldName, newName);
