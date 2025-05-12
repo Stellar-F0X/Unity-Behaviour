@@ -44,41 +44,47 @@ namespace BehaviourSystemEditor.BT
 
         protected override void OnElementsAdded(IEnumerable<GraphElement> elements)
         {
-            foreach (GraphElement node in elements)
+            if (_groupDataCollection is not null)
             {
-                if (node.selected && node is NodeView view)
+                foreach (GraphElement node in elements)
                 {
-                    bool isNotContained = _viewData.nodeGuids.Contains(view.node.guid) == false;
-                    bool isAvailable = string.IsNullOrEmpty(view.node.guid) == false;
-
-                    if (isNotContained && isAvailable)
+                    if (node.selected && node is NodeView view)
                     {
-                        _viewData.nodeGuids.Add(view.node.guid);
+                        bool isNotContained = _viewData.Contains(view.node.guid) == false;
+                        bool isAvailable = string.IsNullOrEmpty(view.node.guid) == false;
+
+                        if (isNotContained && isAvailable)
+                        {
+                            _viewData.AddNodeGUID(view.node.guid);
+                        }
                     }
                 }
+
+                EditorUtility.SetDirty(_groupDataCollection);
             }
-            
-            EditorUtility.SetDirty(_groupDataCollection);
         }
 
 
         protected override void OnElementsRemoved(IEnumerable<GraphElement> elements)
         {
-            foreach (GraphElement node in elements)
+            if (_groupDataCollection is not null)
             {
-                if (node.selected && node is NodeView view)
+                foreach (GraphElement node in elements)
                 {
-                    bool contained = _viewData.nodeGuids.Contains(view.node.guid);
-                    bool isAvailable = string.IsNullOrEmpty(view.node.guid) == false;
-
-                    if (contained && isAvailable)
+                    if (node.selected && node is NodeView view)
                     {
-                        _viewData.nodeGuids.Remove(view.node.guid);
+                        bool contained = _viewData.Contains(view.node.guid);
+                        bool isAvailable = string.IsNullOrEmpty(view.node.guid) == false;
+
+                        if (contained && isAvailable)
+                        {
+                            _viewData.RemoveNodeGUID(view.node.guid);
+                        }
                     }
                 }
-            }
 
-            EditorUtility.SetDirty(_groupDataCollection);
+                EditorUtility.SetDirty(_groupDataCollection);
+            }
         }
     }
 }

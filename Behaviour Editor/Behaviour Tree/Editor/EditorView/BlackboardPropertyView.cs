@@ -21,8 +21,11 @@ namespace BehaviourSystemEditor.BT
             this._keyField       = this.Q<TextField>("name-field");
             this._button         = this.Q<Button>("delete-button");
             
-            this.RegisterButtonEvent(() => this._keyField.UnregisterValueChangedCallback(this.OnKeyFieldChanged));
-            this.RegisterButtonEvent(this._imguiContainer.onGUIHandler -= this.DrawInspectorGUI);
+            this.RegisterButtonEvent(() =>
+            {
+                this._keyField.UnregisterValueChangedCallback(this.OnKeyFieldChanged);
+                this._imguiContainer.onGUIHandler -= this.DrawInspectorGUI;
+            });
 
             this._keyField.value = _keyOfProperty.stringValue;
             this._keyField.RegisterValueChangedCallback(this.OnKeyFieldChanged);

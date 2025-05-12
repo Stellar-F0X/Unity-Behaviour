@@ -194,7 +194,7 @@ namespace BehaviourSystemEditor.BT
                     switch (element)
                     {
                         case Edge edge: this._nodeEdgeHandler.DeleteEdges(_tree, edge); break;
-                        
+
                         case NodeView nodeView: this._tree.DeleteNode(nodeView.node); break;
 
                         case NodeGroupView groupView: this._tree.groupViewDataCollection.RemoveGroup(groupView.viewData); break;
@@ -228,7 +228,7 @@ namespace BehaviourSystemEditor.BT
 
         private void CreateNodeViewGroups(BehaviourTree tree)
         {
-            for (int i = 0; i < tree.groupViewDataCollection.count; ++i)
+            for (int i = 0; i < tree.groupViewDataCollection.Count; ++i)
             {
                 GroupViewData data = tree.groupViewDataCollection.ElementAt(i);
                 NodeGroupView nodeGroupView = new NodeGroupView(tree.groupViewDataCollection, data);
@@ -237,15 +237,12 @@ namespace BehaviourSystemEditor.BT
                 nodeGroupView.SetPosition(new Rect(data.position, Vector2.zero));
 
                 base.AddElement(nodeGroupView);
-
-                foreach (string guid in data.nodeGuids)
+                
+                foreach (Node node in nodes)
                 {
-                    foreach (Node node in nodes)
+                    if (node is NodeView view && data.Contains(view.node.guid))
                     {
-                        if (node is NodeView view && string.CompareOrdinal(guid, view.node.guid) == 0)
-                        {
-                            nodeGroupView.AddElement(view);
-                        }
+                        nodeGroupView.AddElement(view);
                     }
                 }
             }

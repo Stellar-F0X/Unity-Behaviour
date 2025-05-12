@@ -10,7 +10,7 @@ namespace BehaviourSystem
         private List<GroupViewData> _groupViewDataList = new List<GroupViewData>();
 
 
-        public int count
+        public int Count
         {
             get { return _groupViewDataList?.Count ?? 0; }
         }
