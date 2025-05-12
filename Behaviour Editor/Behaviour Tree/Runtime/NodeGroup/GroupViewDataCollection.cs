@@ -17,7 +17,6 @@ namespace BehaviourSystem
         
 
 #if UNITY_EDITOR
-
         public void AddGroup(GroupViewData newData)
         {
             if (_groupViewDataList.Contains(newData))

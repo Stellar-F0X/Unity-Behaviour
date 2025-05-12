@@ -53,8 +53,7 @@ namespace BehaviourSystem
             return _nodeGuidsSet.Contains(nodeGuid);
         }
 
-
-#if UNITY_EDITOR
+        
         public void AddNodeGuid(string nodeGuid)
         {
             _nodeGuidsSet.Add(nodeGuid);
@@ -65,6 +64,5 @@ namespace BehaviourSystem
         {
             _nodeGuidsSet.Remove(nodeGuid);
         }
-#endif
     }
 }
