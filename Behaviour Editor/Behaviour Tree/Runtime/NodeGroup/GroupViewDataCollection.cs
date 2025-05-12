@@ -59,7 +59,6 @@ namespace BehaviourSystem
                 AssetDatabase.SaveAssets();
             }
         }
-
 #endif
     }
 }

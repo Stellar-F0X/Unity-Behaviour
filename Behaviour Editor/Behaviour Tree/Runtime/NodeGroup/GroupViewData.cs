@@ -13,6 +13,12 @@ namespace BehaviourSystem
         [SerializeField]
         private List<string> _nodeGuidList = new List<string>();
         private HashSet<string> _nodeGuidSet = new HashSet<string>(StringComparer.Ordinal);
+
+
+        public int count
+        {
+            get { return _nodeGuidSet?.Count ?? 0; }
+        }
         
         
         public void Setup(string title, Vector2 position)
