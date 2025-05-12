@@ -11,10 +11,10 @@ namespace BehaviourSystemEditor.BT
     [UxmlElement]
     public partial class BlackboardPropertyViewList : ListView
     {
-        private SerializedObject   _serializedObject;
+        private SerializedObject _serializedObject;
         private SerializedProperty _serializedListProperty;
 
-        private ToolbarMenu    _addButton;
+        private ToolbarMenu _addButton;
         private BlackboardData _blackboardData;
 
 
@@ -39,9 +39,9 @@ namespace BehaviourSystemEditor.BT
             {
                 return;
             }
-            
-            _blackboardData         = tree.blackboardData;
-            _serializedObject       = new SerializedObject(tree.blackboardData);
+
+            _blackboardData = tree.blackboardData;
+            _serializedObject = new SerializedObject(tree.blackboardData);
             _serializedListProperty = _serializedObject.FindProperty("_properties");
 
             for (int i = 0; i < _serializedListProperty.arraySize; ++i)
@@ -53,16 +53,14 @@ namespace BehaviourSystemEditor.BT
             {
                 var types = TypeCache.GetTypesDerivedFrom<IBlackboardProperty>();
 
-                if (types.Count == 0)
+                if (types.Count > 0)
                 {
-                    return;
-                }
-
-                foreach (Type type in types)
-                {
-                    if (type.IsAbstract == false)
+                    foreach (Type type in types)
                     {
-                        _addButton.menu.AppendAction(type.Name, _ => this.MakeProperty(type));
+                        if (type.IsAbstract == false)
+                        {
+                            _addButton.menu.AppendAction(type.Name, _ => this.MakeProperty(type));
+                        }
                     }
                 }
             }

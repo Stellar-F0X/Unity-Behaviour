@@ -10,8 +10,6 @@ namespace BehaviourSystemEditor.BT
     {
         private Editor _editor;
 
-        public InspectorView() { }
-
 
         public void UpdateSelection(NodeView view)
         {

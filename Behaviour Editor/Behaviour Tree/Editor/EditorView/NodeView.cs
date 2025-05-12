@@ -11,12 +11,12 @@ namespace BehaviourSystemEditor.BT
     {
         public NodeView(NodeBase node, VisualTreeAsset nodeUxml) : base(AssetDatabase.GetAssetPath(nodeUxml))
         {
-            this.node        = node;
-            this.title       = node.name;
+            this.node = node;
+            this.title = node.name;
             this.viewDataKey = node.guid;
 
             this.style.left = node.position.x;
-            this.style.top  = node.position.y;
+            this.style.top = node.position.y;
 
             _nodeBorder = this.Q<VisualElement>("node-border");
 
@@ -31,13 +31,13 @@ namespace BehaviourSystemEditor.BT
         public event Action<NodeView> OnNodeUnselected;
 
         public NodeBase node;
-        public Port     input;
-        public Port     output;
+        public Port input;
+        public Port output;
 
         private readonly VisualElement _nodeBorder;
 
         private readonly Color _runningColor = new Color32(54, 154, 204, 255);
-        private readonly Color _doneColor    = new Color32(24, 93, 125, 255);
+        private readonly Color _doneColor = new Color32(24, 93, 125, 255);
 
 
 
@@ -55,12 +55,12 @@ namespace BehaviourSystemEditor.BT
                 case NodeBase.ENodeType.Action: input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool)); break;
 
                 case NodeBase.ENodeType.Composite:
-                    input  = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
+                    input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Multi, typeof(bool));
                     break;
 
                 case NodeBase.ENodeType.Decorator:
-                    input  = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
+                    input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
                     break;
             }
@@ -75,7 +75,7 @@ namespace BehaviourSystemEditor.BT
             if (port != null)
             {
                 port.style.flexDirection = direction;
-                port.portName            = portName;
+                port.portName = portName;
                 container.Add(port);
             }
         }
@@ -102,16 +102,16 @@ namespace BehaviourSystemEditor.BT
                 if (node.callState == NodeBase.ENodeCallState.Updating)
                 {
                     _nodeBorder.style.borderBottomColor = _runningColor;
-                    _nodeBorder.style.borderLeftColor   = _runningColor;
-                    _nodeBorder.style.borderRightColor  = _runningColor;
-                    _nodeBorder.style.borderTopColor    = _runningColor;
+                    _nodeBorder.style.borderLeftColor = _runningColor;
+                    _nodeBorder.style.borderRightColor = _runningColor;
+                    _nodeBorder.style.borderTopColor = _runningColor;
                 }
                 else
                 {
                     _nodeBorder.style.borderBottomColor = _doneColor;
-                    _nodeBorder.style.borderLeftColor   = _doneColor;
-                    _nodeBorder.style.borderRightColor  = _doneColor;
-                    _nodeBorder.style.borderTopColor    = _doneColor;
+                    _nodeBorder.style.borderLeftColor = _doneColor;
+                    _nodeBorder.style.borderRightColor = _doneColor;
+                    _nodeBorder.style.borderTopColor = _doneColor;
                 }
             }
         }
@@ -130,7 +130,7 @@ namespace BehaviourSystemEditor.BT
             }
         }
 
-        
+
         //상속받은 상위 클래스에서 Disconnect All이라는 ContextualMenu 생성을 방지하기 위해서 오버라이드
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt) { }
     }

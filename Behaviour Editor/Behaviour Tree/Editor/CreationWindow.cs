@@ -105,14 +105,14 @@ namespace BehaviourSystemEditor.BT
             nodeViewGroupEntry.userData = (Action)(() =>
             {
                 GroupViewData newGroupData = new GroupViewData("Node Group", graphMousePosition);
-                collection.AddGroup(newGroupData);
-
                 NodeGroupView groupView = new NodeGroupView(collection, newGroupData);
+                
                 groupView.SetPosition(new Rect(graphMousePosition, Vector2.zero));
                 groupView.style.backgroundColor = BehaviourTreeEditorWindow.Settings.nodeGroupColor;
                 groupView.title = "Node Group";
                 groupView.name = "Node Group";
 
+                collection.AddGroup(newGroupData);
                 _treeView.AddElement(groupView);
             });
 

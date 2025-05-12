@@ -40,7 +40,7 @@ namespace BehaviourSystemEditor.BT
         {
             foreach (GraphElement node in elements)
             {
-                if (node is NodeView view && view.selected)
+                if (node.selected && node is NodeView view)
                 {
                     bool isNotContained = _viewData.nodeGuids.Contains(view.node.guid) == false;
                     bool isAvailable = string.IsNullOrEmpty(view.node.guid) == false;
@@ -60,7 +60,7 @@ namespace BehaviourSystemEditor.BT
         {
             foreach (GraphElement node in elements)
             {
-                if (node is NodeView view && view.selected)
+                if (node.selected && node is NodeView view)
                 {
                     bool contained = _viewData.nodeGuids.Contains(view.node.guid);
                     bool isAvailable = string.IsNullOrEmpty(view.node.guid) == false;

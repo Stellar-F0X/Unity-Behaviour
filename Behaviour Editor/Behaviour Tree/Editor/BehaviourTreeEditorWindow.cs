@@ -43,7 +43,7 @@ namespace BehaviourSystemEditor.BT
 
         public static BehaviourTreeEditorSettings Settings
         {
-            get { return _settings ??= BTEditorUtility.FindAssetByName<BehaviourTreeEditorSettings>($"t:{nameof(BehaviourTreeEditorSettings)}"); }
+            get { return _settings ??= AssetUtility.FindAssetByName<BehaviourTreeEditorSettings>($"t:{nameof(BehaviourTreeEditorSettings)}"); }
         }
 
 

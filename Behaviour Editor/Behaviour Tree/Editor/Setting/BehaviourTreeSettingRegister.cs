@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using BehaviourSystem.BT;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
@@ -11,7 +12,7 @@ namespace BehaviourSystemEditor.BT
         [SettingsProvider]
         public static SettingsProvider CreateMyCustomSettingsProvider()
         {
-            return new SettingsProvider("Project/BehaviourTreeProjectSettings", SettingsScope.Project) 
+            return new SettingsProvider("Project/BehaviourTreeProjectSettings", SettingsScope.Project)
             {
                 label = "Behaviour Tree Editor",
                 activateHandler = ProvideSettingHandler
@@ -30,9 +31,7 @@ namespace BehaviourSystemEditor.BT
             properties.AddToClassList("property-list");
             rootElement.Add(properties);
 
-            var settings = BTEditorUtility.FindAssetByName<BehaviourTreeEditorSettings>(
-                $"t:{nameof(BehaviourTreeEditorSettings)}"
-            );
+            var settings = AssetUtility.FindAssetByName<BehaviourTreeEditorSettings>($"t:{nameof(BehaviourTreeEditorSettings)}");
 
             properties.Add(new InspectorElement(settings));
             rootElement.Bind(new SerializedObject(settings));

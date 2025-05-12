@@ -11,7 +11,7 @@ using UnityEngine;
 namespace BehaviourSystem.BT
 {
     [CreateAssetMenu]
-    public sealed class BehaviourTree : ScriptableObject, IEqualityComparer<BehaviourTree>
+    public sealed class BehaviourTree : ScriptableObject, IEquatable<BehaviourTree>
     {
         [HideInInspector]
         public NodeBase rootNode;
@@ -198,25 +198,24 @@ namespace BehaviourSystem.BT
             return null;
         }
 
-
-        public bool Equals(BehaviourTree x, BehaviourTree y)
+        
+        public bool Equals(BehaviourTree other)
         {
-            if (x is null || y is null || x.GetType() != y.GetType())
+            if (other is null || this.GetType() != other.GetType())
             {
                 return false;
             }
 
-            return x.rootNode.guid == y.rootNode.guid && x._specificGuid == y._specificGuid;
+            if (rootNode.guid == other.rootNode.guid && _specificGuid == other._specificGuid)
+            {
+                return true;
+            }
+
+            return false;
         }
 
 
-        public int GetHashCode(BehaviourTree obj)
-        {
-            return HashCode.Combine(obj.rootNode, obj._specificGuid);
-        }
-
-
-
+#if UNITY_EDITOR
         public void AddChild(NodeBase parent, NodeBase child)
         {
             Undo.RecordObject(parent, "Behaviour Tree (AddChild)");
@@ -259,8 +258,7 @@ namespace BehaviourSystem.BT
 
             EditorUtility.SetDirty(child);
         }
-
-
+        
         public NodeBase CreateNode(Type nodeType)
         {
             NodeBase node = CreateInstance(nodeType) as NodeBase;
@@ -297,5 +295,6 @@ namespace BehaviourSystem.BT
             Undo.DestroyObjectImmediate(node);
             AssetDatabase.SaveAssets();
         }
+#endif
     }
 }

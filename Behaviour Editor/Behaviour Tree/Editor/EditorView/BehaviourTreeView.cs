@@ -77,7 +77,7 @@ namespace BehaviourSystemEditor.BT
 
         public NodeView FindNodeView(NodeBase node)
         {
-            if (node == null || node.guid == null)
+            if (node is null || node.guid is null)
             {
                 return null;
             }
