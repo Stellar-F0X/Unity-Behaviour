@@ -29,7 +29,7 @@ namespace BehaviourSystemEditor.BT
         protected override void OnGroupRenamed(string oldName, string newName)
         {
             base.OnGroupRenamed(oldName, newName);
-            _viewData.groupTitle = newName;
+            _viewData.title = newName;
             EditorUtility.SetDirty(_groupDataCollection);
         }
 
@@ -55,7 +55,7 @@ namespace BehaviourSystemEditor.BT
 
                         if (isNotContained && isAvailable)
                         {
-                            _viewData.AddNodeGUID(view.node.guid);
+                            _viewData.AddNodeGuid(view.node.guid);
                         }
                     }
                 }
@@ -78,7 +78,7 @@ namespace BehaviourSystemEditor.BT
 
                         if (contained && isAvailable)
                         {
-                            _viewData.RemoveNodeGUID(view.node.guid);
+                            _viewData.RemoveNodeGuid(view.node.guid);
                         }
                     }
                 }

@@ -47,6 +47,11 @@ namespace BehaviourSystem.BT
 
         public static BehaviourTree MakeRuntimeTree(BehaviourActor actor, BehaviourTree targetTree)
         {
+            if (targetTree is null)
+            {
+                return null;
+            }
+            
             Stack<(NodeBase instance, NodeBase origin)> stack = new Stack<(NodeBase instance, NodeBase origin)>();
             Stack<NodeBase> callStack = new Stack<NodeBase>(targetTree.nodeList.Count);
             BehaviourTree runtimeTree = Instantiate(targetTree);
@@ -78,6 +83,12 @@ namespace BehaviourSystem.BT
                         {
                             RootNode instance = (RootNode)traversal.instance;
                             RootNode origin = (RootNode)traversal.origin;
+
+                            if (origin.child is null)
+                            {
+                                continue;
+                            }
+                            
                             NodeBase childInstance = Instantiate(origin.child);
                             childInstance.parent = instance;
                             instance.child = childInstance;
@@ -89,6 +100,12 @@ namespace BehaviourSystem.BT
                         {
                             DecoratorNode instance = (DecoratorNode)traversal.instance;
                             DecoratorNode origin = (DecoratorNode)traversal.origin;
+                            
+                            if (origin.child is null)
+                            {
+                                continue;
+                            }
+                            
                             NodeBase childInstance = Instantiate(origin.child);
                             childInstance.parent = instance;
                             instance.child = childInstance;
@@ -100,6 +117,11 @@ namespace BehaviourSystem.BT
                         {
                             CompositeNode instance = (CompositeNode)traversal.instance;
                             CompositeNode origin = (CompositeNode)traversal.origin;
+                            
+                            if (origin.children is null)
+                            {
+                                continue;
+                            }
 
                             for (int i = 0; i < origin.children.Count; ++i)
                             {
@@ -271,6 +293,7 @@ namespace BehaviourSystem.BT
             //(?<!^)는 문자열의 시작이 아닌 위치에서만 매칭하며 ([A-Z])는 대문자를 찾는다. " $1"는 대문자 앞에 공백을 추가함.
             node.name = Regex.Replace(nodeType.Name.Replace("Node", ""), "(?<!^)([A-Z])", " $1");
             node.guid = GUID.Generate().ToString();
+            node.hideFlags = HideFlags.HideInHierarchy;
             nodeList.Add(node);
 
             if (Application.isPlaying == false && Undo.isProcessing == false)
@@ -278,7 +301,6 @@ namespace BehaviourSystem.BT
                 Undo.RecordObject(this, "Behaviour Tree (CreateNode)");
                 Undo.RegisterCreatedObjectUndo(node, "Behaviour Tree (CreateNode)");
 
-                node.hideFlags = HideFlags.HideInHierarchy;
                 AssetDatabase.AddObjectToAsset(node, this);
                 AssetDatabase.SaveAssets();
             }

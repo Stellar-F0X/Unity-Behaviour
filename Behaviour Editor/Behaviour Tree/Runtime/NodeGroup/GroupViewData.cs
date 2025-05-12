@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace BehaviourSystem
 {
@@ -9,35 +11,40 @@ namespace BehaviourSystem
     {
         public GroupViewData(string title, Vector2 position)
         {
-            this.groupTitle = title;
+            this.title = title;
             this.position = position;
-            this.groupGuid = Guid.NewGuid().ToString();
-            this._nodeGuids = new List<string>();
+            this._nodeGuidList = new List<string>();
             this._nodeGuidsSet = new HashSet<string>(StringComparer.Ordinal);
         }
 
-        public string groupGuid;
-        public string groupTitle;
+        public string title;
         public Vector2 position;
 
         [SerializeField]
-        private List<string> _nodeGuids;
+        private List<string> _nodeGuidList;
         private HashSet<string> _nodeGuidsSet;
 
-        
+
         public void OnBeforeSerialize()
         {
-            _nodeGuids.Clear();
-
             if (_nodeGuidsSet is not null)
             {
-                _nodeGuids.AddRange(_nodeGuidsSet);
+                _nodeGuidList.Clear();
+                _nodeGuidList.AddRange(_nodeGuidsSet);
             }
         }
 
+
         public void OnAfterDeserialize()
         {
-            _nodeGuidsSet = new HashSet<string>(_nodeGuids, StringComparer.Ordinal);
+            if (_nodeGuidsSet is null)
+            {
+                _nodeGuidsSet = new HashSet<string>(_nodeGuidList, StringComparer.Ordinal);
+            }
+            else
+            {
+                _nodeGuidList.ForEach(e => _nodeGuidsSet.Add(e));
+            }
         }
 
 
@@ -45,17 +52,19 @@ namespace BehaviourSystem
         {
             return _nodeGuidsSet.Contains(nodeGuid);
         }
-        
 
-        public void AddNodeGUID(string nodeGuid)
+
+#if UNITY_EDITOR
+        public void AddNodeGuid(string nodeGuid)
         {
             _nodeGuidsSet.Add(nodeGuid);
         }
 
-        
-        public void RemoveNodeGUID(string nodeGuid)
+
+        public void RemoveNodeGuid(string nodeGuid)
         {
             _nodeGuidsSet.Remove(nodeGuid);
         }
+#endif
     }
 }

@@ -228,14 +228,16 @@ namespace BehaviourSystemEditor.BT
 
         private void CreateNodeViewGroups(BehaviourTree tree)
         {
-            for (int i = 0; i < tree.groupViewDataCollection.Count; ++i)
+            if (tree.groupViewDataCollection is null || tree.groupViewDataCollection.dataList.Count == 0)
             {
-                GroupViewData data = tree.groupViewDataCollection.ElementAt(i);
+                return;
+            }
+            
+            foreach (GroupViewData data in tree.groupViewDataCollection.dataList)
+            {
                 NodeGroupView nodeGroupView = new NodeGroupView(tree.groupViewDataCollection, data);
-
-                nodeGroupView.title = data.groupTitle;
+                nodeGroupView.title = data.title;
                 nodeGroupView.SetPosition(new Rect(data.position, Vector2.zero));
-
                 base.AddElement(nodeGroupView);
                 
                 foreach (Node node in nodes)

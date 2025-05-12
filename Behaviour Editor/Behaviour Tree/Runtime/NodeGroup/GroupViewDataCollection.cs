@@ -9,23 +9,14 @@ namespace BehaviourSystem
         [SerializeField]
         private List<GroupViewData> _groupViewDataList = new List<GroupViewData>();
 
-
-        public int Count
+        
+        public IReadOnlyList<GroupViewData> dataList
         {
-            get { return _groupViewDataList?.Count ?? 0; }
+            get { return _groupViewDataList; }
         }
+        
 
-
-        public GroupViewData ElementAt(int index)
-        {
-            if (index >= 0 && index < _groupViewDataList.Count)
-            {
-                return _groupViewDataList[index];
-            }
-
-            return null;
-        }
-
+#if UNITY_EDITOR
 
         public void AddGroup(GroupViewData newData)
         {
@@ -34,11 +25,11 @@ namespace BehaviourSystem
                 return;
             }
 
+            Undo.RecordObject(this, "Behaviour Tree (AddGroup)");
+            
             _groupViewDataList.Add(newData);
-#if UNITY_EDITOR
             EditorUtility.SetDirty(this);
             AssetDatabase.SaveAssets();
-#endif
         }
 
 
@@ -46,12 +37,13 @@ namespace BehaviourSystem
         {
             if (_groupViewDataList.Contains(data))
             {
+                Undo.RecordObject(this, "Behaviour Tree (RemoveGroup)");
+                
                 _groupViewDataList.Remove(data);
-#if UNITY_EDITOR
                 EditorUtility.SetDirty(this);
                 AssetDatabase.SaveAssets();
-#endif
             }
         }
+#endif
     }
 }
