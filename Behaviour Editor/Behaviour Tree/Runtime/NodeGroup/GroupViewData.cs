@@ -1,68 +1,66 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace BehaviourSystem
 {
     [Serializable]
-    public class GroupViewData : ISerializationCallbackReceiver
+    public class GroupViewData : ScriptableObject, ISerializationCallbackReceiver
     {
-        public GroupViewData(string title, Vector2 position)
-        {
-            this.title = title;
-            this.position = position;
-            this._nodeGuidList = new List<string>();
-            this._nodeGuidsSet = new HashSet<string>(StringComparer.Ordinal);
-        }
-
         public string title;
         public Vector2 position;
 
         [SerializeField]
-        private List<string> _nodeGuidList;
-        private HashSet<string> _nodeGuidsSet;
+        private List<string> _nodeGuidList = new List<string>();
+        private HashSet<string> _nodeGuidSet = new HashSet<string>(StringComparer.Ordinal);
+        
+        
+        public void Setup(string title, Vector2 position)
+        {
+            this.title = title;
+            this.position = position;
+        }
 
 
         public void OnBeforeSerialize()
         {
-            if (_nodeGuidsSet is not null)
+            if (_nodeGuidSet is not null)
             {
                 _nodeGuidList.Clear();
-                _nodeGuidList.AddRange(_nodeGuidsSet);
+                _nodeGuidList.AddRange(_nodeGuidSet);
             }
         }
 
 
         public void OnAfterDeserialize()
         {
-            if (_nodeGuidsSet is null)
+            if (_nodeGuidSet is null)
             {
-                _nodeGuidsSet = new HashSet<string>(_nodeGuidList, StringComparer.Ordinal);
+                _nodeGuidSet = new HashSet<string>(_nodeGuidList, StringComparer.Ordinal);
             }
             else
             {
-                _nodeGuidList.ForEach(e => _nodeGuidsSet.Add(e));
+                _nodeGuidSet.Clear();
+                _nodeGuidList.ForEach(e => _nodeGuidSet.Add(e));
             }
         }
 
 
         public bool Contains(string nodeGuid)
         {
-            return _nodeGuidsSet.Contains(nodeGuid);
+            return _nodeGuidSet.Contains(nodeGuid);
         }
 
         
         public void AddNodeGuid(string nodeGuid)
         {
-            _nodeGuidsSet.Add(nodeGuid);
+            _nodeGuidSet.Add(nodeGuid);
         }
 
 
         public void RemoveNodeGuid(string nodeGuid)
         {
-            _nodeGuidsSet.Remove(nodeGuid);
+            _nodeGuidSet.Remove(nodeGuid);
         }
     }
 }

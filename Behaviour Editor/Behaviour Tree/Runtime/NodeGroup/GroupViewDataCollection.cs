@@ -9,40 +9,57 @@ namespace BehaviourSystem
         [SerializeField]
         private List<GroupViewData> _groupViewDataList = new List<GroupViewData>();
 
-        
+
         public IReadOnlyList<GroupViewData> dataList
         {
             get { return _groupViewDataList; }
         }
-        
+
 
 #if UNITY_EDITOR
-        public void AddGroup(GroupViewData newData)
+        public GroupViewData CreateGroupData(string title, Vector2 position)
         {
-            if (_groupViewDataList.Contains(newData))
+            GroupViewData newGroupData = CreateInstance<GroupViewData>();
+            newGroupData.hideFlags = HideFlags.HideInHierarchy;
+            newGroupData.Setup(title, position);
+
+            if (Application.isPlaying == false && Undo.isProcessing == false)
             {
-                return;
+                Undo.RecordObject(this, "Behaviour Tree (CreateGroup)");
             }
 
-            Undo.RecordObject(this, "Behaviour Tree (AddGroup)");
-            
-            _groupViewDataList.Add(newData);
-            EditorUtility.SetDirty(this);
-            AssetDatabase.SaveAssets();
+            _groupViewDataList.Add(newGroupData);
+
+            if (Application.isPlaying == false && Undo.isProcessing == false)
+            {
+                Undo.RegisterCreatedObjectUndo(newGroupData, "Behaviour Tree (CreateGroup)");
+                AssetDatabase.AddObjectToAsset(newGroupData, this);
+                EditorUtility.SetDirty(this);
+                AssetDatabase.SaveAssets();
+            }
+
+            return newGroupData;
         }
 
 
-        public void RemoveGroup(GroupViewData data)
+
+        public void DeleteGroupData(GroupViewData data)
         {
-            if (_groupViewDataList.Contains(data))
+            if (Application.isPlaying == false && Undo.isProcessing == false)
             {
                 Undo.RecordObject(this, "Behaviour Tree (RemoveGroup)");
-                
-                _groupViewDataList.Remove(data);
+            }
+
+            _groupViewDataList.Remove(data);
+
+            if (Application.isPlaying == false && Undo.isProcessing == false)
+            {
+                Undo.DestroyObjectImmediate(data);
                 EditorUtility.SetDirty(this);
                 AssetDatabase.SaveAssets();
             }
         }
+
 #endif
     }
 }

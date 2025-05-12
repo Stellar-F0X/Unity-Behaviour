@@ -63,15 +63,13 @@ namespace BehaviourSystemEditor.BT
 
         public void OnGraphEditorView(BehaviourTree tree)
         {
-            if (tree is null)
+            if (tree is not null)
             {
-                return;
+                this._tree = tree;
+                this.Initialize(tree);
+                this.IntegrityCheckNodeList(tree);
+                this.CreateNodeViewGroups(tree);
             }
-
-            this._tree = tree;
-            this.Initialize(tree);
-            this.IntegrityCheckNodeList(tree);
-            this.CreateNodeViewGroups(tree);
         }
 
 
@@ -137,6 +135,22 @@ namespace BehaviourSystemEditor.BT
         }
 
 
+
+        public NodeGroupView CreateNodeGroupView(string title, Vector2 position)
+        {
+            GroupViewData nodeGroupData = _tree.groupViewDataCollection.CreateGroupData(title, position);
+            NodeGroupView groupView = new NodeGroupView(_tree.groupViewDataCollection, nodeGroupData);
+
+            groupView.SetPosition(new Rect(position, Vector2.zero));
+            groupView.style.backgroundColor = BehaviourTreeEditorWindow.Settings.nodeGroupColor;
+            groupView.title = title;
+
+            base.AddElement(groupView);
+            return groupView;
+        }
+
+
+
         public void UpdateNodeView()
         {
             int length = nodes.Count();
@@ -197,7 +211,7 @@ namespace BehaviourSystemEditor.BT
 
                         case NodeView nodeView: this._tree.DeleteNode(nodeView.node); break;
 
-                        case NodeGroupView groupView: this._tree.groupViewDataCollection.RemoveGroup(groupView.viewData); break;
+                        case NodeGroupView groupView: this._tree.groupViewDataCollection.DeleteGroupData(groupView.viewData); break;
                     }
                 }
             }
@@ -232,14 +246,14 @@ namespace BehaviourSystemEditor.BT
             {
                 return;
             }
-            
+
             foreach (GroupViewData data in tree.groupViewDataCollection.dataList)
             {
                 NodeGroupView nodeGroupView = new NodeGroupView(tree.groupViewDataCollection, data);
                 nodeGroupView.title = data.title;
                 nodeGroupView.SetPosition(new Rect(data.position, Vector2.zero));
                 base.AddElement(nodeGroupView);
-                
+
                 foreach (Node node in nodes)
                 {
                     if (node is NodeView view && data.Contains(view.node.guid))

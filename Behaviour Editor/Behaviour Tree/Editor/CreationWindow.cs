@@ -95,26 +95,12 @@ namespace BehaviourSystemEditor.BT
 
         private SearchTreeEntry CreateNodeViewGroupSearchTreeEntry(SearchWindowContext context, int layerLevel = 2)
         {
-            GroupViewDataCollection collection = BehaviourTreeEditorWindow.Instance.Tree.groupViewDataCollection;
             SearchTreeEntry nodeViewGroupEntry = new SearchTreeEntry(new GUIContent("Node Group"));
             Vector2 graphMousePosition = this.CalculateMousePosition(context);
 
             nodeViewGroupEntry.content.text = "group";
+            nodeViewGroupEntry.userData = (Action)(() => _treeView.CreateNodeGroupView("Node Group", graphMousePosition));
             nodeViewGroupEntry.level = layerLevel;
-
-            nodeViewGroupEntry.userData = (Action)(() =>
-            {
-                GroupViewData newGroupData = new GroupViewData("Node Group", graphMousePosition);
-                NodeGroupView groupView = new NodeGroupView(collection, newGroupData);
-                
-                groupView.SetPosition(new Rect(graphMousePosition, Vector2.zero));
-                groupView.style.backgroundColor = BehaviourTreeEditorWindow.Settings.nodeGroupColor;
-                groupView.title = "Node Group";
-                groupView.name = "Node Group";
-
-                collection.AddGroup(newGroupData);
-                _treeView.AddElement(groupView);
-            });
 
             return nodeViewGroupEntry;
         }

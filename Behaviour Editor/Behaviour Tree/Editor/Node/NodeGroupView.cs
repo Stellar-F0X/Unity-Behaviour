@@ -15,7 +15,6 @@ namespace BehaviourSystemEditor.BT
             this._viewData = dataContainer;
         }
 
-
         private readonly GroupViewDataCollection _groupDataCollection;
         private readonly GroupViewData _viewData;
 
@@ -28,7 +27,6 @@ namespace BehaviourSystemEditor.BT
 
         protected override void OnGroupRenamed(string oldName, string newName)
         {
-            Undo.RecordObject(_groupDataCollection, "Behaviour Tree (NodeGroupViewRenamed)");
             base.OnGroupRenamed(oldName, newName);
             _viewData.title = newName;
             EditorUtility.SetDirty(_groupDataCollection);
@@ -37,7 +35,6 @@ namespace BehaviourSystemEditor.BT
 
         protected override void SetScopePositionOnly(Rect newPos)
         {
-            Undo.RecordObject(_groupDataCollection, "Behaviour Tree (NodeGroupViewMoved)");
             base.SetScopePositionOnly(newPos);
             _viewData.position = newPos.position;
             EditorUtility.SetDirty(_groupDataCollection);
@@ -46,45 +43,45 @@ namespace BehaviourSystemEditor.BT
 
         protected override void OnElementsAdded(IEnumerable<GraphElement> elements)
         {
-            Undo.RecordObject(_groupDataCollection, "Behaviour Tree (AddNodeGuidToGroup)");
-
-            foreach (GraphElement node in elements)
+            if (BehaviourTreeEditorWindow.Instance is not null && BehaviourTreeEditorWindow.Instance.CanEditTree && _viewData != null)
             {
-                if (node.selected && node is NodeView view)
-                {
-                    bool isNotContained = _viewData.Contains(view.node.guid) == false;
-                    bool isAvailable = string.IsNullOrEmpty(view.node.guid) == false;
+                Undo.RecordObject(_viewData, "Behaviour Tree (AddNodeGuidToGroup)");
 
-                    if (isNotContained && isAvailable)
+                foreach (GraphElement node in elements)
+                {
+                    if (node.selected && node is NodeView view)
                     {
-                        _viewData.AddNodeGuid(view.node.guid);
+                        if (_viewData.Contains(view.node.guid) == false && string.IsNullOrEmpty(view.node.guid) == false)
+                        {
+                            _viewData.AddNodeGuid(view.node.guid);
+                        }
                     }
                 }
-            }
 
-            EditorUtility.SetDirty(_groupDataCollection);
+                EditorUtility.SetDirty(_viewData);
+            }
         }
 
 
         protected override void OnElementsRemoved(IEnumerable<GraphElement> elements)
         {
-            Undo.RecordObject(_groupDataCollection, "Behaviour Tree (RemoveNodeGuidToGroup)");
-
-            foreach (GraphElement node in elements)
+            if (BehaviourTreeEditorWindow.Instance is not null && BehaviourTreeEditorWindow.Instance.CanEditTree && _viewData != null)
             {
-                if (node.selected && node is NodeView view)
-                {
-                    bool contained = _viewData.Contains(view.node.guid);
-                    bool isAvailable = string.IsNullOrEmpty(view.node.guid) == false;
+                Undo.RecordObject(_viewData, "Behaviour Tree (RemoveNodeGuidToGroup)");
 
-                    if (contained && isAvailable)
+                foreach (GraphElement node in elements)
+                {
+                    if (node.selected && node is NodeView view)
                     {
-                        _viewData.RemoveNodeGuid(view.node.guid);
+                        if (_viewData.Contains(view.node.guid) && string.IsNullOrEmpty(view.node.guid) == false)
+                        {
+                            _viewData.RemoveNodeGuid(view.node.guid);
+                        }
                     }
                 }
-            }
 
-            EditorUtility.SetDirty(_groupDataCollection);
+                EditorUtility.SetDirty(_viewData);
+            }
         }
     }
 }
