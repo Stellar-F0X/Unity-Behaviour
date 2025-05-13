@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using BehaviourSystem;
 using BehaviourSystem.BT;
 using UnityEditor;
@@ -72,10 +73,11 @@ namespace BehaviourSystemEditor.BT
             for (int i = 1; i < entries.Length; ++i)
             {
                 int index = i - 1;
-
-                entries[i] = new SearchTreeEntry(new GUIContent(typeList[index].Name));
+                string typeName = Regex.Replace(typeList[index].Name.Replace("Node", ""), "(?<!^)([A-Z])", " $1");
+                
+                entries[i] = new SearchTreeEntry(new GUIContent(typeName));
+                entries[i].content.text = typeName;
                 entries[i].userData = (Action)(() => invoke.Invoke(typeList[index]));
-                entries[i].content.text = typeList[index].Name;
                 entries[i].level = layerLevel + 1;
             }
 
@@ -98,7 +100,7 @@ namespace BehaviourSystemEditor.BT
             SearchTreeEntry nodeViewGroupEntry = new SearchTreeEntry(new GUIContent("Node Group"));
             Vector2 graphMousePosition = this.CalculateMousePosition(context);
 
-            nodeViewGroupEntry.content.text = "group";
+            nodeViewGroupEntry.content.text = "Group";
             nodeViewGroupEntry.userData = (Action)(() => _treeView.CreateNodeGroupView("Node Group", graphMousePosition));
             nodeViewGroupEntry.level = layerLevel;
 
