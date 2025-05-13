@@ -43,7 +43,7 @@ namespace BehaviourSystemEditor.BT
 
         public static BehaviourTreeEditorSettings Settings
         {
-            get { return _settings ??= AssetUtility.FindAssetByName<BehaviourTreeEditorSettings>($"t:{nameof(BehaviourTreeEditorSettings)}"); }
+            get { return _settings ??= Utility.FindAssetByName<BehaviourTreeEditorSettings>($"t:{nameof(BehaviourTreeEditorSettings)}"); }
         }
 
 
@@ -139,7 +139,7 @@ namespace BehaviourSystemEditor.BT
             _treeView.popupSearchField.RegisterValueChangedCallback(_treeView.SearchNodeByNameOrTag);
             _treeView.onNodeSelected += _inspectorView.UpdateSelection;
 
-            this._blackboardPropList.SetUp(rootVisualElement.Q<ToolbarMenu>("add-element-button"));
+            this._blackboardPropList.Setup(rootVisualElement.Q<ToolbarMenu>("add-element-button"));
             
             this.OnSelectionChange();
         }

@@ -177,10 +177,8 @@ namespace BehaviourSystemEditor.BT
         {
             _cachedPropertyList.Clear();
 
-            for (int i = 0; i < data.Count; i++)
+            foreach (var prop in data.properties)
             {
-                IBlackboardProperty prop = data.GetProperty(i);
-
                 if ((prop.comparableConditions & EConditionType.None) == EConditionType.None)
                 {
                     continue;

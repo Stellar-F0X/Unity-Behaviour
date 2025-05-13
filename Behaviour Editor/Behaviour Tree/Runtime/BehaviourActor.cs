@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.LowLevel;
 
@@ -103,7 +104,7 @@ namespace BehaviourSystem.BT
             }
             else
             {
-                IBlackboardProperty newProperty = _runtimeTree.blackboardData.GetProperty(key);
+                IBlackboardProperty newProperty = _runtimeTree.blackboardData.FindProperty(key);
 
                 if (newProperty is BlackboardProperty<TValue> prop)
                 {
@@ -128,7 +129,7 @@ namespace BehaviourSystem.BT
             }
             else
             {
-                IBlackboardProperty newProperty = _runtimeTree.blackboardData.GetProperty(key);
+                IBlackboardProperty newProperty = _runtimeTree.blackboardData.FindProperty(key);
 
                 if (newProperty is BlackboardProperty<TValue> castedProperty)
                 {
