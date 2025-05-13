@@ -48,6 +48,9 @@ GridBackground {
     border-top-left-radius: 1px;
     border-top-right-radius: 1px;
     border-bottom-right-radius: 1px;
+    flex-direction: row;
+    flex-grow: 1;
+    -unity-text-align: upper-center;
 }
 
 #unity-tab__header > #unity-tab__header-label {
@@ -68,13 +71,12 @@ GridBackground {
     -unity-text-align: middle-center;
     margin-top: 3px;
     margin-bottom: 3px;
+    flex-grow: 1;
 }
 
 #add-element-button > VisualElement {
     background-image: url("project://database/Packages/com.unity.render-pipelines.core/Editor/LookDev/Icons/d_Add.png?fileID=2800000&guid=160b197aba549514286b94426ceae589&type=3#d_Add");
     -unity-text-align: upper-left;
-    background-position-x: center 0;
-    background-position-y: center 0;
     border-left-width: 0;
     margin-right: 0;
     flex-grow: 0;

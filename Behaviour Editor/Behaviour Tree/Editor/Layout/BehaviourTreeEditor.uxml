@@ -1,18 +1,22 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <Style src="project://database/Assets/Scripts/AI/Behaviour%20Tree/Layout/BehaviourTreeEditorStyle.uss?fileID=7433441132597879392&amp;guid=9f7ef0b4ed1e21f4580d6f651abac776&amp;type=3#BehaviourTreeEditorStyle" />
+    <Style src="project://database/Assets/Scripts/Behaviour%20Editor/Behaviour%20Editor/Behaviour%20Tree/Editor/Layout/BehaviourTreeEditorStyle.uss?fileID=7433441132597879392&amp;guid=9f7ef0b4ed1e21f4580d6f651abac776&amp;type=3#BehaviourTreeEditorStyle" />
     <BehaviourSystemEditor.BT.SplitView fixed-pane-initial-dimension="300">
-        <ui:VisualElement name="left-panel" style="flex-grow: 1; flex-direction: column; width: auto; flex-shrink: 1; min-width: 150px; display: flex; min-height: auto; max-width: 90%; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(25, 25, 25); border-right-color: rgb(25, 25, 25); border-top-color: rgb(25, 25, 25); border-bottom-color: rgb(25, 25, 25); visibility: visible; overflow: visible; flex-wrap: nowrap;">
+        <ui:VisualElement name="left-panel" style="flex-grow: 1; flex-direction: column; width: auto; flex-shrink: 1; min-width: 220px; display: flex; min-height: auto; max-width: 90%; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(25, 25, 25); border-right-color: rgb(25, 25, 25); border-top-color: rgb(25, 25, 25); border-bottom-color: rgb(25, 25, 25); visibility: visible; overflow: visible; flex-wrap: nowrap;">
             <ui:TabView name="tab-view" style="flex-direction: column; flex-grow: 1;">
-                <ui:Tab label="Inspector" name="tab" style="flex-grow: 1;">
+                <ui:Tab label="Inspector" name="inspector-tab" style="flex-grow: 1; min-width: auto;">
                     <ui:Label tabindex="-1" text=" Inspector" parse-escape-sequences="true" display-tooltip-when-elided="true" name="left-view-label" class="window-label" style="flex-shrink: 1; flex-grow: 0;" />
                     <BehaviourSystemEditor.BT.InspectorView style="margin-top: 5px; margin-bottom: 0; margin-right: 10px; margin-left: 10px; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0); height: auto;" />
                 </ui:Tab>
-                <ui:Tab label="Blackboard" name="tab" style="flex-grow: 1;">
+                <ui:Tab label="Blackboard" name="blackboard-tab" style="flex-grow: 1; min-width: auto; flex-direction: column;">
                     <ui:VisualElement name="blackboard-toolbar" style="flex-grow: 0; flex-direction: row; min-width: 7px;">
                         <ui:Label tabindex="-1" text=" Blackboard" parse-escape-sequences="true" display-tooltip-when-elided="true" name="left-view-label" class="window-label" style="flex-shrink: 1; flex-grow: 1; min-width: auto;" />
-                        <uie:ToolbarMenu name="add-element-button" />
+                        <uie:ToolbarMenu name="add-element-button" style="padding-right: 4px; margin-left: 0; border-left-width: 1px; border-right-width: 0; border-bottom-width: 1px; border-top-width: 1px; border-bottom-left-radius: 0; border-top-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0;" />
                     </ui:VisualElement>
-                    <BehaviourSystemEditor.BT.BlackboardPropertyViewList style="flex-grow: 1;" />
+                    <BehaviourSystemEditor.BT.BlackboardPropertyViewList fixed-item-height="22" selection-type="Multiple" horizontal-scrolling="false" show-foldout-header="false" show-add-remove-footer="false" allow-remove="false" allow-add="false" reorder-mode="Animated" reorderable="true" show-border="false" show-alternating-row-backgrounds="None" language-direction="Inherit" binding-source-selection-mode="Manual" virtualization-method="FixedHeight" show-bound-collection-size="false" picking-mode="Ignore" style="flex-grow: 1; border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px;" />
+                </ui:Tab>
+                <ui:Tab label="Settings" name="settings-tab" style="min-width: auto; flex-direction: column; flex-grow: 1;">
+                    <ui:Label tabindex="-1" text=" Settings" parse-escape-sequences="true" display-tooltip-when-elided="true" name="left-view-label" class="window-label" style="flex-shrink: 1; flex-grow: 1; min-width: auto;" />
+                    <ui:IMGUIContainer name="settings" style="flex-grow: 1; height: auto; min-height: auto;" />
                 </ui:Tab>
             </ui:TabView>
         </ui:VisualElement>

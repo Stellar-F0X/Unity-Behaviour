@@ -15,18 +15,25 @@ namespace BehaviourSystemEditor.BT
         private SerializedProperty _serializedListProperty;
         private SerializedObject _serializedObject;
 
-        private ToolbarMenu _addButton;
+        private ToolbarMenu _propertyAddMenu;
         private BlackboardData _blackboardData;
 
 
-        public void Setup(ToolbarMenu button)
+        public void Setup(ToolbarMenu toolbarMenu)
         {
-            this._addButton = button;
-            
+            this._propertyAddMenu = toolbarMenu;
             this.makeItem = BehaviourTreeEditorWindow.Settings.blackboardPropertyViewXml.CloneTree;
             this.bindItem = this.BindItemToList;
-            
-            this.selectionType = SelectionType.Multiple;
+            this.itemIndexChanged += this.OnPropertiesOrderSwapped;
+
+            Undo.undoRedoPerformed += () =>
+            {
+                if (_serializedObject != null)
+                {
+                    this.RefreshItems();
+                    _serializedObject.Update();
+                }
+            };
         }
 
 
@@ -35,7 +42,7 @@ namespace BehaviourSystemEditor.BT
             this.Clear();
             this.RefreshItems();
 
-            _addButton.menu.ClearItems();
+            _propertyAddMenu.menu.ClearItems();
         }
 
 
@@ -44,34 +51,38 @@ namespace BehaviourSystemEditor.BT
             if (tree != null && BehaviourTreeEditorWindow.Instance != null)
             {
                 this._blackboardData = tree.blackboardData;
-                this._serializedObject = new SerializedObject(tree.blackboardData);
+                this._serializedObject = new SerializedObject(this._blackboardData);
                 this._serializedListProperty = _serializedObject.FindProperty("_properties");
 
-                this.itemsSource = _blackboardData.properties;
+                this.itemsSource = this._blackboardData.properties;
                 this.RefreshItems();
 
                 if (BehaviourTreeEditorWindow.Instance.CanEditTree)
                 {
                     TypeCache.GetTypesDerivedFrom<IBlackboardProperty>()
                              .Where(t => t.IsAbstract == false)
-                             .ForEach(t => _addButton.menu.AppendAction(t.Name, _ => this.MakeProperty(t)));
+                             .ForEach(t => _propertyAddMenu.menu.AppendAction(t.Name, _ => this.MakeProperty(t)));
                 }
             }
         }
-        
-        
+
+
         private void MakeProperty(Type type)
         {
+            Undo.RecordObject(_blackboardData, "Behaviour Tree (AddBlackboardProperty)");
+
             itemsSource.Add(IBlackboardProperty.Create(type));
             _serializedObject.Update();
             _serializedObject.ApplyModifiedProperties();
             EditorUtility.SetDirty(_blackboardData);
             this.RefreshItems();
         }
-        
-        
+
+
         private void DeleteProperty(int index)
         {
+            Undo.RecordObject(_blackboardData, "Behaviour Tree (RemoveBlackboardProperty)");
+
             itemsSource.RemoveAt(index);
             _serializedObject.Update();
             _serializedObject.ApplyModifiedProperties();
@@ -85,15 +96,22 @@ namespace BehaviourSystemEditor.BT
             IMGUIContainer imguiField = element.Q<IMGUIContainer>("IMGUIContainer");
             TextField keyField = element.Q<TextField>("name-field");
             Button buttonField = element.Q<Button>("delete-button");
-            
-            buttonField.enabledSelf = BehaviourTreeEditorWindow.Instance.CanEditTree;
-            
-            buttonField.clickable = null;
-            buttonField.clicked += () => this.DeleteProperty(index);
-            imguiField.onGUIHandler = () => this.DrawIMGUIForItem(index);
 
-            keyField.value = (itemsSource[index] as IBlackboardProperty)?.key ?? string.Empty;
-            keyField.RegisterValueChangedCallback(evt => this.OnChangePropertyKey(evt.newValue, index));
+            buttonField.clickable = null; //reset all callback
+            buttonField.clicked += () => this.DeleteProperty(index);
+            buttonField.enabledSelf = BehaviourTreeEditorWindow.Instance.CanEditTree;
+
+            imguiField.onGUIHandler = () => this.DrawIMGUIForItem(index);
+            
+            keyField.SetValueWithoutNotify(((IBlackboardProperty)itemsSource[index]).key);
+            keyField.UnregisterValueChangedCallback(KeyChangeEvent);
+            keyField.RegisterValueChangedCallback(KeyChangeEvent);
+
+            #region Local function for caching
+            
+            void KeyChangeEvent(ChangeEvent<string> evt) => this.OnChangePropertyKey(evt.newValue, index);
+                
+            #endregion
         }
 
 
@@ -106,18 +124,26 @@ namespace BehaviourSystemEditor.BT
             }
         }
 
-        
+
         private void OnChangePropertyKey(string newKey, int index)
         {
             if (itemsSource[index] is IBlackboardProperty property)
             {
                 bool isKeyValid = string.IsNullOrEmpty(newKey);
                 property.key = isKeyValid ? string.Empty : newKey;
-                
+
                 _serializedObject.Update();
                 _serializedObject.ApplyModifiedProperties();
                 EditorUtility.SetDirty(_blackboardData);
             }
+        }
+
+
+        private void OnPropertiesOrderSwapped(int a, int b)
+        {
+            _serializedObject.Update();
+            _serializedObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(_blackboardData);
         }
     }
 }
