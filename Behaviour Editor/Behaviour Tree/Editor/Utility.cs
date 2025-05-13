@@ -10,7 +10,7 @@ namespace BehaviourSystemEditor.BT
     {
         public static T FindAssetByName<T>(string searchFilter) where T : Object
         {
-            string[] guids = UnityEditor.AssetDatabase.FindAssets(searchFilter);
+            string[] guids = AssetDatabase.FindAssets(searchFilter);
 
             if (guids is null || guids.Length == 0)
             {
@@ -19,11 +19,11 @@ namespace BehaviourSystemEditor.BT
 
             foreach (var guid in guids)
             {
-                string parentPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                string parentPath = AssetDatabase.GUIDToAssetPath(guid);
 
                 if (File.Exists(parentPath))
                 {
-                    return UnityEditor.AssetDatabase.LoadAssetAtPath<T>(parentPath);
+                    return AssetDatabase.LoadAssetAtPath<T>(parentPath);
                 }
             }
 
@@ -46,25 +46,6 @@ namespace BehaviourSystemEditor.BT
             foreach (var element in array)
             {
                 action.Invoke(element);
-            }
-        }
-
-
-        public static void ForEach(this SerializedProperty property, Action<SerializedProperty> action)
-        {
-            if (property == null)
-            {
-                throw new ArgumentNullException(nameof(property));
-            }
-            
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-            
-            for (int i = 0; i < property.arraySize; ++i)
-            {
-                action.Invoke(property.GetArrayElementAtIndex(i));
             }
         }
     }

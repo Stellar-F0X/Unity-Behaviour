@@ -9,6 +9,14 @@ namespace BehaviourSystemEditor.BT
     public partial class InspectorView : InspectorElement
     {
         private Editor _editor;
+        
+        
+        public void ClearInspectorView()
+        {
+            base.Clear();
+            Object.DestroyImmediate(_editor);
+            _editor = null;
+        }
 
 
         public void UpdateSelection(NodeView view)

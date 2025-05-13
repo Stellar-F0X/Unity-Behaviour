@@ -37,12 +37,17 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-        public void ClearBlackboardPropertyViews()
+        public void ClearBlackboardView()
         {
+            this.itemsSource = null;
+            this._blackboardData = null;
+            this._serializedObject = null;
+            this._serializedListProperty = null;
+            
+            _propertyAddMenu.menu.ClearItems();
+            
             this.Clear();
             this.RefreshItems();
-
-            _propertyAddMenu.menu.ClearItems();
         }
 
 
@@ -91,6 +96,7 @@ namespace BehaviourSystemEditor.BT
         }
 
 
+        //아이템이 추가, 제거, 순서가 변경될 때마다 호출되어 콜백들을 다시 등록하므로 인덱스가 캐싱돼도 문제되지 않는다.
         private void BindItemToList(VisualElement element, int index)
         {
             IMGUIContainer imguiField = element.Q<IMGUIContainer>("IMGUIContainer");
@@ -98,28 +104,39 @@ namespace BehaviourSystemEditor.BT
             Button buttonField = element.Q<Button>("delete-button");
 
             buttonField.clickable = null; //reset all callback
-            buttonField.clicked += () => this.DeleteProperty(index);
             buttonField.enabledSelf = BehaviourTreeEditorWindow.Instance.CanEditTree;
-
+            buttonField.clicked += () => this.DeleteProperty(index);
             imguiField.onGUIHandler = () => this.DrawIMGUIForItem(index);
-            
-            keyField.SetValueWithoutNotify(((IBlackboardProperty)itemsSource[index]).key);
-            keyField.UnregisterValueChangedCallback(KeyChangeEvent);
-            keyField.RegisterValueChangedCallback(KeyChangeEvent);
 
-            #region Local function for caching
-            
-            void KeyChangeEvent(ChangeEvent<string> evt) => this.OnChangePropertyKey(evt.newValue, index);
-                
-            #endregion
+            if (keyField.userData != null)
+            {
+                var previousCallback = (EventCallback<ChangeEvent<string>>)keyField.userData;
+                keyField.UnregisterValueChangedCallback(previousCallback);
+            }
+
+            keyField.value = ((IBlackboardProperty)itemsSource[index]).key;
+            var newCallback = new EventCallback<ChangeEvent<string>>(e => this.OnChangePropertyKey(e.newValue, index));
+            keyField.RegisterValueChangedCallback(newCallback);
+            keyField.userData = newCallback;
         }
 
 
         private void DrawIMGUIForItem(int index)
         {
+            if (_serializedListProperty.arraySize <= index)
+            {
+                return;
+            }
+
+            SerializedProperty property = _serializedListProperty.GetArrayElementAtIndex(index);
+
+            if (property.boxedValue == null)
+            {
+                return;
+            }
+
             using (new EditorGUI.DisabledScope(true))
             {
-                SerializedProperty property = _serializedListProperty.GetArrayElementAtIndex(index);
                 EditorGUILayout.PropertyField(property.FindPropertyRelative("_value"), GUIContent.none);
             }
         }

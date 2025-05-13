@@ -69,7 +69,7 @@ namespace BehaviourSystemEditor.BT
 
         private void DrawBlackboardProperty(BlackboardData data, SerializedProperty blackboardProp, Rect dropdownRect)
         {
-            if (data.Count == 0)
+            if (data.properties.Count == 0)
             {
                 GUIContent warningIcon = EditorGUIUtility.IconContent("console.warnicon");
                 EditorGUI.LabelField(_rect, new GUIContent("No blackboard properties found.", warningIcon.image));

@@ -17,7 +17,7 @@ namespace BehaviourSystemEditor.BT
         {
             BehaviourTreeEditorWindow wnd = GetWindow<BehaviourTreeEditorWindow>();
             wnd.titleContent = new GUIContent("BT Editor");
-            Instance         = wnd;
+            Instance = wnd;
         }
 
         [OnOpenAsset]
@@ -48,11 +48,11 @@ namespace BehaviourSystemEditor.BT
 
 
 
-        private BehaviourTree  _tree;
+        private BehaviourTree _tree;
         private BehaviourActor _actor;
 
-        private BehaviourTreeView          _treeView;
-        private InspectorView              _inspectorView;
+        private BehaviourTreeView _treeView;
+        private InspectorView _inspectorView;
         private BlackboardPropertyViewList _blackboardPropList;
 
 
@@ -92,13 +92,13 @@ namespace BehaviourSystemEditor.BT
             if (_tree is not null && AssetDatabase.Contains(_tree) == false)
             {
                 //상호 연관이 적은 것부터 삭제.
-                this._blackboardPropList?.ClearBlackboardPropertyViews();
-                this._inspectorView?.Clear();
-                this._treeView?.ClearEditorViewer();
+                this._blackboardPropList.ClearBlackboardView();
+                this._inspectorView.Clear();
+                this._treeView?.ClearEditorView();
 
                 this.CanEditTree = false;
-                this._actor      = null;
-                this._tree       = null;
+                this._actor = null;
+                this._tree = null;
             }
             else
             {
@@ -130,9 +130,9 @@ namespace BehaviourSystemEditor.BT
             Settings.behaviourTreeEditorXml.CloneTree(rootVisualElement);
             rootVisualElement.styleSheets.Add(Settings.behaviourTreeStyle);
 
-            Instance            = this;
-            _inspectorView      = rootVisualElement.Q<InspectorView>();
-            _treeView           = rootVisualElement.Q<BehaviourTreeView>();
+            Instance = this;
+            _inspectorView = rootVisualElement.Q<InspectorView>();
+            _treeView = rootVisualElement.Q<BehaviourTreeView>();
             _blackboardPropList = rootVisualElement.Q<BlackboardPropertyViewList>();
 
             _treeView.popupSearchField = rootVisualElement.Q<ToolbarPopupSearchField>("search-node-field");
@@ -140,7 +140,7 @@ namespace BehaviourSystemEditor.BT
             _treeView.onNodeSelected += _inspectorView.UpdateSelection;
 
             this._blackboardPropList.Setup(rootVisualElement.Q<ToolbarMenu>("add-element-button"));
-            
+
             this.OnSelectionChange();
         }
 
@@ -177,11 +177,11 @@ namespace BehaviourSystemEditor.BT
 
                 if (_actor is not null && Application.isPlaying || openedEditorWindow)
                 {
-                    _inspectorView?.Clear();
-                    _treeView?.OnGraphEditorView(_tree);
-                    
-                    _blackboardPropList?.ClearBlackboardPropertyViews();
-                    _blackboardPropList?.ChangeBehaviourTree(_tree);
+                    _inspectorView.ClearInspectorView();
+                    _treeView.OnGraphEditorView(_tree);
+
+                    _blackboardPropList.ClearBlackboardView();
+                    _blackboardPropList.ChangeBehaviourTree(_tree);
                 }
             }
         }

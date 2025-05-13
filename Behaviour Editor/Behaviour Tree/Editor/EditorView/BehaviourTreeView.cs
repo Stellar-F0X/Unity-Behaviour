@@ -51,7 +51,7 @@ namespace BehaviourSystemEditor.BT
         private CreationWindow _creationWindow;
 
 
-        public void ClearEditorViewer()
+        public void ClearEditorView()
         {
             graphViewChanged -= OnGraphViewChanged;
             DeleteElements(graphElements.ToList());

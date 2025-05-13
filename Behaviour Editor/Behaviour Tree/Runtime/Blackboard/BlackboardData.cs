@@ -15,18 +15,13 @@ namespace BehaviourSystem.BT
             get { return _properties; }
         }
         
-        public int Count
-        {
-            get { return _properties.Count; }
-        }
-        
 
         public static BlackboardData Clone(BlackboardData origin)
         {
             BlackboardData newData = CreateInstance<BlackboardData>();
-            newData._properties = new List<IBlackboardProperty>(origin.Count);
+            newData._properties = new List<IBlackboardProperty>(origin.properties.Count);
             
-            for (int i = 0; i < origin.Count; ++i)
+            for (int i = 0; i < origin.properties.Count; ++i)
             {
                 IBlackboardProperty prop = origin._properties[i];
                 newData._properties.Add(prop.Clone(prop));
