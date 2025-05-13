@@ -6,7 +6,7 @@ using Object = UnityEngine.Object;
 
 namespace BehaviourSystemEditor.BT
 {
-    public static class Utility
+    public static class EditorHelper
     {
         public static T FindAssetByName<T>(string searchFilter) where T : Object
         {

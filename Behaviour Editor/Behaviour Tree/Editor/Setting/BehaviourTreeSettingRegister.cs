@@ -31,7 +31,7 @@ namespace BehaviourSystemEditor.BT
             properties.AddToClassList("property-list");
             rootElement.Add(properties);
 
-            var settings = Utility.FindAssetByName<BehaviourTreeEditorSettings>($"t:{nameof(BehaviourTreeEditorSettings)}");
+            var settings = EditorHelper.FindAssetByName<BehaviourTreeEditorSettings>($"t:{nameof(BehaviourTreeEditorSettings)}");
 
             properties.Add(new InspectorElement(settings));
             rootElement.Bind(new SerializedObject(settings));

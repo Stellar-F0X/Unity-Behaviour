@@ -88,7 +88,7 @@ namespace BehaviourSystemEditor.BT
         private NodeView CreateNode(Type type, SearchWindowContext context)
         {
             Vector2 nodePosition = _nodeOffset + this.CalculateMousePosition(context);
-            NodeView nodeView = _treeView.CreateNodeAndView(type, nodePosition);
+            NodeView nodeView = _treeView.CreateNewNodeAndView(type, nodePosition);
 
             _treeView.SelectNode(nodeView);
             return nodeView;
@@ -101,7 +101,7 @@ namespace BehaviourSystemEditor.BT
             Vector2 graphMousePosition = this.CalculateMousePosition(context);
 
             nodeViewGroupEntry.content.text = "Group";
-            nodeViewGroupEntry.userData = (Action)(() => _treeView.CreateNodeGroupView("Node Group", graphMousePosition));
+            nodeViewGroupEntry.userData = (Action)(() => _treeView.CreateNewNodeGroupView("Node Group", graphMousePosition));
             nodeViewGroupEntry.level = layerLevel;
 
             return nodeViewGroupEntry;

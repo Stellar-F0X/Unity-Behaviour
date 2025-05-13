@@ -54,7 +54,7 @@ namespace BehaviourSystemEditor.BT
         public void ClearEditorView()
         {
             graphViewChanged -= OnGraphViewChanged;
-            DeleteElements(graphElements.ToList());
+            DeleteElements(graphElements);
 
             nodes.ForEach(n => n.RemoveFromHierarchy());
             edges.ForEach(e => e.RemoveFromHierarchy());
@@ -67,8 +67,7 @@ namespace BehaviourSystemEditor.BT
             {
                 this._tree = tree;
                 this.Initialize(tree);
-                this.IntegrityCheckNodeList(tree);
-                this.CreateNodeViewGroups(tree);
+                this.IntegrityCheckAndCreateElements(tree);
             }
         }
 
@@ -127,16 +126,16 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-        public NodeView CreateNodeAndView(Type type, Vector2 mousePosition)
+        public NodeView CreateNewNodeAndView(Type type, Vector2 mousePosition)
         {
             NodeBase node = _tree.CreateNode(type);
             node.position = mousePosition;
-            return this.CreateNodeView(node);
+            return this.RecreateNodeViewOnLoad(node);
         }
 
 
 
-        public NodeGroupView CreateNodeGroupView(string title, Vector2 position)
+        public NodeGroupView CreateNewNodeGroupView(string title, Vector2 position)
         {
             GroupViewData nodeGroupData = _tree.groupViewDataCollection.CreateGroupData(title, position);
             NodeGroupView groupView = new NodeGroupView(_tree.groupViewDataCollection, nodeGroupData);
@@ -169,20 +168,15 @@ namespace BehaviourSystemEditor.BT
         {
             onGraphViewChange?.Invoke();
 
-            graphViewChanged -= OnGraphViewChanged;
-            base.DeleteElements(graphElements.ToList());
-            graphViewChanged += OnGraphViewChanged;
-
-            if (_tree.rootNode is null)
-            {
-                tree.rootNode = tree.CreateNode(typeof(RootNode)) as RootNode;
-                EditorUtility.SetDirty(tree);
-                AssetDatabase.SaveAssets();
-            }
+            graphViewChanged -= this.OnGraphViewChanged;
+            this.deleteSelection -= this.OnDeleteSelectionElements;
+            base.DeleteElements(base.graphElements);
+            graphViewChanged += this.OnGraphViewChanged;
+            this.deleteSelection += this.OnDeleteSelectionElements;
         }
 
 
-        private void IntegrityCheckNodeList(BehaviourTree tree)
+        private void IntegrityCheckAndCreateElements(BehaviourTree tree)
         {
             for (int i = 0; i < tree.nodeList.Count; ++i)
             {
@@ -194,8 +188,10 @@ namespace BehaviourSystemEditor.BT
             }
 
             //트리 구조라서 미리 모두 생성해둬야 자식과 부모를 연결 할 수 있음.
-            tree.nodeList.ForEach(n => this.CreateNodeView(n));
+            tree.nodeList.ForEach(n => this.RecreateNodeViewOnLoad(n));
             tree.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.GetChildren(n)));
+
+            tree.groupViewDataCollection.dataList?.ForEach(this.RecreateNodeGroupViewOnLoad);
         }
 
 
@@ -207,10 +203,10 @@ namespace BehaviourSystemEditor.BT
                 {
                     switch (element)
                     {
-                        case Edge edge: this._nodeEdgeHandler.DeleteEdges(_tree, edge); break;
+                        case Edge edge: this._nodeEdgeHandler.DeleteEdges(_tree, edge); break; 
 
                         case NodeView nodeView: this._tree.DeleteNode(nodeView.node); break;
-
+                        
                         case NodeGroupView groupView: this._tree.groupViewDataCollection.DeleteGroupData(groupView.viewData); break;
                     }
                 }
@@ -228,9 +224,25 @@ namespace BehaviourSystemEditor.BT
 
             return graphViewChange;
         }
+        
+        
+        private void OnDeleteSelectionElements(string operationName, AskUser user)
+        {
+            for (int i = 0; i < selection.Count; ++i)
+            {
+                if (selection[i] is NodeView view && view.node.nodeType == NodeBase.ENodeType.Root)
+                {
+                    view.selected = false;
+                    selection.RemoveAt(i);
+                    break;
+                }
+            }
+
+            this.DeleteElements(selection.ConvertAll(e => (GraphElement)e));
+        }
 
 
-        private NodeView CreateNodeView(NodeBase node)
+        private NodeView RecreateNodeViewOnLoad(NodeBase node)
         {
             NodeView nodeView = new NodeView(node, BehaviourTreeEditorWindow.Settings.nodeViewXml);
             nodeView.OnNodeSelected += this.onNodeSelected;
@@ -240,28 +252,15 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-        private void CreateNodeViewGroups(BehaviourTree tree)
+        private void RecreateNodeGroupViewOnLoad(GroupViewData data)
         {
-            if (tree.groupViewDataCollection is null || tree.groupViewDataCollection.dataList.Count == 0)
-            {
-                return;
-            }
+            NodeGroupView nodeGroupView = new NodeGroupView(_tree.groupViewDataCollection, data);
+            nodeGroupView.SetPosition(new Rect(data.position, Vector2.zero));
+            nodeGroupView.title = data.title;
+            base.AddElement(nodeGroupView);
 
-            foreach (GroupViewData data in tree.groupViewDataCollection.dataList)
-            {
-                NodeGroupView nodeGroupView = new NodeGroupView(tree.groupViewDataCollection, data);
-                nodeGroupView.title = data.title;
-                nodeGroupView.SetPosition(new Rect(data.position, Vector2.zero));
-                base.AddElement(nodeGroupView);
-
-                foreach (Node node in nodes)
-                {
-                    if (node is NodeView view && data.Contains(view.node.guid))
-                    {
-                        nodeGroupView.AddElement(view);
-                    }
-                }
-            }
+            nodes.Where(n => n is NodeView v && data.Contains(v.node.guid))
+                 .ForEach(filteredNode => nodeGroupView.AddElement(filteredNode));
         }
 
 

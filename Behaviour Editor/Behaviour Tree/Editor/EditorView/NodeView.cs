@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using UnityEditor;
+using UnityEditorInternal;
 
 namespace BehaviourSystemEditor.BT
 {
@@ -38,8 +39,7 @@ namespace BehaviourSystemEditor.BT
 
         private readonly Color _runningColor = new Color32(54, 154, 204, 255);
         private readonly Color _doneColor = new Color32(24, 93, 125, 255);
-
-
+        
 
         public override void OnSelected() => OnNodeSelected?.Invoke(this);
 
@@ -79,8 +79,7 @@ namespace BehaviourSystemEditor.BT
                 container.Add(port);
             }
         }
-
-
+        
 
         public override void SetPosition(Rect newPos)
         {

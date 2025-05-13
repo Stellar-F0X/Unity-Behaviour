@@ -151,6 +151,14 @@ namespace BehaviourSystem.BT
             _specificGuid ??= Guid.NewGuid().ToString();
 
 #if UNITY_EDITOR
+
+            if (this.rootNode is null)
+            {
+                this.rootNode = this.CreateNode(typeof(RootNode));
+                EditorUtility.SetDirty(this);
+                AssetDatabase.SaveAssets();
+            }
+
             if (blackboardData is null)
             {
                 this.blackboardData = CreateInstance<BlackboardData>();

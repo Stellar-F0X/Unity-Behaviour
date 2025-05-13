@@ -43,7 +43,7 @@ namespace BehaviourSystemEditor.BT
 
         public static BehaviourTreeEditorSettings Settings
         {
-            get { return _settings ??= Utility.FindAssetByName<BehaviourTreeEditorSettings>($"t:{nameof(BehaviourTreeEditorSettings)}"); }
+            get { return _settings ??= EditorHelper.FindAssetByName<BehaviourTreeEditorSettings>($"t:{nameof(BehaviourTreeEditorSettings)}"); }
         }
 
 
@@ -177,8 +177,8 @@ namespace BehaviourSystemEditor.BT
 
                 if (_actor is not null && Application.isPlaying || openedEditorWindow)
                 {
-                    _inspectorView.ClearInspectorView();
-                    _treeView.OnGraphEditorView(_tree);
+                    _inspectorView?.ClearInspectorView();
+                    _treeView?.OnGraphEditorView(_tree);
 
                     _blackboardPropList.ClearBlackboardView();
                     _blackboardPropList.ChangeBehaviourTree(_tree);
