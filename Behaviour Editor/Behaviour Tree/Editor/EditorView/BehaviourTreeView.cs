@@ -40,8 +40,7 @@ namespace BehaviourSystemEditor.BT
                 AssetDatabase.SaveAssets();
             };
         }
-
-        public Action onGraphViewChange;
+        
         public Action<NodeView> onNodeSelected;
         public ToolbarPopupSearchField popupSearchField;
 
@@ -166,8 +165,6 @@ namespace BehaviourSystemEditor.BT
 
         private void Initialize(BehaviourTree tree)
         {
-            onGraphViewChange?.Invoke();
-
             graphViewChanged -= this.OnGraphViewChanged;
             this.deleteSelection -= this.OnDeleteSelectionElements;
             base.DeleteElements(base.graphElements);
@@ -238,7 +235,8 @@ namespace BehaviourSystemEditor.BT
                 }
             }
 
-            this.DeleteElements(selection.ConvertAll(e => (GraphElement)e));
+            //DeleteSelection는 내부적으로 Selection 배열을 이용해서 VisualElement들을 제거함.
+            this.DeleteSelection();
         }
 
 

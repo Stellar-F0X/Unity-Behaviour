@@ -63,6 +63,7 @@ namespace BehaviourSystemEditor.BT
             }
             
             tree.RemoveChild(parentView?.node, childView?.node);
+            edge.RemoveFromHierarchy();
         }
     }
 }

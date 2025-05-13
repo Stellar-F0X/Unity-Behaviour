@@ -36,6 +36,7 @@ namespace BehaviourSystem.BT
         public Vector2 position;
 #endif
         
+        [Tooltip("If debug mode is on, it will log a message.")]
         public bool debugMode = true;
 
         [ReadOnly]

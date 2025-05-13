@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using BehaviourSystem.BT;
 using UnityEditor;
@@ -10,7 +9,7 @@ using UnityEngine.UIElements;
 namespace BehaviourSystemEditor.BT
 {
     [UxmlElement]
-    public partial class BlackboardPropertyViewList : ListView
+    public partial class BlackboardPropertyListView : ListView
     {
         private SerializedProperty _serializedListProperty;
         private SerializedObject _serializedObject;
@@ -24,7 +23,7 @@ namespace BehaviourSystemEditor.BT
             this._propertyAddMenu = toolbarMenu;
             this.makeItem = BehaviourTreeEditorWindow.Settings.blackboardPropertyViewXml.CloneTree;
             this.bindItem = this.BindItemToList;
-            this.itemIndexChanged += this.OnPropertiesOrderSwapped;
+            this.itemIndexChanged += this.OnPropertyIndicesSwapped;
 
             Undo.undoRedoPerformed += () =>
             {
@@ -156,7 +155,7 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-        private void OnPropertiesOrderSwapped(int a, int b)
+        private void OnPropertyIndicesSwapped(int a, int b)
         {
             _serializedObject.Update();
             _serializedObject.ApplyModifiedProperties();
