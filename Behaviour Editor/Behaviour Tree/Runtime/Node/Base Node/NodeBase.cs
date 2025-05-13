@@ -10,9 +10,9 @@ namespace BehaviourSystem.BT
     {
         public enum ENodeCallState
         {
-            Idle,
+            BeforeEnter,
             Updating,
-            Exited,
+            BeforeExit,
         };
 
         public enum EBehaviourResult
@@ -35,6 +35,8 @@ namespace BehaviourSystem.BT
         [HideInInspector]
         public Vector2 position;
 #endif
+        
+        public bool debugMode = true;
 
         [ReadOnly]
         public string guid;
@@ -77,9 +79,9 @@ namespace BehaviourSystem.BT
         
         public void AbortNode()
         {
-            this.callState = ENodeCallState.Exited;
+            this.callState = ENodeCallState.BeforeExit;
             this.OnExit();
-            this.callState = ENodeCallState.Idle;
+            this.callState = ENodeCallState.BeforeEnter;
         } 
 
 
@@ -87,7 +89,7 @@ namespace BehaviourSystem.BT
         {
             switch (callState)
             {
-                case ENodeCallState.Idle:
+                case ENodeCallState.BeforeEnter:
                 {
                     callStack.Push(this);
                     this.OnEnter();
@@ -101,17 +103,17 @@ namespace BehaviourSystem.BT
                     
                     if (behaviourResult != EBehaviourResult.Running)
                     {
-                        callState = ENodeCallState.Exited;
+                        callState = ENodeCallState.BeforeExit;
                     }
                     
                     return behaviourResult;
                 }
 
-                case ENodeCallState.Exited:
+                case ENodeCallState.BeforeExit:
                 {
                     this.OnExit();
                     callStack.Pop();
-                    callState = ENodeCallState.Idle;
+                    callState = ENodeCallState.BeforeEnter;
                     return behaviourResult;
                 }
                 

@@ -8,11 +8,16 @@ namespace BehaviourSystem.BT
     {
         [HideInInspector]
         public NodeBase child;
+        
+        [Space(10)]
+        public EBehaviourResult defaultResult;
 
+        
         public override ENodeType nodeType
         {
             get { return ENodeType.Decorator; }
         }
+        
 
         public override sealed void FixedUpdateNode()
         {
