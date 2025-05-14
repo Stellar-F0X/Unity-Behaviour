@@ -14,10 +14,6 @@
                     </ui:VisualElement>
                     <BehaviourSystemEditor.BT.BlackboardPropertyListView fixed-item-height="22" selection-type="Multiple" horizontal-scrolling="false" show-foldout-header="false" show-add-remove-footer="false" allow-remove="false" allow-add="false" reorder-mode="Animated" reorderable="true" show-border="false" show-alternating-row-backgrounds="None" language-direction="Inherit" binding-source-selection-mode="Manual" virtualization-method="FixedHeight" show-bound-collection-size="false" picking-mode="Ignore" style="flex-grow: 1; border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px;" />
                 </ui:Tab>
-                <ui:Tab label="Settings" name="settings-tab" style="min-width: auto; flex-direction: column; flex-grow: 1;">
-                    <ui:Label tabindex="-1" text=" Settings" parse-escape-sequences="true" display-tooltip-when-elided="true" name="left-view-label" class="window-label" style="flex-shrink: 1; flex-grow: 1; min-width: auto;" />
-                    <ui:IMGUIContainer name="settings" style="flex-grow: 1; height: auto; min-height: auto;" />
-                </ui:Tab>
             </ui:TabView>
         </ui:VisualElement>
         <ui:VisualElement name="right-panel" style="flex-grow: 1; flex-shrink: 1; min-width: 10%; max-width: none;">

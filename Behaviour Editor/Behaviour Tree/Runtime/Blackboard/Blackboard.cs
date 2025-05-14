@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace BehaviourSystem.BT
 {
     [Serializable]
-    public class BlackboardData : ScriptableObject
+    public class Blackboard : ScriptableObject
     {
         [SerializeReference]
         private List<IBlackboardProperty> _properties = new List<IBlackboardProperty>();
@@ -16,18 +16,18 @@ namespace BehaviourSystem.BT
         }
         
 
-        public static BlackboardData Clone(BlackboardData origin)
+        public Blackboard Clone()
         {
-            BlackboardData newData = CreateInstance<BlackboardData>();
-            newData._properties = new List<IBlackboardProperty>(origin.properties.Count);
+            Blackboard newBlackboard = CreateInstance<Blackboard>();
+            newBlackboard._properties = new List<IBlackboardProperty>(this.properties.Count);
             
-            for (int i = 0; i < origin.properties.Count; ++i)
+            for (int i = 0; i < this.properties.Count; ++i)
             {
-                IBlackboardProperty prop = origin._properties[i];
-                newData._properties.Add(prop.Clone(prop));
+                IBlackboardProperty prop = this._properties[i];
+                newBlackboard._properties.Add(prop.Clone(prop));
             }
             
-            return newData;
+            return newBlackboard;
         }
 
 

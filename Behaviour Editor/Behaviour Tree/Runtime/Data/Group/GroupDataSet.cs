@@ -1,34 +1,53 @@
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-
-namespace BehaviourSystem
-{
-    public class GroupViewDataCollection : ScriptableObject
-    {
-        [SerializeField]
-        private List<GroupViewData> _groupViewDataList = new List<GroupViewData>();
-
-
-        public IReadOnlyList<GroupViewData> dataList
-        {
-            get { return _groupViewDataList; }
-        }
-
 
 #if UNITY_EDITOR
-        public GroupViewData CreateGroupData(string title, Vector2 position)
+using UnityEditor;
+#endif
+
+using UnityEngine;
+
+namespace BehaviourSystem.BT
+{
+    public class GroupDataSet : ScriptableObject
+    {
+        [SerializeField]
+        private List<GroupData> _groupDataList = new List<GroupData>();
+
+
+        public IReadOnlyList<GroupData> dataList
         {
-            GroupViewData newGroupData = CreateInstance<GroupViewData>();
+            get { return _groupDataList; }
+        }
+
+        
+        public GroupDataSet Clone()
+        {
+            GroupDataSet newSet = CreateInstance<GroupDataSet>();
+            newSet._groupDataList = new List<GroupData>(this._groupDataList.Count);
+            
+            foreach (GroupData data in this._groupDataList)
+            {
+                newSet._groupDataList.Add(Instantiate(data));
+            }
+            
+            return newSet;
+        }
+        
+
+#if UNITY_EDITOR
+        public GroupData CreateGroupData(string title, Vector2 position)
+        {
+            GroupData newGroupData = CreateInstance<GroupData>();
             newGroupData.hideFlags = HideFlags.HideInHierarchy;
-            newGroupData.Setup(title, position);
+            newGroupData.title = title;
+            newGroupData.position =  position;
 
             if (Application.isPlaying == false && Undo.isProcessing == false)
             {
                 Undo.RecordObject(this, "Behaviour Tree (CreateGroup)");
             }
 
-            _groupViewDataList.Add(newGroupData);
+            _groupDataList.Add(newGroupData);
 
             if (Application.isPlaying == false && Undo.isProcessing == false)
             {
@@ -43,14 +62,14 @@ namespace BehaviourSystem
 
 
 
-        public void DeleteGroupData(GroupViewData data)
+        public void DeleteGroupData(GroupData data)
         {
             if (Application.isPlaying == false && Undo.isProcessing == false)
             {
                 Undo.RecordObject(this, "Behaviour Tree (RemoveGroup)");
             }
 
-            _groupViewDataList.Remove(data);
+            _groupDataList.Remove(data);
 
             if (Application.isPlaying == false && Undo.isProcessing == false)
             {

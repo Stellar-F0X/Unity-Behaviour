@@ -48,9 +48,6 @@ namespace BehaviourSystem.BT
         public NodeBase parent;
 
         [NonSerialized]
-        public BehaviourTree tree;
-
-        [NonSerialized]
         public BehaviourActor actor;
 
 
@@ -78,10 +75,15 @@ namespace BehaviourSystem.BT
         }
 
         
-        public void AbortNode()
+        public void AbortNode(bool callExit = true)
         {
             this.callState = ENodeCallState.BeforeExit;
-            this.OnExit();
+
+            if (callExit)
+            {
+                this.OnExit();
+            }
+            
             this.callState = ENodeCallState.BeforeEnter;
         } 
 

@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.Linq;
-using BehaviourSystem;
 using BehaviourSystem.BT;
 using UnityEditor.UIElements;
 
@@ -127,7 +126,7 @@ namespace BehaviourSystemEditor.BT
 
         public NodeView CreateNewNodeAndView(Type type, Vector2 mousePosition)
         {
-            NodeBase node = _tree.CreateNode(type);
+            NodeBase node = _tree.nodeSet.CreateNode(type);
             node.position = mousePosition;
             return this.RecreateNodeViewOnLoad(node);
         }
@@ -136,8 +135,8 @@ namespace BehaviourSystemEditor.BT
 
         public NodeGroupView CreateNewNodeGroupView(string title, Vector2 position)
         {
-            GroupViewData nodeGroupData = _tree.groupViewDataCollection.CreateGroupData(title, position);
-            NodeGroupView groupView = new NodeGroupView(_tree.groupViewDataCollection, nodeGroupData);
+            GroupData nodeGroupData = _tree.groupDataSet.CreateGroupData(title, position);
+            NodeGroupView groupView = new NodeGroupView(_tree.groupDataSet, nodeGroupData);
 
             groupView.SetPosition(new Rect(position, Vector2.zero));
             groupView.style.backgroundColor = BehaviourTreeEditorWindow.Settings.nodeGroupColor;
@@ -175,20 +174,20 @@ namespace BehaviourSystemEditor.BT
 
         private void IntegrityCheckAndCreateElements(BehaviourTree tree)
         {
-            for (int i = 0; i < tree.nodeList.Count; ++i)
+            for (int i = 0; i < tree.nodeSet.nodeList.Count; ++i)
             {
                 //Undo로 생성이 취소된 노드를 여기서 처리.
-                if (tree.nodeList[i] is null)
+                if (tree.nodeSet.nodeList[i] is null)
                 {
-                    tree.nodeList.RemoveAt(i);
+                    tree.nodeSet.nodeList.RemoveAt(i);
                 }
             }
 
             //트리 구조라서 미리 모두 생성해둬야 자식과 부모를 연결 할 수 있음.
-            tree.nodeList.ForEach(n => this.RecreateNodeViewOnLoad(n));
-            tree.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.GetChildren(n)));
+            tree.nodeSet.nodeList.ForEach(n => this.RecreateNodeViewOnLoad(n));
+            tree.nodeSet.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.GetChildren(n)));
 
-            tree.groupViewDataCollection.dataList?.ForEach(this.RecreateNodeGroupViewOnLoad);
+            tree.groupDataSet?.dataList?.ForEach(this.RecreateNodeGroupViewOnLoad);
         }
 
 
@@ -202,9 +201,9 @@ namespace BehaviourSystemEditor.BT
                     {
                         case Edge edge: this._nodeEdgeHandler.DeleteEdges(_tree, edge); break; 
 
-                        case NodeView nodeView: this._tree.DeleteNode(nodeView.node); break;
+                        case NodeView nodeView: this._tree.nodeSet.DeleteNode(nodeView.node); break;
                         
-                        case NodeGroupView groupView: this._tree.groupViewDataCollection.DeleteGroupData(groupView.viewData); break;
+                        case NodeGroupView groupView: this._tree.groupDataSet.DeleteGroupData(groupView.data); break;
                     }
                 }
             }
@@ -250,9 +249,9 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-        private void RecreateNodeGroupViewOnLoad(GroupViewData data)
+        private void RecreateNodeGroupViewOnLoad(GroupData data)
         {
-            NodeGroupView nodeGroupView = new NodeGroupView(_tree.groupViewDataCollection, data);
+            NodeGroupView nodeGroupView = new NodeGroupView(_tree.groupDataSet, data);
             nodeGroupView.SetPosition(new Rect(data.position, Vector2.zero));
             nodeGroupView.title = data.title;
             base.AddElement(nodeGroupView);

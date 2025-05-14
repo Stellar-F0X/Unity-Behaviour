@@ -1,25 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.LowLevel;
 
 namespace BehaviourSystem.BT
 {
     public class BehaviourActor : MonoBehaviour
     {
-        public event Action OnDone;
+        private readonly Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
+        
+        private readonly Stack<NodeBase> _runtimeCallStack = new Stack<NodeBase>();
+
 
         [SerializeField]
         private BehaviourTree _runtimeTree;
 
-        private Type _updateType;
-
-        private readonly Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
-
-        private PlayerLoopSystem _playerLoop;
-        private PlayerLoopSystem.UpdateFunction _btUpdater;
-        private NodeBase.EBehaviourResult _lastExecutingResult;
 
         public BehaviourTree runtimeTree
         {
@@ -28,67 +22,99 @@ namespace BehaviourSystem.BT
 
         public NodeBase.EBehaviourResult lastExecutingResult
         {
-            get { return _lastExecutingResult; }
+            get;
+            private set;
+        }
+
+        public bool pause
+        {
+            get;
+            set;
+        }
+
+        public bool aborted
+        {
+            get;
+            private set;
         }
 
 
         private void Awake()
         {
-            this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree);
+            this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree, _runtimeCallStack);
         }
 
 
         private void Update()
         {
-            if (_runtimeTree is null)
+            if (_runtimeTree is null || pause)
             {
-                Debug.LogError("Behaviour Tree is null");
                 return;
             }
 
-            _lastExecutingResult = _runtimeTree.UpdateTree();
-
-            if (_lastExecutingResult != NodeBase.EBehaviourResult.Running)
+            if (aborted)
             {
-                OnDone?.Invoke();
+                if (_runtimeCallStack.Count > 0)
+                {
+                    _runtimeCallStack.Pop().AbortNode();
+                }
+            }
+            else
+            {
+                lastExecutingResult = _runtimeTree.nodeSet.rootNode.UpdateNode();
             }
         }
 
 
         private void FixedUpdate()
         {
-            if (_runtimeTree is null)
+            if (_runtimeTree is null || pause)
             {
-                Debug.LogError("Behaviour Tree is null");
                 return;
             }
 
-            _runtimeTree.FixedUpdateTree();
+            _runtimeTree.nodeSet.rootNode.FixedUpdateNode();
         }
 
 
         private void OnDrawGizmos()
         {
-            if (Application.isPlaying == false)
+            if (_runtimeTree is null || pause || Application.isPlaying == false)
+            {
+                return;
+            }
+
+            _runtimeTree.nodeSet.rootNode.GizmosUpdateNode();
+        }
+
+
+        public void AbortTree()
+        {
+            if (_runtimeTree is null)
+            {
+                return;
+            }
+
+            this.aborted = true;
+        }
+        
+        
+        
+        public void RestartTree()
+        {
+            if (_runtimeTree is null)
             {
                 return;
             }
             
-            if (_runtimeTree is null)
+            this.aborted = false;
+            this.pause = false;
+            
+            while (_runtimeCallStack.Count > 0)
             {
-                Debug.LogError("Behaviour Tree is null");
-                return;
+                _runtimeCallStack.Pop().AbortNode(false);
             }
-
-            _runtimeTree.GizmosUpdateTree();
         }
-
-
-        public void PauseTree() { }
-
-
-        public void AbortTree(bool callOnExit = true) { }
-
 
 
 
@@ -104,7 +130,7 @@ namespace BehaviourSystem.BT
             }
             else
             {
-                IBlackboardProperty newProperty = _runtimeTree.blackboardData.FindProperty(key);
+                IBlackboardProperty newProperty = _runtimeTree.blackboard.FindProperty(key);
 
                 if (newProperty is BlackboardProperty<TValue> prop)
                 {
@@ -129,7 +155,7 @@ namespace BehaviourSystem.BT
             }
             else
             {
-                IBlackboardProperty newProperty = _runtimeTree.blackboardData.FindProperty(key);
+                IBlackboardProperty newProperty = _runtimeTree.blackboard.FindProperty(key);
 
                 if (newProperty is BlackboardProperty<TValue> castedProperty)
                 {

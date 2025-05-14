@@ -15,7 +15,7 @@ namespace BehaviourSystemEditor.BT
         private SerializedObject _serializedObject;
 
         private ToolbarMenu _propertyAddMenu;
-        private BlackboardData _blackboardData;
+        private Blackboard _blackboard;
 
 
         public void Setup(ToolbarMenu toolbarMenu)
@@ -39,7 +39,7 @@ namespace BehaviourSystemEditor.BT
         public void ClearBlackboardView()
         {
             this.itemsSource = null;
-            this._blackboardData = null;
+            this._blackboard = null;
             this._serializedObject = null;
             this._serializedListProperty = null;
             
@@ -54,11 +54,11 @@ namespace BehaviourSystemEditor.BT
         {
             if (tree != null && BehaviourTreeEditorWindow.Instance != null)
             {
-                this._blackboardData = tree.blackboardData;
-                this._serializedObject = new SerializedObject(this._blackboardData);
+                this._blackboard = tree.blackboard;
+                this._serializedObject = new SerializedObject(this._blackboard);
                 this._serializedListProperty = _serializedObject.FindProperty("_properties");
 
-                this.itemsSource = this._blackboardData.properties;
+                this.itemsSource = this._blackboard.properties;
                 this.RefreshItems();
 
                 if (BehaviourTreeEditorWindow.Instance.CanEditTree)
@@ -73,24 +73,24 @@ namespace BehaviourSystemEditor.BT
 
         private void MakeProperty(Type type)
         {
-            Undo.RecordObject(_blackboardData, "Behaviour Tree (AddBlackboardProperty)");
+            Undo.RecordObject(_blackboard, "Behaviour Tree (AddBlackboardProperty)");
 
             itemsSource.Add(IBlackboardProperty.Create(type));
             _serializedObject.Update();
             _serializedObject.ApplyModifiedProperties();
-            EditorUtility.SetDirty(_blackboardData);
+            EditorUtility.SetDirty(_blackboard);
             this.RefreshItems();
         }
 
 
         private void DeleteProperty(int index)
         {
-            Undo.RecordObject(_blackboardData, "Behaviour Tree (RemoveBlackboardProperty)");
+            Undo.RecordObject(_blackboard, "Behaviour Tree (RemoveBlackboardProperty)");
 
             itemsSource.RemoveAt(index);
             _serializedObject.Update();
             _serializedObject.ApplyModifiedProperties();
-            EditorUtility.SetDirty(_blackboardData);
+            EditorUtility.SetDirty(_blackboard);
             this.RefreshItems();
         }
 
@@ -150,7 +150,7 @@ namespace BehaviourSystemEditor.BT
 
                 _serializedObject.Update();
                 _serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(_blackboardData);
+                EditorUtility.SetDirty(_blackboard);
             }
         }
 
@@ -159,7 +159,7 @@ namespace BehaviourSystemEditor.BT
         {
             _serializedObject.Update();
             _serializedObject.ApplyModifiedProperties();
-            EditorUtility.SetDirty(_blackboardData);
+            EditorUtility.SetDirty(_blackboard);
         }
     }
 }

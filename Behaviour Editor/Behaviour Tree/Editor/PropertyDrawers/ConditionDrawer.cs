@@ -49,7 +49,7 @@ namespace BehaviourSystemEditor.BT
                 this.Initialize();
             }
 
-            BlackboardData     data           = BehaviourTreeEditorWindow.Instance.Tree.blackboardData;
+            Blackboard     data           = BehaviourTreeEditorWindow.Instance.Tree.blackboard;
             SerializedProperty blackboardProp = property.FindPropertyRelative("property");
 
             _rect = new Rect(position.x, position.y, position.width - 10, EditorGUIUtility.singleLineHeight);
@@ -67,7 +67,7 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-        private void DrawBlackboardProperty(BlackboardData data, SerializedProperty blackboardProp, Rect dropdownRect)
+        private void DrawBlackboardProperty(Blackboard data, SerializedProperty blackboardProp, Rect dropdownRect)
         {
             if (data.properties.Count == 0)
             {
@@ -173,7 +173,7 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-        private IBlackboardProperty[] GetUsableBlackboardProperties(BlackboardData data)
+        private IBlackboardProperty[] GetUsableBlackboardProperties(Blackboard data)
         {
             _cachedPropertyList.Clear();
 

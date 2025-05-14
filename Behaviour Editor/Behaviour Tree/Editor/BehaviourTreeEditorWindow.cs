@@ -180,8 +180,8 @@ namespace BehaviourSystemEditor.BT
                     _inspectorView?.ClearInspectorView();
                     _treeView?.OnGraphEditorView(_tree);
 
-                    _blackboardProp.ClearBlackboardView();
-                    _blackboardProp.ChangeBehaviourTree(_tree);
+                    _blackboardProp?.ClearBlackboardView();
+                    _blackboardProp?.ChangeBehaviourTree(_tree);
                 }
             }
         }

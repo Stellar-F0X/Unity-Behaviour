@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BehaviourSystem
+namespace BehaviourSystem.BT
 {
     [Serializable]
-    public class GroupViewData : ScriptableObject, ISerializationCallbackReceiver
+    public class GroupData : ScriptableObject, ISerializationCallbackReceiver
     {
         public string title;
         public Vector2 position;
@@ -18,13 +18,6 @@ namespace BehaviourSystem
         public int count
         {
             get { return _nodeGuidSet?.Count ?? 0; }
-        }
-        
-        
-        public void Setup(string title, Vector2 position)
-        {
-            this.title = title;
-            this.position = position;
         }
 
 

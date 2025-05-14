@@ -47,7 +47,7 @@ namespace BehaviourSystemEditor.BT
                     continue;
                 }
                 
-                tree.AddChild(parentView.node, childView.node);
+                tree.nodeSet.AddChild(parentView.node, childView.node);
             }
         }
 
@@ -62,7 +62,7 @@ namespace BehaviourSystemEditor.BT
                 return;
             }
             
-            tree.RemoveChild(parentView?.node, childView?.node);
+            tree.nodeSet.RemoveChild(parentView?.node, childView?.node);
             edge.RemoveFromHierarchy();
         }
     }
