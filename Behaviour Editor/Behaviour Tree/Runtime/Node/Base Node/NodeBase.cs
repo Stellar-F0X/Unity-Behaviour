@@ -78,7 +78,7 @@ namespace BehaviourSystem.BT
 
         public EBehaviourResult UpdateNode()
         {
-            this.callCount++;
+            ++this.callCount;
             
             if (_callState == ENodeCallState.BeforeEnter)
             {

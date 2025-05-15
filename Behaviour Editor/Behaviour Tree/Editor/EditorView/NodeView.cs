@@ -42,6 +42,9 @@ namespace BehaviourSystemEditor.BT
         
         public Edge toParentEdge;
         
+        private VisualElement _inputElement;
+        private VisualElement _outputElement;
+        
         private ulong _lastRenderedNodeCount = 0;
         private readonly VisualElement _nodeBorder;
 
@@ -61,18 +64,28 @@ namespace BehaviourSystemEditor.BT
         {
             switch (node.nodeType)
             {
-                case NodeBase.ENodeType.Root: output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool)); break;
+                case NodeBase.ENodeType.Root: 
+                    output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool)); 
+                    _outputElement = output.Q<VisualElement>("cap");
+                    break;
 
-                case NodeBase.ENodeType.Action: input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool)); break;
+                case NodeBase.ENodeType.Action: 
+                    input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool)); 
+                    _inputElement = input.Q<VisualElement>("cap");
+                    break;
 
                 case NodeBase.ENodeType.Composite:
                     input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Multi, typeof(bool));
+                    _inputElement = input.Q<VisualElement>("cap");
+                    _outputElement = output.Q<VisualElement>("cap");
                     break;
 
                 case NodeBase.ENodeType.Decorator:
                     input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
+                    _inputElement = input.Q<VisualElement>("cap");
+                    _outputElement = output.Q<VisualElement>("cap");
                     break;
             }
 
@@ -104,45 +117,7 @@ namespace BehaviourSystemEditor.BT
             EditorUtility.SetDirty(node);
         }
 
-
-        public void UpdateState()
-        {
-            if (Application.isPlaying)
-            {
-                if (node.callCount != this._lastRenderedNodeCount)
-                {
-                    this._lastRenderedNodeCount = node.callCount;
-
-                    _nodeBorder.style.borderBottomColor = _nodeRunningColor;
-                    _nodeBorder.style.borderLeftColor = _nodeRunningColor;
-                    _nodeBorder.style.borderRightColor = _nodeRunningColor;
-                    _nodeBorder.style.borderTopColor = _nodeRunningColor;
-                    
-                    if (toParentEdge != null)
-                    {
-                        toParentEdge.edgeControl.inputColor = _edgeRunningColor;
-                        toParentEdge.edgeControl.outputColor = _edgeRunningColor;
-                        toParentEdge.BringToFront();
-                    }
-                }
-                else
-                {
-                    _nodeBorder.style.borderBottomColor = _nodeDoneColor;
-                    _nodeBorder.style.borderLeftColor = _nodeDoneColor;
-                    _nodeBorder.style.borderRightColor = _nodeDoneColor;
-                    _nodeBorder.style.borderTopColor = _nodeDoneColor;
-                    
-                    if (toParentEdge != null)
-                    {
-                        toParentEdge.edgeControl.inputColor = _edgeDoneColor;
-                        toParentEdge.edgeControl.outputColor = _edgeDoneColor;
-                        toParentEdge.SendToBack();
-                    }
-                }
-            }
-        }
-
-
+        
         public void SortChildren()
         {
             if (this.node.nodeType != NodeBase.ENodeType.Composite)
@@ -159,5 +134,64 @@ namespace BehaviourSystemEditor.BT
 
         //상속받은 상위 클래스에서 Disconnect All이라는 ContextualMenu 생성을 방지하기 위해서 오버라이드
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt) { }
+        
+
+        
+        public void UpdateState()
+        {
+            if (Application.isPlaying)
+            {
+                if (node.callCount != this._lastRenderedNodeCount)
+                {
+                    this._lastRenderedNodeCount = node.callCount;
+
+                    _nodeBorder.style.borderBottomColor = _nodeRunningColor;
+                    _nodeBorder.style.borderLeftColor = _nodeRunningColor;
+                    _nodeBorder.style.borderRightColor = _nodeRunningColor;
+                    _nodeBorder.style.borderTopColor = _nodeRunningColor;
+                    
+                    if (toParentEdge != null)
+                    {
+                        toParentEdge.BringToFront();
+                        toParentEdge.edgeControl.inputColor = _edgeRunningColor;
+                        toParentEdge.edgeControl.outputColor = _edgeRunningColor;
+                    }
+
+                    if (input != null)
+                    {
+                        _inputElement.style.backgroundColor = _edgeRunningColor;
+                    }
+                    
+                    if (output != null)
+                    {
+                        _outputElement.style.backgroundColor = _edgeRunningColor;
+                    }
+                }
+                else
+                {
+                    _nodeBorder.style.borderBottomColor = _nodeDoneColor;
+                    _nodeBorder.style.borderLeftColor = _nodeDoneColor;
+                    _nodeBorder.style.borderRightColor = _nodeDoneColor;
+                    _nodeBorder.style.borderTopColor = _nodeDoneColor;
+                    
+                    if (toParentEdge != null)
+                    {
+                        toParentEdge.SendToBack();
+                        toParentEdge.edgeControl.inputColor = _edgeDoneColor;
+                        toParentEdge.edgeControl.outputColor = _edgeDoneColor;
+                    }
+                    
+                    if (input != null)
+                    {
+                        _inputElement.style.backgroundColor = _edgeDoneColor;
+                    }
+                    
+                    if (output != null)
+                    {
+                        _outputElement.style.backgroundColor = _edgeDoneColor;
+                    }
+                }
+            }
+        }
     }
 }
