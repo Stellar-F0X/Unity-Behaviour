@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using UnityEditor;
-using UnityEditorInternal;
 
 namespace BehaviourSystemEditor.BT
 {
@@ -42,10 +41,8 @@ namespace BehaviourSystemEditor.BT
         public Port output;
         
         public Edge toParentEdge;
-        public Edge toChildEdge;
-
+        
         private ulong _lastRenderedNodeCount = 0;
-
         private readonly VisualElement _nodeBorder;
 
         private readonly Color _nodeRunningColor;
@@ -125,6 +122,7 @@ namespace BehaviourSystemEditor.BT
                     {
                         toParentEdge.edgeControl.inputColor = _edgeRunningColor;
                         toParentEdge.edgeControl.outputColor = _edgeRunningColor;
+                        toParentEdge.BringToFront();
                     }
                 }
                 else
@@ -138,6 +136,7 @@ namespace BehaviourSystemEditor.BT
                     {
                         toParentEdge.edgeControl.inputColor = _edgeDoneColor;
                         toParentEdge.edgeControl.outputColor = _edgeDoneColor;
+                        toParentEdge.SendToBack();
                     }
                 }
             }
