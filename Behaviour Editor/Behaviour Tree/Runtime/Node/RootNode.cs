@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BehaviourSystem.BT
 {
-    public class RootNode : NodeBase
+    public sealed class RootNode : NodeBase
     {
         [HideInInspector]
         public NodeBase child;
@@ -15,7 +15,14 @@ namespace BehaviourSystem.BT
 
         protected override EBehaviourResult OnUpdate()
         {
-            return child.UpdateNode();
+            if (child == null)
+            {
+                return EBehaviourResult.Failure;
+            }
+            else
+            {
+                return child.UpdateNode();
+            }
         }
     }
 }

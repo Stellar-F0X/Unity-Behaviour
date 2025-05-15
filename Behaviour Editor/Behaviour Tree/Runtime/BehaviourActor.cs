@@ -1,23 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("BehaviourSystemEditor-BT")]
 
 namespace BehaviourSystem.BT
 {
     public class BehaviourActor : MonoBehaviour
     {
         private readonly Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
-        
-        private readonly Stack<NodeBase> _runtimeCallStack = new Stack<NodeBase>();
-
 
         [SerializeField]
         private BehaviourTree _runtimeTree;
 
+        private Stack<NodeBase> _runtimeCallStack;
 
-        public BehaviourTree runtimeTree
+
+        internal BehaviourTree runtimeTree
         {
             get { return _runtimeTree; }
+        }
+
+        public NodeBase currentNode
+        {
+            get { return _runtimeCallStack.Peek(); }
         }
 
         public NodeBase.EBehaviourResult lastExecutingResult
@@ -32,16 +39,23 @@ namespace BehaviourSystem.BT
             set;
         }
 
-        public bool aborted
-        {
-            get;
-            private set;
-        }
 
+#region Unity Event Methods
 
         private void Awake()
         {
-            this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree, _runtimeCallStack);
+            if (_runtimeTree is null)
+            {
+                Debug.LogError("BehaviourTree is not assigned.");
+
+                this.enabled = false;
+            }
+            else
+            {
+                this._runtimeCallStack = new Stack<NodeBase>(_runtimeTree.nodeSet.nodeList.Count);
+
+                this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree);
+            }
         }
 
 
@@ -52,17 +66,7 @@ namespace BehaviourSystem.BT
                 return;
             }
 
-            if (aborted)
-            {
-                if (_runtimeCallStack.Count > 0)
-                {
-                    _runtimeCallStack.Pop().AbortNode();
-                }
-            }
-            else
-            {
-                lastExecutingResult = _runtimeTree.nodeSet.rootNode.UpdateNode();
-            }
+            lastExecutingResult = _runtimeTree.nodeSet.rootNode.UpdateNode();
         }
 
 
@@ -87,35 +91,38 @@ namespace BehaviourSystem.BT
             _runtimeTree.nodeSet.rootNode.GizmosUpdateNode();
         }
 
+#endregion
 
-        public void AbortTree()
+
+#region Internal Methods
+
+        internal void PushInCallStack(NodeBase node)
         {
-            if (_runtimeTree is null)
+            _runtimeCallStack.Push(node);
+        }
+
+        internal void PopInCallStack()
+        {
+            if (_runtimeCallStack.Count > 0)
+            {
+                _runtimeCallStack.Pop();
+            }
+        }
+
+        internal void AbortSubtreeFrom(NodeBase node)
+        {
+            if (this.currentNode is null)
             {
                 return;
             }
 
-            this.aborted = true;
-        }
-        
-        
-        
-        public void RestartTree()
-        {
-            if (_runtimeTree is null)
+            while (this.currentNode.Equals(node) == false && this.currentNode.depth > node.depth)
             {
-                return;
-            }
-            
-            this.aborted = false;
-            this.pause = false;
-            
-            while (_runtimeCallStack.Count > 0)
-            {
-                _runtimeCallStack.Pop().AbortNode(false);
+                currentNode.ExitNode();
             }
         }
 
+#endregion
 
 
         public void SetProperty<TValue>(in string key, TValue property)

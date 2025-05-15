@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 namespace BehaviourSystemEditor.BT
@@ -18,5 +19,11 @@ namespace BehaviourSystemEditor.BT
         public float reductionScale = 0.2f;
 
         public Color nodeGroupColor = new Color(65f, 65f, 65f, 1f);
+        
+        public Color nodeRunningColor = new Color32(54, 154, 204, 255);
+        public Color nodeDoneColor = new Color32(24, 93, 125, 255);
+        
+        public Color edgeRunningColor = new Color32(54, 154, 204, 255);
+        public Color edgeDoneColor = new Color32(200, 200, 200, 255);
     }
 }

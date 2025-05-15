@@ -1,12 +1,12 @@
 using System;
-using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
+[assembly: InternalsVisibleTo("BehaviourSystemEditor-BT")]
 namespace BehaviourSystem.BT
 {
     [Serializable]
-    public abstract class NodeBase : ScriptableObject
+    public abstract class NodeBase : ScriptableObject, IEquatable<NodeBase>
     {
         public enum ENodeCallState
         {
@@ -35,7 +35,7 @@ namespace BehaviourSystem.BT
         [HideInInspector]
         public Vector2 position;
 #endif
-        
+
         [Tooltip("If debug mode is on, it will log a message.")]
         public bool debugMode = true;
 
@@ -50,20 +50,21 @@ namespace BehaviourSystem.BT
         [NonSerialized]
         public BehaviourActor actor;
 
-
-        public Stack<NodeBase> callStack
+        protected ENodeCallState _callState;
+        
+        public int depth
         {
-            protected get;
-            set;
+            get;
+            internal set;
         }
 
-        public EBehaviourResult behaviourResult
+        public ulong callCount
         {
             get;
             private set;
         }
 
-        public ENodeCallState callState
+        public EBehaviourResult behaviourResult
         {
             get;
             private set;
@@ -74,66 +75,91 @@ namespace BehaviourSystem.BT
             get;
         }
 
-        
-        public void AbortNode(bool callExit = true)
-        {
-            this.callState = ENodeCallState.BeforeExit;
-
-            if (callExit)
-            {
-                this.OnExit();
-            }
-            
-            this.callState = ENodeCallState.BeforeEnter;
-        } 
-
 
         public EBehaviourResult UpdateNode()
         {
-            switch (callState)
+            this.callCount++;
+            
+            if (_callState == ENodeCallState.BeforeEnter)
             {
-                case ENodeCallState.BeforeEnter:
-                {
-                    callStack.Push(this);
-                    this.OnEnter();
-                    callState = ENodeCallState.Updating;
-                    return EBehaviourResult.Running;
-                }
+                this.EnterNode();
+            }
 
-                case ENodeCallState.Updating:
+            if (this._callState == ENodeCallState.Updating)
+            {
+                this.behaviourResult = this.OnUpdate();
+
+                if (this.behaviourResult != EBehaviourResult.Running)
                 {
-                    behaviourResult = this.OnUpdate();
-                    
-                    if (behaviourResult != EBehaviourResult.Running)
+                    if (this.actor.currentNode != this)
                     {
-                        callState = ENodeCallState.BeforeExit;
+                        this.actor.AbortSubtreeFrom(this);
                     }
                     
-                    return behaviourResult;
+                    this._callState = ENodeCallState.BeforeExit;
                 }
+            }
 
-                case ENodeCallState.BeforeExit:
-                {
-                    this.OnExit();
-                    callStack.Pop();
-                    callState = ENodeCallState.BeforeEnter;
-                    return behaviourResult;
-                }
-                
-                default: return EBehaviourResult.Failure;
+            if (this._callState == ENodeCallState.BeforeExit)
+            {
+                this.ExitNode();
+            }
+
+            return this.behaviourResult;
+        }
+
+
+        public void EnterNode()
+        {
+            this.actor.PushInCallStack(this);
+            this.OnEnter();
+            this._callState = ENodeCallState.Updating;
+        }
+        
+        
+        public void ExitNode()
+        {
+            this.OnExit();
+            this.actor.PopInCallStack();
+            this._callState = ENodeCallState.BeforeEnter; 
+            
+            // If a parent node fails during execution, this node's result is set to Failure.
+            if (this.behaviourResult == EBehaviourResult.Running)
+            {
+                this.behaviourResult = EBehaviourResult.Failure;
             }
         }
         
+        
+        public bool Equals(NodeBase other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+            
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+            
+            return string.CompareOrdinal(this.guid, other.guid) == 0;
+        }
+
+        
+
         public virtual void OnInitialize() { }
 
         public virtual void FixedUpdateNode() { }
 
         public virtual void GizmosUpdateNode() { }
         
+
         protected virtual void OnEnter() { }
 
         protected virtual void OnExit() { }
         
+
         protected abstract EBehaviourResult OnUpdate();
     }
 }

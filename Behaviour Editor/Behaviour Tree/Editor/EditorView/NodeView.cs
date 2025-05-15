@@ -19,6 +19,12 @@ namespace BehaviourSystemEditor.BT
             this.style.left = node.position.x;
             this.style.top = node.position.y;
 
+            _nodeRunningColor = BehaviourTreeEditorWindow.Settings.nodeRunningColor;
+            _nodeDoneColor = BehaviourTreeEditorWindow.Settings.nodeDoneColor;
+            
+            _edgeRunningColor = BehaviourTreeEditorWindow.Settings.edgeRunningColor;
+            _edgeDoneColor = BehaviourTreeEditorWindow.Settings.edgeDoneColor;
+            
             _nodeBorder = this.Q<VisualElement>("node-border");
 
             string nodeType = node.nodeType.ToString();
@@ -34,12 +40,20 @@ namespace BehaviourSystemEditor.BT
         public NodeBase node;
         public Port input;
         public Port output;
+        
+        public Edge toParentEdge;
+        public Edge toChildEdge;
+
+        private ulong _lastRenderedNodeCount = 0;
 
         private readonly VisualElement _nodeBorder;
 
-        private readonly Color _runningColor = new Color32(54, 154, 204, 255);
-        private readonly Color _doneColor = new Color32(24, 93, 125, 255);
+        private readonly Color _nodeRunningColor;
+        private readonly Color _nodeDoneColor;
         
+        private readonly Color _edgeRunningColor;
+        private readonly Color _edgeDoneColor;
+
 
         public override void OnSelected() => OnNodeSelected?.Invoke(this);
 
@@ -79,7 +93,7 @@ namespace BehaviourSystemEditor.BT
                 container.Add(port);
             }
         }
-        
+
 
         public override void SetPosition(Rect newPos)
         {
@@ -98,19 +112,33 @@ namespace BehaviourSystemEditor.BT
         {
             if (Application.isPlaying)
             {
-                if (node.callState == NodeBase.ENodeCallState.Updating)
+                if (node.callCount != this._lastRenderedNodeCount)
                 {
-                    _nodeBorder.style.borderBottomColor = _runningColor;
-                    _nodeBorder.style.borderLeftColor = _runningColor;
-                    _nodeBorder.style.borderRightColor = _runningColor;
-                    _nodeBorder.style.borderTopColor = _runningColor;
+                    this._lastRenderedNodeCount = node.callCount;
+
+                    _nodeBorder.style.borderBottomColor = _nodeRunningColor;
+                    _nodeBorder.style.borderLeftColor = _nodeRunningColor;
+                    _nodeBorder.style.borderRightColor = _nodeRunningColor;
+                    _nodeBorder.style.borderTopColor = _nodeRunningColor;
+                    
+                    if (toParentEdge != null)
+                    {
+                        toParentEdge.edgeControl.inputColor = _edgeRunningColor;
+                        toParentEdge.edgeControl.outputColor = _edgeRunningColor;
+                    }
                 }
                 else
                 {
-                    _nodeBorder.style.borderBottomColor = _doneColor;
-                    _nodeBorder.style.borderLeftColor = _doneColor;
-                    _nodeBorder.style.borderRightColor = _doneColor;
-                    _nodeBorder.style.borderTopColor = _doneColor;
+                    _nodeBorder.style.borderBottomColor = _nodeDoneColor;
+                    _nodeBorder.style.borderLeftColor = _nodeDoneColor;
+                    _nodeBorder.style.borderRightColor = _nodeDoneColor;
+                    _nodeBorder.style.borderTopColor = _nodeDoneColor;
+                    
+                    if (toParentEdge != null)
+                    {
+                        toParentEdge.edgeControl.inputColor = _edgeDoneColor;
+                        toParentEdge.edgeControl.outputColor = _edgeDoneColor;
+                    }
                 }
             }
         }

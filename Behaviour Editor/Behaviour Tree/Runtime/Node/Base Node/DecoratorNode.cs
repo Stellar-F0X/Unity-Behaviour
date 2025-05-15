@@ -9,9 +9,6 @@ namespace BehaviourSystem.BT
         [HideInInspector]
         public NodeBase child;
         
-        [Space(10)]
-        public EBehaviourResult defaultResult;
-
         
         public override ENodeType nodeType
         {

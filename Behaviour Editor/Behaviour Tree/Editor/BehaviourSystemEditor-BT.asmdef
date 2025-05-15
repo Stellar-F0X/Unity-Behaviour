@@ -2,8 +2,7 @@
     "name": "BehaviourSystemEditor-BT",
     "rootNamespace": "BehaviourSystemEditor.BT",
     "references": [
-        "GUID:591e76298d9f64d4497b69da86171ced",
-        "GUID:ed5cf72165df0bc40a89736a7ca8f582"
+        "GUID:591e76298d9f64d4497b69da86171ced"
     ],
     "includePlatforms": [
         "Editor"

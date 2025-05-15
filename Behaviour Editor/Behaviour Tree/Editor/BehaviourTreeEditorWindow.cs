@@ -1,11 +1,8 @@
-using System;
-using System.Linq;
 using BehaviourSystem.BT;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.Callbacks;
-using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 
 namespace BehaviourSystemEditor.BT

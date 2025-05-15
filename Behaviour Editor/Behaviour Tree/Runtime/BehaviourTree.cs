@@ -43,7 +43,7 @@ namespace BehaviourSystem.BT
 
         #region Make Runtime Tree
 
-        public static BehaviourTree MakeRuntimeTree(BehaviourActor actor, BehaviourTree targetTree, Stack<NodeBase> callStack)
+        public static BehaviourTree MakeRuntimeTree(BehaviourActor actor, BehaviourTree targetTree)
         {
             if (targetTree != null)
             {
@@ -52,7 +52,7 @@ namespace BehaviourSystem.BT
                 runtimeTree._specificGuid = Guid.NewGuid().ToString();
                 runtimeTree._cloneGroupID = targetTree._cloneGroupID;
 
-                runtimeTree.nodeSet = targetTree.nodeSet.Clone(actor, callStack);
+                runtimeTree.nodeSet = targetTree.nodeSet.Clone(actor);
                 runtimeTree.blackboard = targetTree.blackboard.Clone();
                 runtimeTree.groupDataSet = targetTree.groupDataSet.Clone();
                 return runtimeTree;
@@ -101,21 +101,6 @@ namespace BehaviourSystem.BT
                 AssetDatabase.SaveAssets();
             }
 #endif
-        }
-
-
-        public List<NodeBase> GetChildren(NodeBase parent)
-        {
-            switch (parent.nodeType)
-            {
-                case NodeBase.ENodeType.Root: return new List<NodeBase> { ((RootNode)parent).child };
-
-                case NodeBase.ENodeType.Decorator: return new List<NodeBase> { ((DecoratorNode)parent).child };
-
-                case NodeBase.ENodeType.Composite: return ((CompositeNode)parent).children;
-            }
-
-            return null;
         }
 
 
