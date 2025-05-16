@@ -19,8 +19,8 @@ namespace BehaviourSystemEditor.BT
 
             ContentZoomer zoomer = new ContentZoomer()
             {
-                maxScale = BehaviourTreeEditorWindow.Settings.enlargementScale,
-                minScale = BehaviourTreeEditorWindow.Settings.reductionScale
+                maxScale = BehaviourTreeEditor.Settings.enlargementScale,
+                minScale = BehaviourTreeEditor.Settings.reductionScale
             };
 
             this.AddManipulator(zoomer);
@@ -28,7 +28,7 @@ namespace BehaviourSystemEditor.BT
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
 
-            styleSheets.Add(BehaviourTreeEditorWindow.Settings.behaviourTreeStyle);
+            styleSheets.Add(BehaviourTreeEditor.Settings.behaviourTreeStyle);
 
             _nodeEdgeHandler = new NodeEdgeHandler();
             _nodeSearchHelper = new NodeSearchHelper();
@@ -95,7 +95,7 @@ namespace BehaviourSystemEditor.BT
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            if (BehaviourTreeEditorWindow.Instance.CanEditTree == false)
+            if (BehaviourTreeEditor.Instance.CanEditTree == false)
             {
                 return;
             }
@@ -139,7 +139,7 @@ namespace BehaviourSystemEditor.BT
             NodeGroupView groupView = new NodeGroupView(_tree.groupDataSet, nodeGroupData);
 
             groupView.SetPosition(new Rect(position, Vector2.zero));
-            groupView.style.backgroundColor = BehaviourTreeEditorWindow.Settings.nodeGroupColor;
+            groupView.style.backgroundColor = BehaviourTreeEditor.Settings.nodeGroupColor;
             groupView.title = title;
 
             base.AddElement(groupView);
@@ -156,7 +156,7 @@ namespace BehaviourSystemEditor.BT
             {
                 if (nodes.AtIndex(i) is NodeView nodeView)
                 {
-                    nodeView.UpdateState();
+                    nodeView.UpdateView();
                 }
             }
         }
@@ -224,7 +224,7 @@ namespace BehaviourSystemEditor.BT
         
         private void OnDeleteSelectionElements(string operationName, AskUser user)
         {
-            if (BehaviourTreeEditorWindow.Instance.CanEditTree == false)
+            if (BehaviourTreeEditor.Instance.CanEditTree == false)
             {
                 return;
             }
@@ -246,7 +246,7 @@ namespace BehaviourSystemEditor.BT
 
         private NodeView RecreateNodeViewOnLoad(NodeBase node)
         {
-            NodeView nodeView = new NodeView(node, BehaviourTreeEditorWindow.Settings.nodeViewXml);
+            NodeView nodeView = new NodeView(node, BehaviourTreeEditor.Settings.nodeViewXml);
             nodeView.OnNodeSelected += this.onNodeSelected;
 
             base.AddElement(nodeView); //nodes라는 GraphElement 컨테이너에 추가.

@@ -21,7 +21,7 @@ namespace BehaviourSystemEditor.BT
         public void Setup(ToolbarMenu toolbarMenu)
         {
             this._propertyAddMenu = toolbarMenu;
-            this.makeItem = BehaviourTreeEditorWindow.Settings.blackboardPropertyViewXml.CloneTree;
+            this.makeItem = BehaviourTreeEditor.Settings.blackboardPropertyViewXml.CloneTree;
             this.bindItem = this.BindItemToList;
             this.itemIndexChanged += this.OnPropertyIndicesSwapped;
 
@@ -52,7 +52,7 @@ namespace BehaviourSystemEditor.BT
 
         public void ChangeBehaviourTree(BehaviourTree tree)
         {
-            if (tree != null && BehaviourTreeEditorWindow.Instance != null)
+            if (tree != null && BehaviourTreeEditor.Instance != null)
             {
                 this._blackboard = tree.blackboard;
                 this._serializedObject = new SerializedObject(this._blackboard);
@@ -61,7 +61,7 @@ namespace BehaviourSystemEditor.BT
                 this.itemsSource = this._blackboard.properties;
                 this.RefreshItems();
 
-                if (BehaviourTreeEditorWindow.Instance.CanEditTree)
+                if (BehaviourTreeEditor.Instance.CanEditTree)
                 {
                     TypeCache.GetTypesDerivedFrom<IBlackboardProperty>()
                              .Where(t => t.IsAbstract == false)
@@ -103,7 +103,7 @@ namespace BehaviourSystemEditor.BT
             Button buttonField = element.Q<Button>("delete-button");
 
             buttonField.clickable = null; //reset all callback
-            buttonField.enabledSelf = BehaviourTreeEditorWindow.Instance.CanEditTree;
+            buttonField.enabledSelf = BehaviourTreeEditor.Instance.CanEditTree;
             buttonField.clicked += () => this.DeleteProperty(index);
             imguiField.onGUIHandler = () => this.DrawIMGUIForItem(index);
 

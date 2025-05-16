@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace BehaviourSystemEditor.BT
@@ -37,12 +40,12 @@ namespace BehaviourSystemEditor.BT
             {
                 throw new ArgumentNullException(nameof(array));
             }
-            
+
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
-            
+
             foreach (var element in array)
             {
                 action.Invoke(element);

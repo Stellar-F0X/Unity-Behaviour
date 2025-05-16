@@ -29,7 +29,7 @@ namespace BehaviourSystem.BT
 
             while (recursionStack.Count > 0)
             {
-                var traversal = recursionStack.Pop();
+                TraversalInfo traversal = recursionStack.Pop();
 
                 traversal.clone.name = traversal.clone.name.Remove(traversal.origin.name.Length, 7);
                 traversal.clone.depth = traversal.depth;

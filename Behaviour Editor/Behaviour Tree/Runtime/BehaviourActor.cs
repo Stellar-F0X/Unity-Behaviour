@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("BehaviourSystemEditor-BT")]
-
 namespace BehaviourSystem.BT
 {
     public class BehaviourActor : MonoBehaviour

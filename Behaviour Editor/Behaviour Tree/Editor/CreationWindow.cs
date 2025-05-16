@@ -53,10 +53,10 @@ namespace BehaviourSystemEditor.BT
         
         private Vector2 CalculateMousePosition(SearchWindowContext context)
         {
-            BehaviourTreeEditorWindow editorWindow = BehaviourTreeEditorWindow.Instance;
-            Vector2 targetVector = context.screenMousePosition - editorWindow.position.position;
-            Vector2 mousePosition = editorWindow.rootVisualElement.ChangeCoordinatesTo(editorWindow.rootVisualElement.parent, targetVector);
-            return editorWindow.View.contentViewContainer.WorldToLocal(mousePosition);
+            BehaviourTreeEditor editor = BehaviourTreeEditor.Instance;
+            Vector2 targetVector = context.screenMousePosition - editor.position.position;
+            Vector2 mousePosition = editor.rootVisualElement.ChangeCoordinatesTo(editor.rootVisualElement.parent, targetVector);
+            return editor.View.contentViewContainer.WorldToLocal(mousePosition);
         }
 
 

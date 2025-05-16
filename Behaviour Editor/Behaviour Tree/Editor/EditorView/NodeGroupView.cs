@@ -55,7 +55,7 @@ namespace BehaviourSystemEditor.BT
 
         protected override void OnElementsAdded(IEnumerable<GraphElement> elements)
         {
-            if (BehaviourTreeEditorWindow.Instance is not null && BehaviourTreeEditorWindow.Instance.CanEditTree && _data != null)
+            if (BehaviourTreeEditor.Instance is not null && BehaviourTreeEditor.Instance.CanEditTree && _data != null)
             {
                 Undo.RecordObject(_data, "Behaviour Tree (AddNodeGuidToGroup)");
 
@@ -77,7 +77,7 @@ namespace BehaviourSystemEditor.BT
 
         protected override void OnElementsRemoved(IEnumerable<GraphElement> elements)
         {
-            if (BehaviourTreeEditorWindow.Instance is not null && BehaviourTreeEditorWindow.Instance.CanEditTree && _data != null)
+            if (BehaviourTreeEditor.Instance is not null && BehaviourTreeEditor.Instance.CanEditTree && _data != null)
             {
                 Undo.RecordObject(_data, "Behaviour Tree (RemoveNodeGuidToGroup)");
 

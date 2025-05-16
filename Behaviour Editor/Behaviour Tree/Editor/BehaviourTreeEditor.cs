@@ -7,12 +7,12 @@ using UnityEditor.UIElements;
 
 namespace BehaviourSystemEditor.BT
 {
-    public class BehaviourTreeEditorWindow : EditorWindow
+    public class BehaviourTreeEditor : EditorWindow
     {
         [MenuItem("Tools/Behaviour Tree Editor")]
         private static void OpenWindow()
         {
-            BehaviourTreeEditorWindow wnd = GetWindow<BehaviourTreeEditorWindow>();
+            BehaviourTreeEditor wnd = GetWindow<BehaviourTreeEditor>();
             wnd.titleContent = new GUIContent("BT Editor");
             Instance = wnd;
         }
@@ -32,7 +32,7 @@ namespace BehaviourSystemEditor.BT
 
         private static BehaviourTreeEditorSettings _settings;
 
-        public static BehaviourTreeEditorWindow Instance
+        public static BehaviourTreeEditor Instance
         {
             get;
             private set;
@@ -40,7 +40,17 @@ namespace BehaviourSystemEditor.BT
 
         public static BehaviourTreeEditorSettings Settings
         {
-            get { return _settings ??= EditorHelper.FindAssetByName<BehaviourTreeEditorSettings>($"t:{nameof(BehaviourTreeEditorSettings)}"); }
+            get
+            {
+                if (_settings is null)
+                {
+                    string filter = $"t:{nameof(BehaviourTreeEditorSettings)}"; 
+                    
+                    _settings = EditorHelper.FindAssetByName<BehaviourTreeEditorSettings>(filter);
+                }
+
+                return _settings;
+            }
         }
 
 

@@ -39,7 +39,7 @@ namespace BehaviourSystemEditor.BT
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (BehaviourTreeEditorWindow.Instance is null)
+            if (BehaviourTreeEditor.Instance is null)
             {
                 return;
             }
@@ -49,7 +49,7 @@ namespace BehaviourSystemEditor.BT
                 this.Initialize();
             }
 
-            Blackboard     data           = BehaviourTreeEditorWindow.Instance.Tree.blackboard;
+            Blackboard     data           = BehaviourTreeEditor.Instance.Tree.blackboard;
             SerializedProperty blackboardProp = property.FindPropertyRelative("property");
 
             _rect = new Rect(position.x, position.y, position.width - 10, EditorGUIUtility.singleLineHeight);

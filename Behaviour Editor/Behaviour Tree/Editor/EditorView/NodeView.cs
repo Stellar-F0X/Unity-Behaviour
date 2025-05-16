@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BehaviourSystem.BT;
 using UnityEngine;
 using UnityEditor.Experimental.GraphView;
@@ -14,45 +15,41 @@ namespace BehaviourSystemEditor.BT
             this.node = node;
             this.title = node.name;
             this.viewDataKey = node.guid;
-
             this.style.left = node.position.x;
             this.style.top = node.position.y;
 
-            _nodeRunningColor = BehaviourTreeEditorWindow.Settings.nodeRunningColor;
-            _nodeDoneColor = BehaviourTreeEditorWindow.Settings.nodeDoneColor;
-            
-            _edgeRunningColor = BehaviourTreeEditorWindow.Settings.edgeRunningColor;
-            _edgeDoneColor = BehaviourTreeEditorWindow.Settings.edgeDoneColor;
-            
             _nodeBorder = this.Q<VisualElement>("node-border");
-
-            string nodeType = node.nodeType.ToString();
-
-            this.AddToClassList(nodeType.ToLower());
+            
+            if (Application.isPlaying)
+            {
+                _nodeBorder.style.borderTopColor = BehaviourTreeEditor.Settings.nodeDisappearingColor;
+                _nodeBorder.style.borderBottomColor = BehaviourTreeEditor.Settings.nodeDisappearingColor;
+                _nodeBorder.style.borderLeftColor = BehaviourTreeEditor.Settings.nodeDisappearingColor;
+                _nodeBorder.style.borderRightColor = BehaviourTreeEditor.Settings.nodeDisappearingColor;
+            }
+            
+            this.AddToClassList(node.nodeType.ToString().ToLower());
             this.CreatePorts();
         }
-
 
         public event Action<NodeView> OnNodeSelected;
         public event Action<NodeView> OnNodeUnselected;
 
+
+        private float _elapsedTime;
+        private float _minimumStayTime;
+        private ulong _lastRenderedNodeCount = 0;
+
+
         public NodeBase node;
+        public Edge toParentEdge;
+
         public Port input;
         public Port output;
-        
-        public Edge toParentEdge;
-        
-        private VisualElement _inputElement;
-        private VisualElement _outputElement;
-        
-        private ulong _lastRenderedNodeCount = 0;
-        private readonly VisualElement _nodeBorder;
 
-        private readonly Color _nodeRunningColor;
-        private readonly Color _nodeDoneColor;
-        
-        private readonly Color _edgeRunningColor;
-        private readonly Color _edgeDoneColor;
+        private VisualElement _nodeBorder;
+        private VisualElement _inputPortView;
+        private VisualElement _outputPortView;
 
 
         public override void OnSelected() => OnNodeSelected?.Invoke(this);
@@ -64,34 +61,35 @@ namespace BehaviourSystemEditor.BT
         {
             switch (node.nodeType)
             {
-                case NodeBase.ENodeType.Root: 
-                    output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool)); 
-                    _outputElement = output.Q<VisualElement>("cap");
+                case NodeBase.ENodeType.Root:
+                    output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
+                    _outputPortView = output.Q<VisualElement>("cap");
                     break;
 
-                case NodeBase.ENodeType.Action: 
-                    input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool)); 
-                    _inputElement = input.Q<VisualElement>("cap");
+                case NodeBase.ENodeType.Action:
+                    input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
+                    _inputPortView = input.Q<VisualElement>("cap");
                     break;
 
                 case NodeBase.ENodeType.Composite:
                     input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Multi, typeof(bool));
-                    _inputElement = input.Q<VisualElement>("cap");
-                    _outputElement = output.Q<VisualElement>("cap");
+                    _inputPortView = input.Q<VisualElement>("cap");
+                    _outputPortView = output.Q<VisualElement>("cap");
                     break;
 
                 case NodeBase.ENodeType.Decorator:
                     input = InstantiatePort(Orientation.Vertical, Direction.Input, Port.Capacity.Single, typeof(bool));
                     output = InstantiatePort(Orientation.Vertical, Direction.Output, Port.Capacity.Single, typeof(bool));
-                    _inputElement = input.Q<VisualElement>("cap");
-                    _outputElement = output.Q<VisualElement>("cap");
+                    _inputPortView = input.Q<VisualElement>("cap");
+                    _outputPortView = output.Q<VisualElement>("cap");
                     break;
             }
 
             this.SetupPort(input, string.Empty, FlexDirection.Column, base.inputContainer);
             this.SetupPort(output, string.Empty, FlexDirection.ColumnReverse, base.outputContainer);
         }
+
 
 
         private void SetupPort(Port port, string portName, FlexDirection direction, VisualElement container)
@@ -117,7 +115,7 @@ namespace BehaviourSystemEditor.BT
             EditorUtility.SetDirty(node);
         }
 
-        
+
         public void SortChildren()
         {
             if (this.node.nodeType != NodeBase.ENodeType.Composite)
@@ -134,62 +132,63 @@ namespace BehaviourSystemEditor.BT
 
         //상속받은 상위 클래스에서 Disconnect All이라는 ContextualMenu 생성을 방지하기 위해서 오버라이드
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt) { }
-        
 
-        
-        public void UpdateState()
+
+
+        public void UpdateView()
         {
             if (Application.isPlaying)
             {
-                if (node.callCount != this._lastRenderedNodeCount)
+                if (node.callCount != _lastRenderedNodeCount)
                 {
-                    this._lastRenderedNodeCount = node.callCount;
+                    toParentEdge?.BringToFront();
+                    _lastRenderedNodeCount = node.callCount;
+                    _minimumStayTime = BehaviourTreeEditor.Settings.minimumFocusingDuration;
+                }
 
-                    _nodeBorder.style.borderBottomColor = _nodeRunningColor;
-                    _nodeBorder.style.borderLeftColor = _nodeRunningColor;
-                    _nodeBorder.style.borderRightColor = _nodeRunningColor;
-                    _nodeBorder.style.borderTopColor = _nodeRunningColor;
+                if (_minimumStayTime > 0f)
+                {
+                    _elapsedTime = Mathf.Min(_elapsedTime + Time.deltaTime, BehaviourTreeEditor.Settings.minimumFocusingDuration);
                     
-                    if (toParentEdge != null)
-                    {
-                        toParentEdge.BringToFront();
-                        toParentEdge.edgeControl.inputColor = _edgeRunningColor;
-                        toParentEdge.edgeControl.outputColor = _edgeRunningColor;
-                    }
-
-                    if (input != null)
-                    {
-                        _inputElement.style.backgroundColor = _edgeRunningColor;
-                    }
-                    
-                    if (output != null)
-                    {
-                        _outputElement.style.backgroundColor = _edgeRunningColor;
-                    }
+                    _minimumStayTime = Mathf.Max(_minimumStayTime - Time.deltaTime, 0f);
+                }
+                else if (Mathf.Approximately(this._elapsedTime, 0f))
+                {
+                    return;
                 }
                 else
                 {
-                    _nodeBorder.style.borderBottomColor = _nodeDoneColor;
-                    _nodeBorder.style.borderLeftColor = _nodeDoneColor;
-                    _nodeBorder.style.borderRightColor = _nodeDoneColor;
-                    _nodeBorder.style.borderTopColor = _nodeDoneColor;
-                    
-                    if (toParentEdge != null)
-                    {
-                        toParentEdge.SendToBack();
-                        toParentEdge.edgeControl.inputColor = _edgeDoneColor;
-                        toParentEdge.edgeControl.outputColor = _edgeDoneColor;
-                    }
-                    
-                    if (input != null)
-                    {
-                        _inputElement.style.backgroundColor = _edgeDoneColor;
-                    }
-                    
-                    if (output != null)
-                    {
-                        _outputElement.style.backgroundColor = _edgeDoneColor;
-                    }
+                    _elapsedTime = Mathf.Max(_elapsedTime - Time.deltaTime, 0f);
+                }
+
+                float progress = Mathf.InverseLerp(0f, BehaviourTreeEditor.Settings.minimumFocusingDuration, this._elapsedTime);
+
+                Color borderColor = Color.Lerp(BehaviourTreeEditor.Settings.nodeDisappearingColor, BehaviourTreeEditor.Settings.nodeAppearingColor, progress);
+                Color portColor = Color.Lerp(BehaviourTreeEditor.Settings.portDisappearingColor, BehaviourTreeEditor.Settings.portAppearingColor, progress);
+                Color edgeColor = Color.Lerp(BehaviourTreeEditor.Settings.edgeDisappearingColor, BehaviourTreeEditor.Settings.edgeAppearingColor, progress);
+
+                if (_nodeBorder != null)
+                {
+                    _nodeBorder.style.borderTopColor = borderColor;
+                    _nodeBorder.style.borderBottomColor = borderColor;
+                    _nodeBorder.style.borderLeftColor = borderColor;
+                    _nodeBorder.style.borderRightColor = borderColor;
+                }
+
+                if (toParentEdge != null)
+                {
+                    toParentEdge.edgeControl.inputColor = edgeColor;
+                    toParentEdge.edgeControl.outputColor = edgeColor;
+                }
+
+                if (_inputPortView != null)
+                {
+                    _inputPortView.style.backgroundColor = portColor;
+                }
+
+                if (_outputPortView != null)
+                {
+                    _outputPortView.style.backgroundColor = portColor;
                 }
             }
         }

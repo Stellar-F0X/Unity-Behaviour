@@ -25,8 +25,9 @@ namespace BehaviourSystemEditor.BT
                     continue;
                 }
 
-                childView.toParentEdge = parentView.output.ConnectTo(childView.input);
-                treeView.AddElement(childView.toParentEdge);
+                Edge newEdge = parentView.output.ConnectTo(childView.input);
+                childView.toParentEdge = newEdge;
+                treeView.AddElement(newEdge);
             }
         }
 
