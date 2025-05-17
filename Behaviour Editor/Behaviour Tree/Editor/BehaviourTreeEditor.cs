@@ -52,7 +52,18 @@ namespace BehaviourSystemEditor.BT
                 return _settings;
             }
         }
+        
+        public static bool CanEditTree
+        {
+            get;
+            private set;
+        }
 
+        public static bool isInLoadingBTAsset
+        {
+            get;
+            private set;
+        }
 
 
         private BehaviourTree _tree;
@@ -61,14 +72,8 @@ namespace BehaviourSystemEditor.BT
         private BehaviourTreeView _treeView;
         private InspectorView _inspectorView;
         private BlackboardPropertyListView _blackboardProp;
-
-
-        public bool CanEditTree
-        {
-            get;
-            private set;
-        }
-
+        
+        
         public BehaviourTree Tree
         {
             get { return _tree; }
@@ -103,7 +108,7 @@ namespace BehaviourSystemEditor.BT
                 this._inspectorView.Clear();
                 this._treeView?.ClearEditorView();
 
-                this.CanEditTree = false;
+                CanEditTree = false;
                 this._actor = null;
                 this._tree = null;
             }
@@ -185,11 +190,15 @@ namespace BehaviourSystemEditor.BT
 
                 if (_actor is not null && Application.isPlaying || openedEditorWindow)
                 {
+                    isInLoadingBTAsset = true;
+                    
                     _inspectorView?.ClearInspectorView();
-                    _treeView?.OnGraphEditorView(_tree);
-
                     _blackboardProp?.ClearBlackboardView();
-                    _blackboardProp?.ChangeBehaviourTree(_tree);
+                    
+                    _treeView?.OnGraphEditorView(_tree);
+                    _blackboardProp?.OnBehaviourTreeChanged(_tree);
+                    
+                    isInLoadingBTAsset = false;
                 }
             }
         }

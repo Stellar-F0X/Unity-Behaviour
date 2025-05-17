@@ -29,7 +29,7 @@ namespace BehaviourSystemEditor.BT
                             asset.nodeSet.rootNode = asset.nodeSet.CreateNode(typeof(RootNode));
                             EditorUtility.SetDirty(asset);
                         }
-
+                        
                         AssetDatabase.SaveAssets();
                     }
 

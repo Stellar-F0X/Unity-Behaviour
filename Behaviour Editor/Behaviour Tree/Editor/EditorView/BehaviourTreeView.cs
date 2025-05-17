@@ -97,7 +97,7 @@ namespace BehaviourSystemEditor.BT
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            if (BehaviourTreeEditor.Instance.CanEditTree == false)
+            if (BehaviourTreeEditor.CanEditTree == false)
             {
                 return;
             }
@@ -189,8 +189,8 @@ namespace BehaviourSystemEditor.BT
 
             //트리 구조라서 미리 모두 생성해둬야 자식과 부모를 연결 할 수 있음.
             tree.nodeSet.nodeList.ForEach(n => this.RecreateNodeViewOnLoad(n));
-            tree.nodeSet.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.nodeSet.GetChildren(n)));
             tree.groupDataSet?.dataList.ForEach(d => this.RecreateNodeGroupViewOnLoad(d));
+            tree.nodeSet.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.nodeSet.GetChildren(n)));
         }
 
 
@@ -227,7 +227,7 @@ namespace BehaviourSystemEditor.BT
 
         private void OnDeleteSelectionElements(string operationName, AskUser user)
         {
-            if (BehaviourTreeEditor.Instance.CanEditTree == false)
+            if (BehaviourTreeEditor.CanEditTree == false)
             {
                 return;
             }
@@ -260,12 +260,13 @@ namespace BehaviourSystemEditor.BT
         private void RecreateNodeGroupViewOnLoad(GroupData data)
         {
             NodeGroupView nodeGroupView = new NodeGroupView(_tree.groupDataSet, data);
-            nodeGroupView.SetPosition(new Rect(data.position, Vector2.zero));
-
-            nodes.Where(n => n is NodeView v && data.Contains(v.node.guid))
-                 .ForEach(filteredNode => nodeGroupView.AddElement(filteredNode));
-
             base.AddElement(nodeGroupView);
+            
+            nodeGroupView.schedule.Execute(() =>
+            {
+                nodeGroupView.SetPosition(new Rect(data.position, Vector2.zero));
+                nodeGroupView.AddElements(nodes.Where(n => n is NodeView v && data.Contains(v.node.guid)));
+            });
         }
 
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace BehaviourSystem.BT
@@ -15,9 +16,9 @@ namespace BehaviourSystem.BT
         private HashSet<string> _nodeGuidSet = new HashSet<string>(StringComparer.Ordinal);
 
 
-        public int count
+        public int containedNodeCount
         {
-            get { return _nodeGuidSet?.Count ?? 0; }
+            get { return _nodeGuidList.Count; }
         }
 
 
@@ -51,15 +52,27 @@ namespace BehaviourSystem.BT
         }
 
         
-        public void AddNodeGuid(string nodeGuid)
+        public void AddNodeGuid(List<NodeBase> nodeGuid)
         {
-            _nodeGuidSet.Add(nodeGuid);
+#if UNITY_EDITOR
+            Undo.RecordObject(this, "Behaviour Tree (AddNodeGuidToGroup)");
+            
+            nodeGuid.ForEach(node => _nodeGuidSet.Add(node.guid));
+            
+            EditorUtility.SetDirty(this);
+#endif
         }
 
 
-        public void RemoveNodeGuid(string nodeGuid)
+        public void RemoveNodeGuid(List<NodeBase> nodeGuid)
         {
-            _nodeGuidSet.Remove(nodeGuid);
+#if UNITY_EDITOR
+            Undo.RecordObject(this, "Behaviour Tree (RemoveNodeGuidToGroup)");
+            
+            nodeGuid.ForEach(node => _nodeGuidSet.Remove(node.guid));
+            
+            EditorUtility.SetDirty(this);
+#endif
         }
     }
 }

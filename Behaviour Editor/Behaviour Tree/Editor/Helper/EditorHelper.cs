@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -50,6 +51,19 @@ namespace BehaviourSystemEditor.BT
             {
                 action.Invoke(element);
             }
+        }
+        
+        
+        public static List<TOutput> ConvertAll<TInput, TOutput>(this IEnumerable<TInput> array, Func<TInput, TOutput> converter)
+        {
+            List<TOutput> outputList = new List<TOutput>(array.Count());
+
+            foreach (var element in array)
+            {
+                outputList.Add(converter.Invoke(element));
+            }
+            
+            return outputList;
         }
     }
 }

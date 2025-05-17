@@ -50,7 +50,7 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-        public void ChangeBehaviourTree(BehaviourTree tree)
+        public void OnBehaviourTreeChanged(BehaviourTree tree)
         {
             if (tree != null && BehaviourTreeEditor.Instance != null)
             {
@@ -61,7 +61,7 @@ namespace BehaviourSystemEditor.BT
                 this.itemsSource = this._blackboard.properties;
                 this.RefreshItems();
 
-                if (BehaviourTreeEditor.Instance.CanEditTree)
+                if (BehaviourTreeEditor.CanEditTree)
                 {
                     TypeCache.GetTypesDerivedFrom<IBlackboardProperty>()
                              .Where(t => t.IsAbstract == false)
@@ -103,7 +103,7 @@ namespace BehaviourSystemEditor.BT
             Button buttonField = element.Q<Button>("delete-button");
 
             buttonField.clickable = null; //reset all callback
-            buttonField.enabledSelf = BehaviourTreeEditor.Instance.CanEditTree;
+            buttonField.enabledSelf = BehaviourTreeEditor.CanEditTree;
             buttonField.clicked += () => this.DeleteProperty(index);
             imguiField.onGUIHandler = () => this.DrawIMGUIForItem(index);
 
