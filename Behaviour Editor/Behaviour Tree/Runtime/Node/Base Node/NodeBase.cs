@@ -8,6 +8,7 @@ namespace BehaviourSystem.BT
     [Serializable]
     public abstract class NodeBase : ScriptableObject, IEquatable<NodeBase>
     {
+#region Node Enums
         public enum ENodeCallState
         {
             BeforeEnter,
@@ -30,12 +31,13 @@ namespace BehaviourSystem.BT
             Decorator,
             Subset
         };
+        
+#endregion
 
-#if UNITY_EDITOR
-        [HideInInspector]
-        public Vector2 position;
-#endif
-
+        public event Action<NodeBase> onNodeEnter;
+        
+        public event Action<NodeBase> onNodeExit;
+        
         [Tooltip("If debug mode is on, it will log a message.")]
         public bool debugMode = true;
 
@@ -43,6 +45,11 @@ namespace BehaviourSystem.BT
         public string guid;
 
         public string tag;
+        
+#if UNITY_EDITOR
+        [HideInInspector]
+        public Vector2 position;
+#endif
 
         [HideInInspector]
         public NodeBase parent;
@@ -83,6 +90,7 @@ namespace BehaviourSystem.BT
             if (_callState == ENodeCallState.BeforeEnter)
             {
                 this.EnterNode();
+                onNodeEnter?.Invoke(this);
             }
 
             if (this._callState == ENodeCallState.Updating)
@@ -102,6 +110,7 @@ namespace BehaviourSystem.BT
 
             if (this._callState == ENodeCallState.BeforeExit)
             {
+                onNodeExit?.Invoke(this);
                 this.ExitNode();
             }
 

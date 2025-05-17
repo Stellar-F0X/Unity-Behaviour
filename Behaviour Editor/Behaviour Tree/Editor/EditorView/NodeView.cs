@@ -19,7 +19,8 @@ namespace BehaviourSystemEditor.BT
             this.style.top = node.position.y;
 
             _nodeBorder = this.Q<VisualElement>("node-border");
-            
+            _lastRenderedNodeCount = node.callCount;
+
             if (Application.isPlaying)
             {
                 _nodeBorder.style.borderTopColor = BehaviourTreeEditor.Settings.nodeDisappearingColor;
@@ -27,7 +28,7 @@ namespace BehaviourSystemEditor.BT
                 _nodeBorder.style.borderLeftColor = BehaviourTreeEditor.Settings.nodeDisappearingColor;
                 _nodeBorder.style.borderRightColor = BehaviourTreeEditor.Settings.nodeDisappearingColor;
             }
-            
+
             this.AddToClassList(node.nodeType.ToString().ToLower());
             this.CreatePorts();
         }
@@ -91,7 +92,6 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-
         private void SetupPort(Port port, string portName, FlexDirection direction, VisualElement container)
         {
             if (port != null)
@@ -139,9 +139,8 @@ namespace BehaviourSystemEditor.BT
         {
             if (Application.isPlaying)
             {
-                if (node.callCount != _lastRenderedNodeCount)
+                if (node.callCount > _lastRenderedNodeCount)
                 {
-                    toParentEdge?.BringToFront();
                     _lastRenderedNodeCount = node.callCount;
                     _minimumStayTime = BehaviourTreeEditor.Settings.minimumFocusingDuration;
                 }
@@ -149,7 +148,6 @@ namespace BehaviourSystemEditor.BT
                 if (_minimumStayTime > 0f)
                 {
                     _elapsedTime = Mathf.Min(_elapsedTime + Time.deltaTime, BehaviourTreeEditor.Settings.minimumFocusingDuration);
-                    
                     _minimumStayTime = Mathf.Max(_minimumStayTime - Time.deltaTime, 0f);
                 }
                 else if (Mathf.Approximately(this._elapsedTime, 0f))
@@ -161,7 +159,7 @@ namespace BehaviourSystemEditor.BT
                     _elapsedTime = Mathf.Max(_elapsedTime - Time.deltaTime, 0f);
                 }
 
-                float progress = Mathf.InverseLerp(0f, BehaviourTreeEditor.Settings.minimumFocusingDuration, this._elapsedTime);
+                float progress = this._elapsedTime / BehaviourTreeEditor.Settings.minimumFocusingDuration;
 
                 Color borderColor = Color.Lerp(BehaviourTreeEditor.Settings.nodeDisappearingColor, BehaviourTreeEditor.Settings.nodeAppearingColor, progress);
                 Color portColor = Color.Lerp(BehaviourTreeEditor.Settings.portDisappearingColor, BehaviourTreeEditor.Settings.portAppearingColor, progress);

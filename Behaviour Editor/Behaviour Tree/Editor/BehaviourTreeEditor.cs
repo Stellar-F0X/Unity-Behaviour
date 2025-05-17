@@ -138,15 +138,16 @@ namespace BehaviourSystemEditor.BT
             rootVisualElement.styleSheets.Add(Settings.behaviourTreeStyle);
 
             Instance = this;
-            _inspectorView = rootVisualElement.Q<InspectorView>();
+            
             _treeView = rootVisualElement.Q<BehaviourTreeView>();
+            _inspectorView = rootVisualElement.Q<InspectorView>();
+            
             _blackboardProp = rootVisualElement.Q<BlackboardPropertyListView>();
-
+            _blackboardProp.Setup(rootVisualElement.Q<ToolbarMenu>("add-element-button"));
+            
             _treeView.popupSearchField = rootVisualElement.Q<ToolbarPopupSearchField>("search-node-field");
             _treeView.popupSearchField.RegisterValueChangedCallback(_treeView.SearchNodeByNameOrTag);
             _treeView.onNodeSelected += _inspectorView.UpdateSelection;
-
-            this._blackboardProp.Setup(rootVisualElement.Q<ToolbarMenu>("add-element-button"));
 
             this.OnSelectionChange();
         }

@@ -39,7 +39,7 @@ namespace BehaviourSystemEditor.BT
                 AssetDatabase.SaveAssets();
             };
         }
-        
+
         public Action<NodeView> onNodeSelected;
         public ToolbarPopupSearchField popupSearchField;
 
@@ -56,6 +56,8 @@ namespace BehaviourSystemEditor.BT
 
             nodes.ForEach(n => n.RemoveFromHierarchy());
             edges.ForEach(e => e.RemoveFromHierarchy());
+
+            Debug.Break();
         }
 
 
@@ -166,7 +168,9 @@ namespace BehaviourSystemEditor.BT
         {
             graphViewChanged -= this.OnGraphViewChanged;
             this.deleteSelection -= this.OnDeleteSelectionElements;
+
             base.DeleteElements(base.graphElements);
+
             graphViewChanged += this.OnGraphViewChanged;
             this.deleteSelection += this.OnDeleteSelectionElements;
         }
@@ -186,8 +190,7 @@ namespace BehaviourSystemEditor.BT
             //트리 구조라서 미리 모두 생성해둬야 자식과 부모를 연결 할 수 있음.
             tree.nodeSet.nodeList.ForEach(n => this.RecreateNodeViewOnLoad(n));
             tree.nodeSet.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.nodeSet.GetChildren(n)));
-
-            tree.groupDataSet?.dataList?.ForEach(this.RecreateNodeGroupViewOnLoad);
+            tree.groupDataSet?.dataList.ForEach(d => this.RecreateNodeGroupViewOnLoad(d));
         }
 
 
@@ -199,10 +202,10 @@ namespace BehaviourSystemEditor.BT
                 {
                     switch (element)
                     {
-                        case Edge edge: this._nodeEdgeHandler.DeleteEdges(_tree, edge); break; 
+                        case Edge edge: this._nodeEdgeHandler.DeleteEdges(_tree, edge); break;
 
                         case NodeView nodeView: this._tree.nodeSet.DeleteNode(nodeView.node); break;
-                        
+
                         case NodeGroupView groupView: this._tree.groupDataSet.DeleteGroupData(groupView.data); break;
                     }
                 }
@@ -220,15 +223,15 @@ namespace BehaviourSystemEditor.BT
 
             return graphViewChange;
         }
-        
-        
+
+
         private void OnDeleteSelectionElements(string operationName, AskUser user)
         {
             if (BehaviourTreeEditor.Instance.CanEditTree == false)
             {
                 return;
             }
-            
+
             for (int i = 0; i < selection.Count; ++i)
             {
                 if (selection[i] is NodeView view && view.node.nodeType == NodeBase.ENodeType.Root)
@@ -258,11 +261,11 @@ namespace BehaviourSystemEditor.BT
         {
             NodeGroupView nodeGroupView = new NodeGroupView(_tree.groupDataSet, data);
             nodeGroupView.SetPosition(new Rect(data.position, Vector2.zero));
-            nodeGroupView.title = data.title;
-            base.AddElement(nodeGroupView);
 
             nodes.Where(n => n is NodeView v && data.Contains(v.node.guid))
                  .ForEach(filteredNode => nodeGroupView.AddElement(filteredNode));
+
+            base.AddElement(nodeGroupView);
         }
 
 

@@ -14,29 +14,28 @@ namespace BehaviourSystemEditor.BT
         public void ClearInspectorView()
         {
             base.Clear();
+            this._editor = null;
             Object.DestroyImmediate(_editor);
-            _editor = null;
         }
 
 
         public void UpdateSelection(NodeView view)
         {
             base.Clear();
-
-            Object.DestroyImmediate(_editor);
-            _editor = Editor.CreateEditor(view.node);
+            Object.DestroyImmediate(this._editor);
+            this._editor = Editor.CreateEditor(view.node);
             base.Add(new IMGUIContainer(DrawInspectorGUI));
         }
 
 
         private void DrawInspectorGUI()
         {
-            if (_editor.target == null)
+            if (this._editor.target is null || this._editor.serializedObject.targetObject is null)
             {
                 return;
             }
-
-            _editor?.OnInspectorGUI();
+            
+            this._editor.OnInspectorGUI();
         }
     }
 }

@@ -8,13 +8,17 @@ namespace BehaviourSystemEditor.BT
 {
     public class NodeGroupView : Group
     {
-        public NodeGroupView(GroupDataSet set, GroupData dataContainer)
+        public NodeGroupView(GroupDataSet dataSet, GroupData dataContainer)
         {
-            this._groupDataSet = set;
+            this.style.top = dataContainer.position.y;
+            this.style.left = dataContainer.position.x;
+            this.title = dataContainer.title;
+
             this._data = dataContainer;
+            this._groupDataDataSet = dataSet;
         }
 
-        private readonly GroupDataSet _groupDataSet;
+        private readonly GroupDataSet _groupDataDataSet;
         private readonly GroupData _data;
 
 
@@ -29,7 +33,7 @@ namespace BehaviourSystemEditor.BT
             Undo.RecordObject(_data, "Behaviour Tree (NodeGroupViewNameChanged)");
             base.OnGroupRenamed(oldName, newName);
             _data.title = newName;
-            EditorUtility.SetDirty(_groupDataSet);
+            EditorUtility.SetDirty(_groupDataDataSet);
         }
 
 
@@ -43,12 +47,12 @@ namespace BehaviourSystemEditor.BT
                 Undo.RecordObject(_data, "Behaviour Tree (NodeGroupViewPositionChanged)");
             }
 
-            base.SetScopePositionOnly(newPos);
             _data.position = newPos.position;
+            base.SetScopePositionOnly(newPos);
 
             if (_data.count == 0)
             {
-                EditorUtility.SetDirty(_groupDataSet);
+                EditorUtility.SetDirty(_groupDataDataSet);
             }
         }
 
@@ -61,12 +65,9 @@ namespace BehaviourSystemEditor.BT
 
                 foreach (GraphElement node in elements)
                 {
-                    if (node.selected && node is NodeView view)
+                    if (node.selected && node is NodeView view && string.IsNullOrEmpty(view.node.guid) == false && _data.Contains(view.node.guid) == false)
                     {
-                        if (_data.Contains(view.node.guid) == false && string.IsNullOrEmpty(view.node.guid) == false)
-                        {
-                            _data.AddNodeGuid(view.node.guid);
-                        }
+                        _data.AddNodeGuid(view.node.guid);
                     }
                 }
 
@@ -83,12 +84,9 @@ namespace BehaviourSystemEditor.BT
 
                 foreach (GraphElement node in elements)
                 {
-                    if (node.selected && node is NodeView view)
+                    if (node.selected && node is NodeView view && string.IsNullOrEmpty(view.node.guid) == false && _data.Contains(view.node.guid))
                     {
-                        if (_data.Contains(view.node.guid) && string.IsNullOrEmpty(view.node.guid) == false)
-                        {
-                            _data.RemoveNodeGuid(view.node.guid);
-                        }
+                        _data.RemoveNodeGuid(view.node.guid);
                     }
                 }
 

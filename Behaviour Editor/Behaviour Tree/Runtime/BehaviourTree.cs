@@ -23,34 +23,22 @@ namespace BehaviourSystem.BT
         [HideInInspector]
         public GroupDataSet groupDataSet;
 
-        [SerializeField, ReadOnly, Tooltip("개별 트리를 구분하기 위한 고유 ID")]
-        private string _specificGuid;
 
-        [SerializeField, ReadOnly, Tooltip("복제 트리를 구분하기 위한 GUID")]
-        private string _cloneGroupID;
-
-
-        private string specificGuid
+        [field: SerializeField, ReadOnly]
+        public string treeGuid
         {
-            get { return _specificGuid; }
-        }
-
-        public string cloneGroupID
-        {
-            get { return _cloneGroupID; }
+            get;
+            internal set;
         }
 
 
-        #region Make Runtime Tree
+#region Make Runtime Tree
 
         public static BehaviourTree MakeRuntimeTree(BehaviourActor actor, BehaviourTree targetTree)
         {
             if (targetTree != null)
             {
                 BehaviourTree runtimeTree = Instantiate(targetTree);
-
-                runtimeTree._specificGuid = Guid.NewGuid().ToString();
-                runtimeTree._cloneGroupID = targetTree._cloneGroupID;
 
                 runtimeTree.nodeSet = targetTree.nodeSet.Clone(actor);
                 runtimeTree.blackboard = targetTree.blackboard.Clone();
@@ -61,48 +49,7 @@ namespace BehaviourSystem.BT
             return null;
         }
 
-        #endregion
-
-
-        public void Awake()
-        {
-            _cloneGroupID ??= Guid.NewGuid().ToString();
-            _specificGuid ??= Guid.NewGuid().ToString();
-
-#if UNITY_EDITOR
-            if (nodeSet is null)
-            {
-                this.nodeSet = CreateInstance<BehaviourNodeSet>();
-                this.nodeSet.hideFlags = HideFlags.HideInHierarchy;
-                AssetDatabase.AddObjectToAsset(this.nodeSet, this);
-
-                if (this.nodeSet.rootNode is null)
-                {
-                    this.nodeSet.rootNode = this.nodeSet.CreateNode(typeof(RootNode));
-                    EditorUtility.SetDirty(this);
-                }
-
-                AssetDatabase.SaveAssets();
-            }
-
-            if (blackboard is null)
-            {
-                this.blackboard = CreateInstance<Blackboard>();
-                this.blackboard.hideFlags = HideFlags.HideInHierarchy;
-                AssetDatabase.AddObjectToAsset(this.blackboard, this);
-                AssetDatabase.SaveAssets();
-            }
-
-            if (groupDataSet is null)
-            {
-                groupDataSet = CreateInstance<GroupDataSet>();
-                groupDataSet.hideFlags = HideFlags.HideInHierarchy;
-                AssetDatabase.AddObjectToAsset(groupDataSet, this);
-                AssetDatabase.SaveAssets();
-            }
-#endif
-        }
-
+#endregion
 
         public bool Equals(BehaviourTree other)
         {
@@ -111,12 +58,17 @@ namespace BehaviourSystem.BT
                 return false;
             }
 
-            if (this.nodeSet.rootNode.guid == other.nodeSet.rootNode.guid && _specificGuid == other._specificGuid)
+            if (string.CompareOrdinal(this.treeGuid, other.treeGuid) != 0)
             {
-                return true;
+                return false;
             }
 
-            return false;
+            if (string.CompareOrdinal(this.nodeSet.rootNode.guid, other.nodeSet.rootNode.guid) != 0)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
