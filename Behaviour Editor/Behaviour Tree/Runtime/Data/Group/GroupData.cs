@@ -51,8 +51,28 @@ namespace BehaviourSystem.BT
             return _nodeGuidSet.Contains(nodeGuid);
         }
 
+
+        public void ChangeNodePosition(Vector2 newPosition)
+        {
+#if UNITY_EDITOR
+            if (this.containedNodeCount > 0)
+            {
+                position = newPosition;
+            }
+            else
+            {
+                //NodeView도 위치를 Record하는데, GroupView를 움직이면 NodeView도 움직이며 위치가 기록되어 Undo 기록이 중첩됨.
+                //따라서 Group에 요소가 있는 상태로 움직인 후 GroupView가 정상적으로 동작하려면 여러번 Undo해야 되며
+                //또한 NodeView를 기준으로 GroupView 위치가 정해지기 때문에 Group에 요소가 없는 상태일 때만 기록시킴.  
+                Undo.RecordObject(this, "Behaviour Tree (NodeGroupViewPositionChanged)");
+                position = newPosition;
+                EditorUtility.SetDirty(this);
+            }
+#endif
+        }
+
         
-        public void AddNodeGuid(List<NodeBase> nodeGuid)
+        public void AddNodeGuids(List<NodeBase> nodeGuid)
         {
 #if UNITY_EDITOR
             Undo.RecordObject(this, "Behaviour Tree (AddNodeGuidToGroup)");
@@ -64,7 +84,7 @@ namespace BehaviourSystem.BT
         }
 
 
-        public void RemoveNodeGuid(List<NodeBase> nodeGuid)
+        public void RemoveNodeGuids(List<NodeBase> nodeGuid)
         {
 #if UNITY_EDITOR
             Undo.RecordObject(this, "Behaviour Tree (RemoveNodeGuidToGroup)");

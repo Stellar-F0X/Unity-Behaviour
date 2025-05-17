@@ -41,38 +41,35 @@ namespace BehaviourSystemEditor.BT
 
         protected override void SetScopePositionOnly(Rect newPos)
         {
-            //NodeView도 위치를 Record하는데, GroupView를 움직이면 NodeView도 움직이며 위치가 기록되어 Undo 기록이 중첩됨.
-            //따라서 Group에 요소가 있는 상태로 움직인 후 GroupView가 정상적으로 동작하려면 여러번 Undo해야 되므로
-            //또한 NodeView를 기준으로 GroupView 위치가 정해지기 때문에 Group에 요소가 없는 상태일 때만 기록시킴.  
-            if (_data.containedNodeCount == 0)
-            {
-                Undo.RecordObject(_data, "Behaviour Tree (NodeGroupViewPositionChanged)");
-            }
-
-            _data.position = newPos.position;
+            this._data.ChangeNodePosition(newPos.position);
             base.SetScopePositionOnly(newPos);
-
-            if (_data.containedNodeCount == 0)
-            {
-                EditorUtility.SetDirty(_groupDataDataSet);
-            }
         }
 
 
         protected override void OnElementsAdded(IEnumerable<GraphElement> elements)
         {
-            if (BehaviourTreeEditor.Instance != null && BehaviourTreeEditor.CanEditTree && BehaviourTreeEditor.isInLoadingBTAsset == false && _data != null)
+            if (BehaviourTreeEditor.Instance == null || _data == null)
             {
-                _data.AddNodeGuid(elements.Where(x => x.selected && x is NodeView).ConvertAll(x => ((NodeView)x).node));
+                return;
+            }
+
+            if (BehaviourTreeEditor.CanEditTree && BehaviourTreeEditor.isInLoadingBTAsset == false)
+            {
+                _data.AddNodeGuids(elements.Where(x => x.selected && x is NodeView).ConvertAll(x => ((NodeView)x).node));
             }
         }
 
 
         protected override void OnElementsRemoved(IEnumerable<GraphElement> elements)
         {
-            if (BehaviourTreeEditor.Instance != null && BehaviourTreeEditor.CanEditTree && BehaviourTreeEditor.isInLoadingBTAsset == false && _data != null)
+            if (BehaviourTreeEditor.Instance == null || _data == null)
             {
-                _data.RemoveNodeGuid(elements.Where(x => x.selected && x is NodeView).ConvertAll(x => ((NodeView)x).node));
+                return;
+            }
+
+            if (BehaviourTreeEditor.CanEditTree && BehaviourTreeEditor.isInLoadingBTAsset == false)
+            {
+                _data.RemoveNodeGuids(elements.Where(x => x.selected && x is NodeView).ConvertAll(x => ((NodeView)x).node));
             }
         }
     }

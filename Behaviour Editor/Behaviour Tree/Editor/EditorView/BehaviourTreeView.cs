@@ -32,12 +32,6 @@ namespace BehaviourSystemEditor.BT
 
             _nodeEdgeHandler = new NodeEdgeHandler();
             _nodeSearchHelper = new NodeSearchHelper();
-
-            Undo.undoRedoPerformed = () =>
-            {
-                this.OnGraphEditorView(_tree);
-                AssetDatabase.SaveAssets();
-            };
         }
 
         public Action<NodeView> onNodeSelected;
@@ -52,12 +46,7 @@ namespace BehaviourSystemEditor.BT
         public void ClearEditorView()
         {
             graphViewChanged -= OnGraphViewChanged;
-            DeleteElements(graphElements);
-
-            nodes.ForEach(n => n.RemoveFromHierarchy());
-            edges.ForEach(e => e.RemoveFromHierarchy());
-
-            Debug.Break();
+            base.DeleteElements(graphElements);
         }
 
 
@@ -66,8 +55,28 @@ namespace BehaviourSystemEditor.BT
             if (tree is not null)
             {
                 this._tree = tree;
-                this.Initialize(tree);
-                this.IntegrityCheckAndCreateElements(tree);
+                
+                graphViewChanged -= this.OnGraphViewChanged;
+                this.deleteSelection -= this.OnDeleteSelectionElements;
+
+                base.DeleteElements(base.graphElements);
+
+                graphViewChanged += this.OnGraphViewChanged;
+                this.deleteSelection += this.OnDeleteSelectionElements;
+                
+                for (int i = 0; i < tree.nodeSet.nodeList.Count; ++i)
+                {
+                    //Undo로 생성이 취소된 노드를 여기서 처리.
+                    if (tree.nodeSet.nodeList[i] is null)
+                    {
+                        tree.nodeSet.nodeList.RemoveAt(i);
+                    }
+                }
+
+                //트리 구조라서 미리 모두 생성해둬야 자식과 부모를 연결 할 수 있음.
+                tree.nodeSet.nodeList.ForEach(n => this.RecreateNodeViewOnLoad(n));
+                tree.groupDataSet?.dataList.ForEach(d => this.RecreateNodeGroupViewOnLoad(d));
+                tree.nodeSet.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.nodeSet.GetChildren(n)));
             }
         }
 
@@ -124,7 +133,7 @@ namespace BehaviourSystemEditor.BT
                 base.AddToSelection(nodeView);
             }
         }
-
+        
 
         public NodeView CreateNewNodeAndView(Type type, Vector2 mousePosition)
         {
@@ -132,7 +141,6 @@ namespace BehaviourSystemEditor.BT
             node.position = mousePosition;
             return this.RecreateNodeViewOnLoad(node);
         }
-
 
 
         public NodeGroupView CreateNewNodeGroupView(string title, Vector2 position)
@@ -149,7 +157,6 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-
         public void UpdateNodeView()
         {
             int length = nodes.Count();
@@ -161,36 +168,6 @@ namespace BehaviourSystemEditor.BT
                     nodeView.UpdateView();
                 }
             }
-        }
-
-
-        private void Initialize(BehaviourTree tree)
-        {
-            graphViewChanged -= this.OnGraphViewChanged;
-            this.deleteSelection -= this.OnDeleteSelectionElements;
-
-            base.DeleteElements(base.graphElements);
-
-            graphViewChanged += this.OnGraphViewChanged;
-            this.deleteSelection += this.OnDeleteSelectionElements;
-        }
-
-
-        private void IntegrityCheckAndCreateElements(BehaviourTree tree)
-        {
-            for (int i = 0; i < tree.nodeSet.nodeList.Count; ++i)
-            {
-                //Undo로 생성이 취소된 노드를 여기서 처리.
-                if (tree.nodeSet.nodeList[i] is null)
-                {
-                    tree.nodeSet.nodeList.RemoveAt(i);
-                }
-            }
-
-            //트리 구조라서 미리 모두 생성해둬야 자식과 부모를 연결 할 수 있음.
-            tree.nodeSet.nodeList.ForEach(n => this.RecreateNodeViewOnLoad(n));
-            tree.groupDataSet?.dataList.ForEach(d => this.RecreateNodeGroupViewOnLoad(d));
-            tree.nodeSet.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.nodeSet.GetChildren(n)));
         }
 
 
