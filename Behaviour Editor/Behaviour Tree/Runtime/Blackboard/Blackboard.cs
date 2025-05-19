@@ -35,7 +35,7 @@ namespace BehaviourSystem.BT
         {
             foreach (IBlackboardProperty prop in properties)
             {
-                if (string.CompareOrdinal(prop.key, key) == 0)
+                if (string.Compare(prop.key, key) == 0)
                 {
                     return prop;
                 }

@@ -92,6 +92,8 @@ namespace BehaviourSystemEditor.BT
 
             Undo.undoRedoPerformed -= this.BehaviourEditorUndoPerformed;
             Undo.undoRedoPerformed += this.BehaviourEditorUndoPerformed;
+
+            EditorApplication.update -= this.RuntimeUpdate;
         }
 
 
@@ -100,6 +102,8 @@ namespace BehaviourSystemEditor.BT
             EditorApplication.playModeStateChanged -= this.OnPlayNodeStateChanged;
             
             Undo.undoRedoPerformed -= this.BehaviourEditorUndoPerformed;
+            
+            EditorApplication.update -= this.RuntimeUpdate;
         }
 
 
@@ -123,10 +127,10 @@ namespace BehaviourSystemEditor.BT
                 EditorApplication.delayCall += this.OnSelectionChange;
             }
         }
+        
+        
 
-
-
-        private void Update()
+        private void RuntimeUpdate()
         {
             if (Application.isPlaying == false)
             {
@@ -137,7 +141,7 @@ namespace BehaviourSystemEditor.BT
             {
                 return;
             }
-
+            
             _treeView.UpdateNodeView();
         }
 
@@ -177,9 +181,15 @@ namespace BehaviourSystemEditor.BT
         {
             switch (state)
             {
-                case PlayModeStateChange.EnteredEditMode: this.OnSelectionChange(); break;
+                case PlayModeStateChange.EnteredEditMode: 
+                    EditorApplication.update -= this.RuntimeUpdate;
+                    this.OnSelectionChange();
+                    break;
 
-                case PlayModeStateChange.EnteredPlayMode: this.OnSelectionChange(); break;
+                case PlayModeStateChange.EnteredPlayMode: 
+                    EditorApplication.update += this.RuntimeUpdate;
+                    this.OnSelectionChange(); 
+                    break;
             }
         }
 

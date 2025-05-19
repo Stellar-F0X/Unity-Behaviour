@@ -6,7 +6,7 @@ namespace BehaviourSystem.BT
     {
         public float duration = 1f;
         private float _startTime;
-
+        
         protected override void OnEnter()
         {
             _startTime = Time.time;

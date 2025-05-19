@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using System.Linq;
+using System.Reflection;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace BehaviourSystem.BT
 {
@@ -43,6 +43,39 @@ namespace BehaviourSystem.BT
                 runtimeTree.nodeSet = targetTree.nodeSet.Clone(actor);
                 runtimeTree.blackboard = targetTree.blackboard.Clone();
                 runtimeTree.groupDataSet = targetTree.groupDataSet.Clone();
+
+                foreach (var nodeBase in runtimeTree.nodeSet.nodeList)
+                {
+                    Type nodeType = nodeBase.GetType();
+
+                    if (ReflectionHelper.FieldCacher.TryGetValue(nodeType, out FieldInfo[] infos) == false)
+                    {
+                        infos = nodeType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                        .Where(f => typeof(IBlackboardProperty).IsAssignableFrom(f.FieldType))
+                                        .ToArray();
+
+                        ReflectionHelper.FieldCacher[nodeType] = infos;
+                    }
+
+                    foreach (var info in infos)
+                    {
+                        if (typeof(IBlackboardProperty).IsAssignableFrom(info.FieldType))
+                        {
+                            ReflectionHelper.FieldAccessor accessor = ReflectionHelper.GetAccessor(info);
+
+                            if (accessor.getter(nodeBase) is IBlackboardProperty property)
+                            {
+                                IBlackboardProperty foundProperty = runtimeTree.blackboard.FindProperty(property.key);
+
+                                if (foundProperty != null)
+                                {
+                                    accessor.setter(nodeBase, foundProperty);
+                                }
+                            }
+                        }
+                    }
+                }
+
                 return runtimeTree;
             }
 
@@ -50,6 +83,7 @@ namespace BehaviourSystem.BT
         }
 
 #endregion
+
 
         public bool Equals(BehaviourTree other)
         {

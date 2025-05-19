@@ -42,9 +42,9 @@ namespace BehaviourSystemEditor.BT
             this._blackboard = null;
             this._serializedObject = null;
             this._serializedListProperty = null;
-            
+
             _propertyAddMenu.menu.ClearItems();
-            
+
             this.Clear();
             this.RefreshItems();
         }
@@ -105,7 +105,18 @@ namespace BehaviourSystemEditor.BT
             buttonField.clickable = null; //reset all callback
             buttonField.enabledSelf = BehaviourTreeEditor.CanEditTree;
             buttonField.clicked += () => this.DeleteProperty(index);
-            imguiField.onGUIHandler = () => this.DrawIMGUIForItem(index);
+
+
+            SerializedProperty elementProperty = _serializedListProperty.GetArrayElementAtIndex(index);
+            SerializedProperty valueProp = elementProperty.FindPropertyRelative("_value");
+
+            if (elementProperty?.boxedValue != null && valueProp != null)
+            {
+                imguiField.Unbind();
+                imguiField.TrackPropertyValue(valueProp, _ => imguiField.MarkDirtyRepaint());
+                imguiField.onGUIHandler = () => this.DrawIMGUIForItem(elementProperty);
+            }
+
 
             if (keyField.userData != null)
             {
@@ -120,15 +131,8 @@ namespace BehaviourSystemEditor.BT
         }
 
 
-        private void DrawIMGUIForItem(int index)
+        private void DrawIMGUIForItem(SerializedProperty property)
         {
-            if (_serializedListProperty.arraySize <= index)
-            {
-                return;
-            }
-
-            SerializedProperty property = _serializedListProperty.GetArrayElementAtIndex(index);
-
             if (property.boxedValue == null)
             {
                 return;
@@ -157,9 +161,12 @@ namespace BehaviourSystemEditor.BT
 
         private void OnPropertyIndicesSwapped(int a, int b)
         {
-            _serializedObject.Update();
-            _serializedObject.ApplyModifiedProperties();
-            EditorUtility.SetDirty(_blackboard);
+            if (BehaviourTreeEditor.CanEditTree)
+            {
+                _serializedObject.Update();
+                _serializedObject.ApplyModifiedProperties();
+                EditorUtility.SetDirty(_blackboard);
+            }
         }
     }
 }

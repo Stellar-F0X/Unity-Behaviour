@@ -146,7 +146,7 @@ namespace BehaviourSystem.BT
                 }
             }
 
-            throw new Exception($"Blackboard property with key '{key}' was not found.");
+            Debug.LogWarning($"Blackboard property with key '{key}' was not found.");
         }
 
 
@@ -170,7 +170,8 @@ namespace BehaviourSystem.BT
                 }
             }
 
-            throw new Exception($"Blackboard property with key '{key}' was not found.");
+            Debug.LogWarning($"Blackboard property with key '{key}' was not found.");
+            return default;
         }
     }
 }

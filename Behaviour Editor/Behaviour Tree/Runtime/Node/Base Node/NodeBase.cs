@@ -38,10 +38,8 @@ namespace BehaviourSystem.BT
         
         public event Action<NodeBase> onNodeExit;
         
-        [Tooltip("If debug mode is on, it will log a message.")]
-        public bool debugMode = true;
 
-        [ReadOnly]
+        [HideInInspector]
         public string guid;
 
         public string tag;

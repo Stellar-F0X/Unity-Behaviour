@@ -286,8 +286,9 @@ namespace BehaviourSystemEditor.BT
                     });
                 }
 
-                EditorApplication.delayCall -= popupSearchField.ShowMenu;
-                EditorApplication.delayCall += popupSearchField.ShowMenu;
+                popupSearchField.schedule
+                                .Execute(_ => popupSearchField.ShowMenu())
+                                .ExecuteLater(100);
             }
         }
     }

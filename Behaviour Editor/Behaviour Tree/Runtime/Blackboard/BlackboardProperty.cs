@@ -34,9 +34,9 @@ namespace BehaviourSystem.BT
             set { _type = value; }
         }
 
-        public abstract EConditionType comparableConditions
+        public virtual EConditionType comparableConditions
         {
-            get;
+            get { return EConditionType.None; }
         }
 
         public void OnBeforeSerialize()
@@ -68,7 +68,10 @@ namespace BehaviourSystem.BT
 
             return newProperty;
         }
-        
-        public abstract int CompareTo(IBlackboardProperty other);
+
+        public virtual int CompareTo(IBlackboardProperty other)
+        {
+            return -1;
+        }
     }
 }

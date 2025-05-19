@@ -1,0 +1,105 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using BehaviourSystem.BT;
+using UnityEditor;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
+
+namespace BehaviourSystemEditor.BT
+{
+    [CustomPropertyDrawer(typeof(BlackboardProperty<>))]
+    public class BlackboardPropertyDrawer : PropertyDrawer
+    {
+        private const BindingFlags _BINDING_FLAG = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            if (BehaviourTreeEditor.Instance is null)
+            {
+                return;
+            }
+
+            Blackboard blackboard = BehaviourTreeEditor.Instance.Tree.blackboard;
+
+            bool exception = blackboard is null || blackboard.properties is null || blackboard.properties.Count == 0;
+
+            if (exception == false && this.GetProperties(blackboard, property, out List<IBlackboardProperty> properties))
+            {
+                if (property.boxedValue is null)
+                {
+                    property.boxedValue = properties.First();
+                }
+
+                SerializedProperty keyProp = property.FindPropertyRelative("_key");
+                string[] keyNames = properties.ConvertAll(key => key.key).ToArray();
+                int selectedIndex = string.IsNullOrEmpty(keyProp.stringValue) ? 0 : Array.IndexOf(keyNames, keyProp.stringValue);
+                selectedIndex = Mathf.Clamp(selectedIndex, 0, keyNames.Length - 1);
+
+                float width = EditorGUIUtility.labelWidth;
+                float height = EditorGUIUtility.singleLineHeight;
+
+                Rect labelRect = new Rect(position.x, position.y, width, height);
+                Rect fieldRect = new Rect(position.x + width, position.y, position.width - width, height);
+                
+                using (new EditorGUI.PropertyScope(position, label, property))
+                {
+                    using (new EditorGUI.DisabledScope(BehaviourTreeEditor.CanEditTree == false))
+                    {
+                        EditorGUI.PrefixLabel(labelRect, label);
+                        selectedIndex = EditorGUI.Popup(fieldRect, selectedIndex, keyNames);
+                        property.boxedValue = properties[selectedIndex];
+                    }
+                }
+
+                property.serializedObject.ApplyModifiedProperties();
+            }
+            else
+            {
+                using (new EditorGUI.PropertyScope(position, label, property))
+                {
+                    GUIContent warningIcon = EditorGUIUtility.IconContent("console.warnicon");
+                    EditorGUI.LabelField(position, new GUIContent("No blackboard properties found.", warningIcon.image));
+                }
+            }
+        }
+
+
+        private bool GetProperties(Blackboard blackboard, SerializedProperty property, out List<IBlackboardProperty> properties)
+        {
+            if (property.serializedObject.targetObject == null)
+            {
+                properties = null;
+                return false;
+            }
+
+            //TODO: 한번 할당되면 property.boxedValue에 아마 객체 메모리가 생겼을테니, FindPropertyRelative로 TypeName을 가져오자.
+            FieldInfo info = property.serializedObject.targetObject.GetType()?.GetField(property.name, _BINDING_FLAG);
+
+            properties = new List<IBlackboardProperty>();
+
+            if (info is not null)
+            {
+                for (int i = 0; i < blackboard.properties.Count; i++)
+                {
+                    if (string.IsNullOrEmpty(blackboard.properties[i].key))
+                    {
+                        continue;
+                    }
+
+                    Type propertyType = blackboard.properties[i].GetType();
+
+                    if (propertyType.IsSubclassOf(info.FieldType))
+                    {
+                        properties.Add(blackboard.properties[i]);
+                    }
+                }
+            }
+
+            return properties.Count > 0;
+        }
+    }
+}
