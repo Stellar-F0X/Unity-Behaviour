@@ -29,8 +29,10 @@ namespace BehaviourSystemEditor.BT
             {
                 if (_serializedObject != null)
                 {
-                    this.RefreshItems();
                     _serializedObject.Update();
+                    _serializedObject.ApplyModifiedProperties();
+                    
+                    this.RefreshItems();
                 }
             };
         }
@@ -98,6 +100,11 @@ namespace BehaviourSystemEditor.BT
         //아이템이 추가, 제거, 순서가 변경될 때마다 호출되어 콜백들을 다시 등록하므로 인덱스가 캐싱돼도 문제되지 않는다.
         private void BindItemToList(VisualElement element, int index)
         {
+            if (_serializedListProperty.arraySize <= index)
+            {
+                return;
+            }
+            
             IMGUIContainer imguiField = element.Q<IMGUIContainer>("IMGUIContainer");
             TextField keyField = element.Q<TextField>("name-field");
             Button buttonField = element.Q<Button>("delete-button");
@@ -105,8 +112,7 @@ namespace BehaviourSystemEditor.BT
             buttonField.clickable = null; //reset all callback
             buttonField.enabledSelf = BehaviourTreeEditor.CanEditTree;
             buttonField.clicked += () => this.DeleteProperty(index);
-
-
+            
             SerializedProperty elementProperty = _serializedListProperty.GetArrayElementAtIndex(index);
             SerializedProperty valueProp = elementProperty.FindPropertyRelative("_value");
 
@@ -133,6 +139,11 @@ namespace BehaviourSystemEditor.BT
 
         private void DrawIMGUIForItem(SerializedProperty property)
         {
+            if (property == null)
+            {
+                return;
+            }
+            
             if (property.boxedValue == null)
             {
                 return;
