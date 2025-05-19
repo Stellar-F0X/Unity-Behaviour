@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -28,7 +29,7 @@ namespace BehaviourSystem.BT
             public Setter setter { get; set; }
         }
 
-        public readonly static Dictionary<Type, FieldInfo[]> FieldCacher = new Dictionary<Type, FieldInfo[]>();
+        private readonly static Dictionary<Type, FieldInfo[]> _FieldCacher = new Dictionary<Type, FieldInfo[]>();
 
         private readonly static Lazy<Dictionary<FieldInfo, FieldAccessor>> _DelegateCacher = new Lazy<Dictionary<FieldInfo, FieldAccessor>>(() => new());
 
@@ -36,15 +37,34 @@ namespace BehaviourSystem.BT
 
         private readonly static Type _NodeBaseType = typeof(NodeBase);
 
-        
+        private readonly static Type _PropertyBaseType = typeof(IBlackboardProperty);
+
+
 #if UNITY_EDITOR
         [InitializeOnEnterPlayMode]
         private static void ClearCache()
         {
-            FieldCacher.Clear();
+            _FieldCacher.Clear();
             _DelegateCacher.Value.Clear();
         }
 #endif
+
+
+        public static FieldInfo[] GetCachedFieldInfo(Type type)
+        {
+            if (_FieldCacher.TryGetValue(type, out FieldInfo[] fieldInfos))
+            {
+                return fieldInfos;
+            }
+
+            fieldInfos = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                             .Where(f => _PropertyBaseType.IsAssignableFrom(f.FieldType))
+                             .ToArray();
+
+            _FieldCacher[type] = fieldInfos;
+            return fieldInfos;
+        }
+
 
 
         public static FieldAccessor GetAccessor(FieldInfo fieldInfo)

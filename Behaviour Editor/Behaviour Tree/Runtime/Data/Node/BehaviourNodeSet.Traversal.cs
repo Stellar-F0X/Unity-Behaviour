@@ -19,7 +19,7 @@ namespace BehaviourSystem.BT
         }
 
 
-        public BehaviourNodeSet Clone(BehaviourActor actor)
+        public BehaviourNodeSet Clone(BehaviourTreeRunner treeRunner)
         {
             Stack<TraversalInfo> recursionStack = new Stack<TraversalInfo>();
             BehaviourNodeSet clone = CreateInstance<BehaviourNodeSet>();
@@ -33,7 +33,7 @@ namespace BehaviourSystem.BT
 
                 traversal.clone.name = traversal.clone.name.Remove(traversal.origin.name.Length, 7);
                 traversal.clone.depth = traversal.depth;
-                traversal.clone.actor = actor;
+                traversal.clone.treeRunner = treeRunner;
 
                 clone.nodeList.Add(traversal.clone);
 

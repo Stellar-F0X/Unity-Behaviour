@@ -67,7 +67,7 @@ namespace BehaviourSystemEditor.BT
 
 
         private BehaviourTree _tree;
-        private BehaviourActor _actor;
+        private BehaviourTreeRunner _treeRunner;
 
         private BehaviourTreeView _treeView;
         private InspectorView _inspectorView;
@@ -118,7 +118,7 @@ namespace BehaviourSystemEditor.BT
                 this._treeView?.ClearEditorView();
 
                 CanEditTree = false;
-                this._actor = null;
+                this._treeRunner = null;
                 this._tree = null;
             }
             else
@@ -195,7 +195,7 @@ namespace BehaviourSystemEditor.BT
             {
                 case BehaviourTree treeObj: _tree = treeObj; break;
 
-                case GameObject gameObj: _tree = gameObj.TryGetComponent(out _actor) ? _actor.runtimeTree : null; break;
+                case GameObject gameObj: _tree = gameObj.TryGetComponent(out _treeRunner) ? _treeRunner.runtimeTree : null; break;
 
                 default: return;
             }
@@ -208,7 +208,7 @@ namespace BehaviourSystemEditor.BT
 
                 bool openedEditorWindow = AssetDatabase.CanOpenAssetInEditor(_tree.GetInstanceID());
 
-                if (_actor is not null && Application.isPlaying || openedEditorWindow)
+                if (_treeRunner is not null && Application.isPlaying || openedEditorWindow)
                 {
                     isInLoadingBTAsset = true;
 

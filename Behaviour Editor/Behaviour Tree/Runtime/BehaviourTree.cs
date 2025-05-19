@@ -32,57 +32,49 @@ namespace BehaviourSystem.BT
         }
 
 
-#region Make Runtime Tree
-
-        public static BehaviourTree MakeRuntimeTree(BehaviourActor actor, BehaviourTree targetTree)
+        public static BehaviourTree MakeRuntimeTree(BehaviourTreeRunner treeRunner, BehaviourTree targetTree)
         {
-            if (targetTree != null)
+            if (treeRunner == null)
             {
-                BehaviourTree runtimeTree = Instantiate(targetTree);
+                Debug.LogError("BehaviourActor is null.");
+                return null;
+            }
 
-                runtimeTree.nodeSet = targetTree.nodeSet.Clone(actor);
-                runtimeTree.blackboard = targetTree.blackboard.Clone();
-                runtimeTree.groupDataSet = targetTree.groupDataSet.Clone();
+            if (targetTree == null)
+            {
+                Debug.LogError("BehaviourTree is null.");
+                return null;
+            }
 
-                foreach (var nodeBase in runtimeTree.nodeSet.nodeList)
+            BehaviourTree runtimeTree = Instantiate(targetTree);
+
+            runtimeTree.nodeSet = targetTree.nodeSet.Clone(treeRunner);
+            runtimeTree.blackboard = targetTree.blackboard.Clone();
+            runtimeTree.groupDataSet = targetTree.groupDataSet.Clone();
+
+            foreach (var nodeBase in runtimeTree.nodeSet.nodeList)
+            {
+                foreach (var info in ReflectionHelper.GetCachedFieldInfo(nodeBase.GetType()))
                 {
-                    Type nodeType = nodeBase.GetType();
-
-                    if (ReflectionHelper.FieldCacher.TryGetValue(nodeType, out FieldInfo[] infos) == false)
+                    if (typeof(IBlackboardProperty).IsAssignableFrom(info.FieldType))
                     {
-                        infos = nodeType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                        .Where(f => typeof(IBlackboardProperty).IsAssignableFrom(f.FieldType))
-                                        .ToArray();
+                        ReflectionHelper.FieldAccessor accessor = ReflectionHelper.GetAccessor(info);
 
-                        ReflectionHelper.FieldCacher[nodeType] = infos;
-                    }
-
-                    foreach (var info in infos)
-                    {
-                        if (typeof(IBlackboardProperty).IsAssignableFrom(info.FieldType))
+                        if (accessor.getter(nodeBase) is IBlackboardProperty property)
                         {
-                            ReflectionHelper.FieldAccessor accessor = ReflectionHelper.GetAccessor(info);
+                            IBlackboardProperty foundProperty = runtimeTree.blackboard.FindProperty(property.key);
 
-                            if (accessor.getter(nodeBase) is IBlackboardProperty property)
+                            if (foundProperty != null)
                             {
-                                IBlackboardProperty foundProperty = runtimeTree.blackboard.FindProperty(property.key);
-
-                                if (foundProperty != null)
-                                {
-                                    accessor.setter(nodeBase, foundProperty);
-                                }
+                                accessor.setter(nodeBase, foundProperty);
                             }
                         }
                     }
                 }
-
-                return runtimeTree;
             }
 
-            return null;
+            return runtimeTree;
         }
-
-#endregion
 
 
         public bool Equals(BehaviourTree other)
