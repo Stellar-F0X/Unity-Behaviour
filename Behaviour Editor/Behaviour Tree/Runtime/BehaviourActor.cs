@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -6,6 +5,7 @@ using UnityEngine;
 [assembly: InternalsVisibleTo("BehaviourSystemEditor-BT")]
 namespace BehaviourSystem.BT
 {
+    [DefaultExecutionOrder(-1)]
     public class BehaviourActor : MonoBehaviour
     {
         private readonly Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();

@@ -34,11 +34,6 @@ namespace BehaviourSystem.BT
         
 #endregion
 
-        public event Action<NodeBase> onNodeEnter;
-        
-        public event Action<NodeBase> onNodeExit;
-        
-
         [HideInInspector]
         public string guid;
 
@@ -88,7 +83,6 @@ namespace BehaviourSystem.BT
             if (_callState == ENodeCallState.BeforeEnter)
             {
                 this.EnterNode();
-                onNodeEnter?.Invoke(this);
             }
 
             if (this._callState == ENodeCallState.Updating)
@@ -108,7 +102,6 @@ namespace BehaviourSystem.BT
 
             if (this._callState == ENodeCallState.BeforeExit)
             {
-                onNodeExit?.Invoke(this);
                 this.ExitNode();
             }
 
