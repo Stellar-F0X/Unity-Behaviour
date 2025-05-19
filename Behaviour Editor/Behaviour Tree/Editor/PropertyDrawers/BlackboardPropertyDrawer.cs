@@ -15,6 +15,7 @@ namespace BehaviourSystemEditor.BT
     {
         private const BindingFlags _BINDING_FLAG = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
+        private const float _ICON_SIZE = 12f;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -27,6 +28,12 @@ namespace BehaviourSystemEditor.BT
 
             bool exception = blackboard is null || blackboard.properties is null || blackboard.properties.Count == 0;
 
+            float width = EditorGUIUtility.labelWidth;
+            float height = EditorGUIUtility.singleLineHeight;
+
+            Rect labelRect = new Rect(position.x, position.y, width, height);
+            Rect fieldRect = new Rect(position.x + width, position.y, position.width - width, height);
+            
             if (exception == false && this.GetProperties(blackboard, property, out List<IBlackboardProperty> properties))
             {
                 if (property.boxedValue is null)
@@ -38,12 +45,6 @@ namespace BehaviourSystemEditor.BT
                 string[] keyNames = properties.ConvertAll(key => key.key).ToArray();
                 int selectedIndex = string.IsNullOrEmpty(keyProp.stringValue) ? 0 : Array.IndexOf(keyNames, keyProp.stringValue);
                 selectedIndex = Mathf.Clamp(selectedIndex, 0, keyNames.Length - 1);
-
-                float width = EditorGUIUtility.labelWidth;
-                float height = EditorGUIUtility.singleLineHeight;
-
-                Rect labelRect = new Rect(position.x, position.y, width, height);
-                Rect fieldRect = new Rect(position.x + width, position.y, position.width - width, height);
                 
                 using (new EditorGUI.PropertyScope(position, label, property))
                 {
@@ -61,8 +62,15 @@ namespace BehaviourSystemEditor.BT
             {
                 using (new EditorGUI.PropertyScope(position, label, property))
                 {
-                    GUIContent warningIcon = EditorGUIUtility.IconContent("console.warnicon");
-                    EditorGUI.LabelField(position, new GUIContent("No blackboard properties found.", warningIcon.image));
+                    EditorGUI.PrefixLabel(labelRect, label);
+                    
+                    Rect iconRect = new Rect(fieldRect.x, fieldRect.y + (fieldRect.height - _ICON_SIZE) * 0.5f, _ICON_SIZE, _ICON_SIZE);
+                    Rect textRect = new Rect(fieldRect.x + _ICON_SIZE + 2f, fieldRect.y, fieldRect.width - _ICON_SIZE - 2f, fieldRect.height);
+                    
+                    Texture warningImg = EditorGUIUtility.IconContent("console.warnicon").image;
+                    GUI.DrawTexture(iconRect, warningImg, ScaleMode.ScaleToFit);
+                    
+                    EditorGUI.LabelField(textRect, "No blackboard properties found.");
                 }
             }
         }
