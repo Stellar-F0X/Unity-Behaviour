@@ -131,6 +131,7 @@ namespace BehaviourSystemEditor.BT
             }
 
             keyField.value = ((IBlackboardProperty)itemsSource[index]).key;
+            keyField.enabledSelf = BehaviourTreeEditor.CanEditTree;
             var newCallback = new EventCallback<ChangeEvent<string>>(e => this.OnChangePropertyKey(e.newValue, index));
             keyField.RegisterValueChangedCallback(newCallback);
             keyField.userData = newCallback;

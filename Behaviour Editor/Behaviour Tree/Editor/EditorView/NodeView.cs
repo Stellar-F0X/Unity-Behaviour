@@ -96,8 +96,9 @@ namespace BehaviourSystemEditor.BT
 
         private void SetupPort(Port port, string portName, FlexDirection direction, VisualElement container)
         {
-            if (port != null)
+            if (port is not null)
             {
+                port.pickingMode = BehaviourTreeEditor.CanEditTree ? PickingMode.Position : PickingMode.Ignore;
                 port.style.flexDirection = direction;
                 port.portName = portName;
                 container.Add(port);

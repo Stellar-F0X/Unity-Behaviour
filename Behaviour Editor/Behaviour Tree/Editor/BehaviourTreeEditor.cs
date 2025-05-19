@@ -132,12 +132,7 @@ namespace BehaviourSystemEditor.BT
 
         private void RuntimeUpdate()
         {
-            if (Application.isPlaying == false)
-            {
-                return;
-            }
-
-            if (_actor is null)
+            if (Application.isPlaying == false || _treeRunner is null || _treeRunner.runtimeTree is null)
             {
                 return;
             }
