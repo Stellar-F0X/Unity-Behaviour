@@ -33,6 +33,24 @@ namespace BehaviourSystemEditor.BT
 
             throw new FileNotFoundException($"Asset not found at filter: {searchFilter}");
         }
+        
+        
+        public static string FindAssetPath(string searchFilter)
+        {
+            string[] guids = AssetDatabase.FindAssets(searchFilter);
+            
+            if (guids != null && guids.Length > 0)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+            }
+    
+            throw new FileNotFoundException($"Asset not found at filter: {searchFilter}");
+        }
 
 
         public static void ForEach<T>(this IEnumerable<T> array, Action<T> action)

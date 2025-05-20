@@ -33,7 +33,7 @@ namespace BehaviourSystemEditor.BT
 
             Rect labelRect = new Rect(position.x, position.y, width, height);
             Rect fieldRect = new Rect(position.x + width, position.y, position.width - width, height);
-            
+
             if (exception == false && this.GetProperties(blackboard, property, out List<IBlackboardProperty> properties))
             {
                 if (property.boxedValue is null)
@@ -45,7 +45,7 @@ namespace BehaviourSystemEditor.BT
                 string[] keyNames = properties.ConvertAll(key => key.key).ToArray();
                 int selectedIndex = string.IsNullOrEmpty(keyProp.stringValue) ? 0 : Array.IndexOf(keyNames, keyProp.stringValue);
                 selectedIndex = Mathf.Clamp(selectedIndex, 0, keyNames.Length - 1);
-                
+
                 using (new EditorGUI.PropertyScope(position, label, property))
                 {
                     using (new EditorGUI.DisabledScope(BehaviourTreeEditor.CanEditTree == false))
@@ -63,13 +63,13 @@ namespace BehaviourSystemEditor.BT
                 using (new EditorGUI.PropertyScope(position, label, property))
                 {
                     EditorGUI.PrefixLabel(labelRect, label);
-                    
+
                     Rect iconRect = new Rect(fieldRect.x, fieldRect.y + (fieldRect.height - _ICON_SIZE) * 0.5f, _ICON_SIZE, _ICON_SIZE);
                     Rect textRect = new Rect(fieldRect.x + _ICON_SIZE + 2f, fieldRect.y, fieldRect.width - _ICON_SIZE - 2f, fieldRect.height);
-                    
+
                     Texture warningImg = EditorGUIUtility.IconContent("console.warnicon").image;
                     GUI.DrawTexture(iconRect, warningImg, ScaleMode.ScaleToFit);
-                    
+
                     EditorGUI.LabelField(textRect, "No blackboard properties found.");
                 }
             }
@@ -84,30 +84,51 @@ namespace BehaviourSystemEditor.BT
                 return false;
             }
 
-            //TODO: 한번 할당되면 property.boxedValue에 아마 객체 메모리가 생겼을테니, FindPropertyRelative로 TypeName을 가져오자.
-            FieldInfo info = property.serializedObject.targetObject.GetType()?.GetField(property.name, _BINDING_FLAG);
+            Type targetType = this.GetPropertyType(property);
 
+            if (targetType == null)
+            {
+                properties = null;
+                return false;
+            }
+            
             properties = new List<IBlackboardProperty>();
 
-            if (info is not null)
+            for (int i = 0; i < blackboard.properties.Count; i++)
             {
-                for (int i = 0; i < blackboard.properties.Count; i++)
+                if (string.IsNullOrEmpty(blackboard.properties[i].key))
                 {
-                    if (string.IsNullOrEmpty(blackboard.properties[i].key))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    Type propertyType = blackboard.properties[i].GetType();
+                Type propertyType = blackboard.properties[i].type;
 
-                    if (propertyType.IsSubclassOf(info.FieldType))
-                    {
-                        properties.Add(blackboard.properties[i]);
-                    }
+                if (propertyType.IsAssignableFrom(targetType))
+                {
+                    properties.Add(blackboard.properties[i]);
                 }
             }
 
             return properties.Count > 0;
+        }
+
+
+
+        private Type GetPropertyType(SerializedProperty property)
+        {
+            if (property.boxedValue is IBlackboardProperty castedProperty && castedProperty.type != null)
+            {
+                return castedProperty.type;
+            }
+
+            FieldInfo info = property.serializedObject.targetObject.GetType()?.GetField(property.name, _BINDING_FLAG);
+
+            if (info is not null)
+            {
+                return info.FieldType;
+            }
+
+            return null;
         }
     }
 }

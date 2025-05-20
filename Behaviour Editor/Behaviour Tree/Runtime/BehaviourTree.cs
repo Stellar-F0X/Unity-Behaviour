@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 using UnityEngine;
 
 namespace BehaviourSystem.BT
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(fileName = "Behaviour Tree", menuName = "Behaviour Tree/Tree Asset")]
     public sealed class BehaviourTree : ScriptableObject, IEquatable<BehaviourTree>
     {
         [HideInInspector]

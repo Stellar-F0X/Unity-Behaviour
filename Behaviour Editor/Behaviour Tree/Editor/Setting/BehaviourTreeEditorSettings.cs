@@ -3,7 +3,6 @@ using UnityEngine.UIElements;
 
 namespace BehaviourSystemEditor.BT
 {
-    [CreateAssetMenu]
     public class BehaviourTreeEditorSettings : ScriptableObject
     {
         [Header("Grid Options")]
