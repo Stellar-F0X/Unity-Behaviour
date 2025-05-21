@@ -40,31 +40,9 @@ namespace BehaviourSystem.BT
 
             BehaviourTree runtimeTree = Instantiate(targetTree);
 
-            runtimeTree.nodeSet = targetTree.nodeSet.Clone(treeRunner);
             runtimeTree.blackboard = targetTree.blackboard.Clone();
             runtimeTree.groupDataSet = targetTree.groupDataSet.Clone();
-
-            foreach (var nodeBase in runtimeTree.nodeSet.nodeList)
-            {
-                foreach (var info in ReflectionHelper.GetCachedFieldInfo(nodeBase.GetType()))
-                {
-                    if (typeof(IBlackboardProperty).IsAssignableFrom(info.FieldType))
-                    {
-                        ReflectionHelper.FieldAccessor accessor = ReflectionHelper.GetAccessor(info);
-
-                        if (accessor.getter(nodeBase) is IBlackboardProperty property)
-                        {
-                            IBlackboardProperty foundProperty = runtimeTree.blackboard.FindProperty(property.key);
-
-                            if (foundProperty != null)
-                            {
-                                accessor.setter(nodeBase, foundProperty);
-                            }
-                        }
-                    }
-                }
-            }
-
+            runtimeTree.nodeSet = targetTree.nodeSet.Clone(treeRunner);
             return runtimeTree;
         }
 

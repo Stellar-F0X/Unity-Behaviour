@@ -103,7 +103,7 @@ namespace BehaviourSystemEditor.BT
 
                 Type propertyType = blackboard.properties[i].type;
 
-                if (propertyType.IsAssignableFrom(targetType))
+                if (targetType.IsAssignableFrom(propertyType))
                 {
                     properties.Add(blackboard.properties[i]);
                 }

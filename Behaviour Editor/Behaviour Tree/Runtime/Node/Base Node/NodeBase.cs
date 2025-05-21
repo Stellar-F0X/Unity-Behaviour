@@ -3,12 +3,14 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("BehaviourSystemEditor-BT")]
+
 namespace BehaviourSystem.BT
 {
     [Serializable]
     public abstract class NodeBase : ScriptableObject, IEquatable<NodeBase>
     {
 #region Node Enums
+
         public enum ENodeCallState
         {
             BeforeEnter,
@@ -44,7 +46,7 @@ namespace BehaviourSystem.BT
         public string guid;
 
         public string tag;
-        
+
 #if UNITY_EDITOR
         [HideInInspector]
         public Vector2 position;
@@ -57,7 +59,7 @@ namespace BehaviourSystem.BT
         public BehaviourTreeRunner treeRunner;
 
         protected ENodeCallState _callState;
-        
+
         public int depth
         {
             get;
@@ -85,7 +87,7 @@ namespace BehaviourSystem.BT
         public EBehaviourResult UpdateNode()
         {
             this.callCount++;
-            
+
             if (_callState == ENodeCallState.BeforeEnter)
             {
                 this.EnterNode();
@@ -102,7 +104,7 @@ namespace BehaviourSystem.BT
                     {
                         this.treeRunner.AbortSubtreeFrom(this);
                     }
-                    
+
                     this._callState = ENodeCallState.BeforeExit;
                 }
             }
@@ -123,51 +125,58 @@ namespace BehaviourSystem.BT
             this.OnEnter();
             this._callState = ENodeCallState.Updating;
         }
-        
-        
+
+
         public void ExitNode()
         {
             this.OnExit();
             this.treeRunner.PopInCallStack();
-            this._callState = ENodeCallState.BeforeEnter; 
-            
+            this._callState = ENodeCallState.BeforeEnter;
+
             // If a parent node fails during execution, this node's result is set to Failure.
             if (this.behaviourResult == EBehaviourResult.Running)
             {
                 this.behaviourResult = EBehaviourResult.Failure;
             }
         }
-        
-        
+
+
         public bool Equals(NodeBase other)
         {
             if (other is null)
             {
                 return false;
             }
-            
+
             if (ReferenceEquals(this, other))
             {
                 return true;
             }
-            
+
             return string.CompareOrdinal(this.guid, other.guid) == 0;
         }
 
-        
 
+
+        /// 현재 노드가 생성 직후 호출되는 함수.
         public virtual void OnInitialize() { }
+        
+        
+        /// 모든 노드가 생성된뒤 호출되는 함수.
+        public virtual void OnPostInitialize() { }
+        
 
         public virtual void FixedUpdateNode() { }
 
         public virtual void GizmosUpdateNode() { }
-        
+
 
         protected virtual void OnEnter() { }
 
         protected virtual void OnExit() { }
-        
+
 
         protected abstract EBehaviourResult OnUpdate();
+
     }
 }

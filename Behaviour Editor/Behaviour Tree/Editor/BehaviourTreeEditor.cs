@@ -3,7 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.Callbacks;
+using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
+using UnityEngine.SceneManagement;
 
 namespace BehaviourSystemEditor.BT
 {
@@ -93,6 +95,9 @@ namespace BehaviourSystemEditor.BT
             Undo.undoRedoPerformed -= this.BehaviourEditorUndoPerformed;
             Undo.undoRedoPerformed += this.BehaviourEditorUndoPerformed;
 
+            EditorSceneManager.sceneClosed -= this.OnSceneClosed;
+            EditorSceneManager.sceneClosed += this.OnSceneClosed;
+            
             EditorApplication.update -= this.RuntimeUpdate;
         }
 
@@ -100,9 +105,9 @@ namespace BehaviourSystemEditor.BT
         private void OnDisable()
         {
             EditorApplication.playModeStateChanged -= this.OnPlayNodeStateChanged;
+            EditorSceneManager.sceneClosed -= this.OnSceneClosed;
             
             Undo.undoRedoPerformed -= this.BehaviourEditorUndoPerformed;
-            
             EditorApplication.update -= this.RuntimeUpdate;
         }
 
@@ -125,6 +130,22 @@ namespace BehaviourSystemEditor.BT
             {
                 EditorApplication.delayCall -= this.OnSelectionChange;
                 EditorApplication.delayCall += this.OnSelectionChange;
+            }
+        }
+        
+        
+        
+        private void OnSceneClosed(Scene scene)
+        {
+            if (_tree is null)
+            {
+                this._blackboardProp.ClearBlackboardView();
+                this._inspectorView.Clear();
+                this._treeView?.ClearEditorView();
+
+                CanEditTree = false;
+                this._treeRunner = null;
+                this._tree = null;
             }
         }
         

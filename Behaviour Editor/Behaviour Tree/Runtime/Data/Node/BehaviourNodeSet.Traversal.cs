@@ -22,20 +22,22 @@ namespace BehaviourSystem.BT
         public BehaviourNodeSet Clone(BehaviourTreeRunner treeRunner)
         {
             Stack<TraversalInfo> recursionStack = new Stack<TraversalInfo>();
-            BehaviourNodeSet clone = CreateInstance<BehaviourNodeSet>();
+            Stack<NodeBase> postIninitNodeStack = new Stack<NodeBase>();
+            BehaviourNodeSet clonedSet = CreateInstance<BehaviourNodeSet>();
 
-            clone.rootNode = Instantiate(this.rootNode) as RootNode;
-            recursionStack.Push(new TraversalInfo(clone.rootNode, this.rootNode, 0));
+            clonedSet.rootNode = Instantiate(this.rootNode) as RootNode;
+            recursionStack.Push(new TraversalInfo(clonedSet.rootNode, this.rootNode, 0));
 
             while (recursionStack.Count > 0)
             {
                 TraversalInfo traversal = recursionStack.Pop();
+                postIninitNodeStack.Push(traversal.clone);
 
                 traversal.clone.name = traversal.clone.name.Remove(traversal.origin.name.Length, 7);
                 traversal.clone.depth = traversal.depth;
                 traversal.clone.treeRunner = treeRunner;
 
-                clone.nodeList.Add(traversal.clone);
+                clonedSet.nodeList.Add(traversal.clone);
 
                 switch (traversal.origin.nodeType)
                 {
@@ -91,10 +93,34 @@ namespace BehaviourSystem.BT
                     }
                 }
 
+                foreach (var info in ReflectionHelper.GetCachedFieldInfo(traversal.clone?.GetType()))
+                {
+                    if (typeof(IBlackboardProperty).IsAssignableFrom(info.FieldType))
+                    {
+                        ReflectionHelper.FieldAccessor accessor = ReflectionHelper.GetAccessor(info);
+
+                        if (accessor.getter(traversal.clone) is IBlackboardProperty property)
+                        {
+                            IBlackboardProperty foundProperty = treeRunner.runtimeTree.blackboard.FindProperty(property.key);
+
+                            if (foundProperty != null)
+                            {
+                                accessor.setter(traversal.clone, foundProperty);
+                            }
+                        }
+                    }
+                }
+
                 traversal.clone.OnInitialize();
             }
 
-            return clone;
+            while (postIninitNodeStack.Count > 0)
+            {
+                NodeBase currentNode = postIninitNodeStack.Pop();
+                currentNode.OnPostInitialize();
+            }
+
+            return clonedSet;
         }
     }
 }
