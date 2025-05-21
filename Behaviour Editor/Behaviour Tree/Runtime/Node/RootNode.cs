@@ -12,7 +12,13 @@ namespace BehaviourSystem.BT
         {
             get { return ENodeType.Root; }
         }
+        
+        public int childCount
+        {
+            get { return 1; }
+        }
 
+        
         protected override EBehaviourResult OnUpdate()
         {
             if (child == null)
@@ -24,6 +30,7 @@ namespace BehaviourSystem.BT
                 return child.UpdateNode();
             }
         }
+
 
         public IEnumerable<NodeBase> GetChildren()
         {

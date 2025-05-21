@@ -10,9 +10,24 @@ namespace BehaviourSystem.BT
     [DefaultExecutionOrder(-1)]
     public class BehaviourTreeRunner : MonoBehaviour
     {
+        private struct TraversalInfo
+        {
+            public TraversalInfo(NodeBase node, int stackID)
+            {
+                this.node = node;
+                this.stackID = stackID;
+            }
+
+            public NodeBase node;
+            public int stackID;
+        }
+
+
         private readonly Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
 
-        private BehaviourTracer _behaviourTracer;
+        private readonly List<Stack<NodeBase>> _runtimeCallStack = new List<Stack<NodeBase>>();
+
+
 
         public event Action<NodeBase.EBehaviourResult> onResolved;
 
@@ -29,15 +44,12 @@ namespace BehaviourSystem.BT
         [SerializeField]
         private BehaviourTree _runtimeTree;
 
+        private NodeBase _rootNode;
+
 
         internal BehaviourTree runtimeTree
         {
             get { return _runtimeTree; }
-        }
-
-        internal BehaviourTracer tracer
-        {
-            get { return _behaviourTracer; }
         }
 
         public NodeBase.EBehaviourResult lastExecutingResult
@@ -72,8 +84,6 @@ namespace BehaviourSystem.BT
         }
 
 
-#region Unity Event Methods
-
         private void Awake()
         {
             if (_runtimeTree is null)
@@ -83,13 +93,14 @@ namespace BehaviourSystem.BT
             }
             else
             {
-                if (useUpdateRate)
+                if (this.useUpdateRate)
                 {
                     this.updateRate = (int)_updateRate;
                 }
-                
+
                 this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree);
-                this._behaviourTracer = new BehaviourTracer(_runtimeTree.nodeSet.rootNode);
+                this._rootNode = _runtimeTree.nodeSet.rootNode;
+                this.CreateCallStack(_rootNode);
             }
         }
 
@@ -104,7 +115,7 @@ namespace BehaviourSystem.BT
             if (useUpdateRate == false || _frameInterval + _timeSinceLastUpdate < Time.time)
             {
                 this._timeSinceLastUpdate = Time.time;
-                this.lastExecutingResult = _behaviourTracer.UpdateTree();
+                this.lastExecutingResult = _rootNode.UpdateNode();
 
                 if (this.lastExecutingResult != NodeBase.EBehaviourResult.Running)
                 {
@@ -116,39 +127,94 @@ namespace BehaviourSystem.BT
 
         private void FixedUpdate()
         {
-            if (useFixedUpdate == false)
+            if (useFixedUpdate == false || _runtimeTree is null || pause)
             {
                 return;
             }
 
-            if (_runtimeTree is null || pause)
-            {
-                return;
-            }
-
-            _behaviourTracer.FixedUpdateTree();
+            _rootNode.FixedUpdateNode();
         }
 
 
         private void OnDrawGizmos()
         {
-            if (useGizmos == false)
+            if (useGizmos == false || _runtimeTree is null || pause || Application.isPlaying == false)
             {
                 return;
             }
 
-            if (_runtimeTree is null || pause || Application.isPlaying == false)
-            {
-                return;
-            }
-
-            _behaviourTracer.GizmoUpdateTree();
+            _rootNode.GizmosUpdateNode();
         }
 
-#endregion
+
+        internal NodeBase GetCurrentNode(in int callStackID)
+        {
+            if (_runtimeCallStack.Count <= callStackID || _runtimeCallStack[callStackID].Count == 0)
+            {
+                return null;
+            }
+
+            return _runtimeCallStack[callStackID].Peek();
+        }
 
 
-#region Public Methods
+        internal void PushInCallStack(in int callStackID, NodeBase node)
+        {
+            _runtimeCallStack[callStackID].Push(node);
+        }
+
+
+        internal void PopInCallStack(in int callStackID)
+        {
+            if (_runtimeCallStack.Count == 0)
+            {
+                Debug.LogWarning("");
+                return;
+            }
+
+            _runtimeCallStack[callStackID].Pop();
+        }
+
+
+        internal void AbortSubtreeFrom(in int callStackID, NodeBase node)
+        {
+            Queue<TraversalInfo> abortQueue = new Queue<TraversalInfo>();
+            abortQueue.Enqueue(new TraversalInfo(node, callStackID));
+
+            while (abortQueue.Count > 0)
+            {
+                TraversalInfo current = abortQueue.Dequeue();
+                NodeBase currentNode = current.node;
+
+                if (_runtimeCallStack.Count > current.stackID && _runtimeCallStack[current.stackID].Count > 0)
+                {
+                    NodeBase stackNode = _runtimeCallStack[current.stackID].Peek();
+
+                    while (stackNode.Equals(currentNode) == false && stackNode.depth > currentNode.depth)
+                    {
+                        if (stackNode is ParallelNode parallelNode)
+                        {
+                            parallelNode.Stop();
+
+                            foreach (var child in parallelNode.GetChildren())
+                            {
+                                abortQueue.Enqueue(new TraversalInfo(child, child.callStackID));
+                            }
+                        }
+
+                        stackNode.ExitNode();
+
+                        if (_runtimeCallStack[current.stackID].Count == 0)
+                        {
+                            break;
+                        }
+
+                        stackNode = _runtimeCallStack[current.stackID].Peek();
+                    }
+                }
+            }
+        }
+
 
         public void SetProperty<TValue>(in string key, TValue property)
         {
@@ -252,7 +318,54 @@ namespace BehaviourSystem.BT
             }
         }
 
-#endregion
+
+
+        private void CreateCallStack(NodeBase rootOfSubtree)
+        {
+            int callStackID = 0;
+            Queue<TraversalInfo> workQueue = new Queue<TraversalInfo>();
+            workQueue.Enqueue(new TraversalInfo(rootOfSubtree, 0));
+
+            while (workQueue.Count > 0)
+            {
+                TraversalInfo currentTraversal = workQueue.Dequeue();
+                Stack<NodeBase> traversalStack = new Stack<NodeBase>();
+                currentTraversal.node.callStackID = currentTraversal.stackID;
+                traversalStack.Push(currentTraversal.node);
+
+                while (traversalStack.Count > 0)
+                {
+                    NodeBase currentNode = traversalStack.Pop();
+                    currentNode.callStackID = currentTraversal.stackID;
+                    
+                    while (_runtimeCallStack.Count <= currentNode.callStackID)
+                    {
+                        _runtimeCallStack.Add(new Stack<NodeBase>());
+                    }
+
+                    if (currentNode is IBehaviourIterable iterable && iterable.childCount > 0)
+                    {
+                        if (currentNode is ParallelNode)
+                        {
+                            _runtimeCallStack.Add(new Stack<NodeBase>());
+
+                            foreach (NodeBase child in iterable.GetChildren())
+                            {
+                                workQueue.Enqueue(new TraversalInfo(child, ++callStackID));
+                            }
+                        }
+                        else
+                        {
+                            foreach (NodeBase child in iterable.GetChildren())
+                            {
+                                traversalStack.Push(child);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 
         private bool TryGetNodeByPath(string treePath, out NodeBase node)
         {

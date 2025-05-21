@@ -15,7 +15,12 @@ namespace BehaviourSystem.BT
         {
             get { return ENodeType.Decorator; }
         }
-        
+
+        public int childCount
+        {
+            get { return 1; }
+        }
+
 
         public override sealed void FixedUpdateNode()
         {

@@ -18,6 +18,11 @@ namespace BehaviourSystem.BT
             get { return ENodeType.Composite; }
         }
 
+        public int childCount
+        {
+            get { return children.Count; }
+        }
+
         public int currentChildIndex
         {
             get { return _currentChildIndex; }

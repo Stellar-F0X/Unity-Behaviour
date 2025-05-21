@@ -16,12 +16,12 @@ namespace BehaviourSystem.BT
             RequireAllFailure,
             RequireOneFailure
         };
-        
+
         public EParallelPolicy parallelPolicy;
 
         private int _successfulChildCount = 0;
         private int _failedChildCount = 0;
-        
+
         private List<Coroutine> _executingCoroutines = new List<Coroutine>();
 
 
@@ -40,7 +40,7 @@ namespace BehaviourSystem.BT
                 IEnumerator enumerator = this.Run(child);
 
                 _executingCoroutines.Add(treeRunner.StartCoroutine(enumerator));
-            }    
+            }
         }
 
 
@@ -50,23 +50,19 @@ namespace BehaviourSystem.BT
             {
                 switch (parallelPolicy)
                 {
-                    case EParallelPolicy.RequireAllSuccess: 
-                        return _successfulChildCount == children.Count ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                    case EParallelPolicy.RequireAllSuccess: return _successfulChildCount == children.Count ? EBehaviourResult.Success : EBehaviourResult.Failure;
 
-                    case EParallelPolicy.RequireAllFailure: 
-                        return _failedChildCount == children.Count ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                    case EParallelPolicy.RequireAllFailure: return _failedChildCount == children.Count ? EBehaviourResult.Success : EBehaviourResult.Failure;
 
-                    case EParallelPolicy.RequireOneSuccess: 
-                        return _successfulChildCount > 0 ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                    case EParallelPolicy.RequireOneSuccess: return _successfulChildCount > 0 ? EBehaviourResult.Success : EBehaviourResult.Failure;
 
-                    case EParallelPolicy.RequireOneFailure: 
-                        return _failedChildCount > 0 ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                    case EParallelPolicy.RequireOneFailure: return _failedChildCount > 0 ? EBehaviourResult.Success : EBehaviourResult.Failure;
                 }
             }
 
             return EBehaviourResult.Running;
         }
-        
+
 
         protected override void OnExit()
         {
@@ -108,7 +104,7 @@ namespace BehaviourSystem.BT
                     treeRunner.StopCoroutine(_executingCoroutines[i]);
                 }
             }
-            
+
             _executingCoroutines.Clear();
         }
     }

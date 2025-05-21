@@ -103,9 +103,9 @@ namespace BehaviourSystem.BT
 
                 if (this.behaviourResult != EBehaviourResult.Running)
                 {
-                    if (this.treeRunner.tracer.GetCurrentNode(callStackID) != this)
+                    if (this.treeRunner.GetCurrentNode(callStackID) != this)
                     {
-                        this.treeRunner.tracer.AbortSubtreeFrom(callStackID, this);
+                        this.treeRunner.AbortSubtreeFrom(callStackID, this);
                     }
 
                     this._callState = ENodeCallState.BeforeExit;
@@ -124,7 +124,7 @@ namespace BehaviourSystem.BT
 
         public void EnterNode()
         {
-            this.treeRunner.tracer.PushInCallStack(callStackID, this);
+            this.treeRunner.PushInCallStack(callStackID, this);
             this.OnEnter();
             this._callState = ENodeCallState.Updating;
         }
@@ -133,7 +133,7 @@ namespace BehaviourSystem.BT
         public void ExitNode()
         {
             this.OnExit();
-            this.treeRunner.tracer.PopInCallStack(callStackID);
+            this.treeRunner.PopInCallStack(callStackID);
             this._callState = ENodeCallState.BeforeEnter;
 
             // If a parent node fails during execution, this node's result is set to Failure.
