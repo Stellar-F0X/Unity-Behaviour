@@ -153,7 +153,7 @@ namespace BehaviourSystemEditor.BT
 
         private void RuntimeUpdate()
         {
-            if (Application.isPlaying == false || _treeRunner is null || _treeRunner.runtimeTree is null)
+            if (Application.isPlaying == false || EditorApplication.isPaused || _treeRunner is null || _treeRunner.runtimeTree is null)
             {
                 return;
             }
