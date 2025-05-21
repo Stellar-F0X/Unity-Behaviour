@@ -46,17 +46,59 @@ namespace BehaviourSystem.BT
 
         protected override EBehaviourResult OnUpdate()
         {
-            if (_successfulChildCount + _failedChildCount == children.Count)
+            if (_successfulChildCount + _failedChildCount > 0)
             {
                 switch (parallelPolicy)
                 {
-                    case EParallelPolicy.RequireAllSuccess: return _successfulChildCount == children.Count ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                    case EParallelPolicy.RequireAllSuccess:
+                    {
+                        if (_successfulChildCount + _failedChildCount == children.Count)
+                        {
+                            return _successfulChildCount == children.Count ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                        }
 
-                    case EParallelPolicy.RequireAllFailure: return _failedChildCount == children.Count ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                        break;
+                    }
 
-                    case EParallelPolicy.RequireOneSuccess: return _successfulChildCount > 0 ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                    case EParallelPolicy.RequireAllFailure:
+                    {
+                        if (_successfulChildCount + _failedChildCount == children.Count)
+                        {
+                            return _failedChildCount == children.Count ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                        }
 
-                    case EParallelPolicy.RequireOneFailure: return _failedChildCount > 0 ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                        break;
+                    }
+
+                    case EParallelPolicy.RequireOneSuccess:
+                    {
+                        this.Stop();
+
+                        foreach (var child in children)
+                        {
+                            if (child.behaviourResult == EBehaviourResult.Running)
+                            {
+                                treeRunner.AbortSubtree(child.callStackID);
+                            }
+                        }
+
+                        return _successfulChildCount > 0 ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                    }
+
+                    case EParallelPolicy.RequireOneFailure:
+                    {
+                        this.Stop();
+
+                        foreach (var child in children)
+                        {
+                            if (child.behaviourResult == EBehaviourResult.Running)
+                            {
+                                treeRunner.AbortSubtree(child.callStackID);
+                            }
+                        }
+
+                        return _failedChildCount > 0 ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                    }
                 }
             }
 
