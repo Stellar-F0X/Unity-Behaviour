@@ -33,15 +33,15 @@ namespace BehaviourSystem.BT
             Decorator,
             Subset
         };
-        
+
 #endregion
 
-        
+
         public event Action<NodeBase> onNodeEnter;
-        
+
         public event Action<NodeBase> onNodeExit;
-        
-        
+
+
         [HideInInspector]
         public string guid;
 
@@ -58,8 +58,11 @@ namespace BehaviourSystem.BT
         [NonSerialized]
         public BehaviourTreeRunner treeRunner;
 
+        public int callStackID;
+        
         protected ENodeCallState _callState;
 
+        
         public int depth
         {
             get;
@@ -100,9 +103,9 @@ namespace BehaviourSystem.BT
 
                 if (this.behaviourResult != EBehaviourResult.Running)
                 {
-                    if (this.treeRunner.currentNode != this)
+                    if (this.treeRunner.tracer.GetCurrentNode(callStackID) != this)
                     {
-                        this.treeRunner.AbortSubtreeFrom(this);
+                        this.treeRunner.tracer.AbortSubtreeFrom(callStackID, this);
                     }
 
                     this._callState = ENodeCallState.BeforeExit;
@@ -121,7 +124,7 @@ namespace BehaviourSystem.BT
 
         public void EnterNode()
         {
-            this.treeRunner.PushInCallStack(this);
+            this.treeRunner.tracer.PushInCallStack(callStackID, this);
             this.OnEnter();
             this._callState = ENodeCallState.Updating;
         }
@@ -130,7 +133,7 @@ namespace BehaviourSystem.BT
         public void ExitNode()
         {
             this.OnExit();
-            this.treeRunner.PopInCallStack();
+            this.treeRunner.tracer.PopInCallStack(callStackID);
             this._callState = ENodeCallState.BeforeEnter;
 
             // If a parent node fails during execution, this node's result is set to Failure.
@@ -168,11 +171,13 @@ namespace BehaviourSystem.BT
 
         public virtual void FixedUpdateNode() { }
 
+        
         public virtual void GizmosUpdateNode() { }
 
 
         protected virtual void OnEnter() { }
 
+        
         protected virtual void OnExit() { }
 
 

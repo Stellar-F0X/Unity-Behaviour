@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BehaviourSystem.BT
 {
-    public sealed class RootNode : NodeBase
+    public sealed class RootNode : NodeBase, IBehaviourIterable
     {
         [HideInInspector]
         public NodeBase child;
@@ -23,6 +23,11 @@ namespace BehaviourSystem.BT
             {
                 return child.UpdateNode();
             }
+        }
+
+        public IEnumerable<NodeBase> GetChildren()
+        {
+            return new NodeBase[] { child };
         }
     }
 }

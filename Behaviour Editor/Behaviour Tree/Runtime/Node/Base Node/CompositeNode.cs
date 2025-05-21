@@ -5,7 +5,7 @@ using UnityEngine;
 namespace BehaviourSystem.BT
 {
     [Serializable]
-    public abstract class CompositeNode : NodeBase
+    public abstract class CompositeNode : NodeBase, IBehaviourIterable
     {
         [HideInInspector]
         public List<NodeBase> children = new List<NodeBase>();
@@ -37,6 +37,11 @@ namespace BehaviourSystem.BT
             {
                 children[_currentChildIndex].GizmosUpdateNode();
             }
+        }
+
+        public IEnumerable<NodeBase> GetChildren()
+        {
+            return children;
         }
     }
 }

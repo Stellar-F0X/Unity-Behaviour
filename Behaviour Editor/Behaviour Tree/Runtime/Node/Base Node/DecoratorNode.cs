@@ -1,10 +1,11 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 namespace BehaviourSystem.BT
 {
     [Serializable]
-    public abstract class DecoratorNode : NodeBase
+    public abstract class DecoratorNode : NodeBase, IBehaviourIterable
     {
         [HideInInspector]
         public NodeBase child;
@@ -30,6 +31,11 @@ namespace BehaviourSystem.BT
             {
                 child.GizmosUpdateNode();
             }
+        }
+
+        public IEnumerable<NodeBase> GetChildren()
+        {
+            return new NodeBase[] { child };
         }
     }
 }

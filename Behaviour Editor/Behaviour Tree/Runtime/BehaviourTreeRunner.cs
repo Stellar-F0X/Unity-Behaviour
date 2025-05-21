@@ -12,6 +12,8 @@ namespace BehaviourSystem.BT
     {
         private readonly Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
 
+        private BehaviourTracer _behaviourTracer;
+
         public event Action<NodeBase.EBehaviourResult> onResolved;
 
         public bool useUpdateRate = false;
@@ -27,17 +29,15 @@ namespace BehaviourSystem.BT
         [SerializeField]
         private BehaviourTree _runtimeTree;
 
-        private Stack<NodeBase> _runtimeCallStack;
-
 
         internal BehaviourTree runtimeTree
         {
             get { return _runtimeTree; }
         }
 
-        internal NodeBase currentNode
+        internal BehaviourTracer tracer
         {
-            get { return _runtimeCallStack.Peek(); }
+            get { return _behaviourTracer; }
         }
 
         public NodeBase.EBehaviourResult lastExecutingResult
@@ -54,10 +54,7 @@ namespace BehaviourSystem.BT
 
         public int updateRate
         {
-            get
-            {
-                return this.useUpdateRate ? (int)this._updateRate : -1;
-            }
+            get { return this.useUpdateRate ? (int)this._updateRate : -1; }
 
             set
             {
@@ -91,8 +88,8 @@ namespace BehaviourSystem.BT
                     this.updateRate = (int)_updateRate;
                 }
                 
-                this._runtimeCallStack = new Stack<NodeBase>(_runtimeTree.nodeSet.nodeList.Count);
                 this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree);
+                this._behaviourTracer = new BehaviourTracer(_runtimeTree.nodeSet.rootNode);
             }
         }
 
@@ -102,12 +99,12 @@ namespace BehaviourSystem.BT
             if (_runtimeTree is null || pause)
             {
                 return;
-            }   
+            }
 
             if (useUpdateRate == false || _frameInterval + _timeSinceLastUpdate < Time.time)
             {
                 this._timeSinceLastUpdate = Time.time;
-                this.lastExecutingResult = _runtimeTree.nodeSet.rootNode.UpdateNode();
+                this.lastExecutingResult = _behaviourTracer.UpdateTree();
 
                 if (this.lastExecutingResult != NodeBase.EBehaviourResult.Running)
                 {
@@ -129,7 +126,7 @@ namespace BehaviourSystem.BT
                 return;
             }
 
-            _runtimeTree.nodeSet.rootNode.FixedUpdateNode();
+            _behaviourTracer.FixedUpdateTree();
         }
 
 
@@ -145,42 +142,13 @@ namespace BehaviourSystem.BT
                 return;
             }
 
-            _runtimeTree.nodeSet.rootNode.GizmosUpdateNode();
+            _behaviourTracer.GizmoUpdateTree();
         }
 
 #endregion
 
 
-#region Internal Methods
-
-        internal void PushInCallStack(NodeBase node)
-        {
-            _runtimeCallStack.Push(node);
-        }
-
-        internal void PopInCallStack()
-        {
-            if (_runtimeCallStack.Count > 0)
-            {
-                _runtimeCallStack.Pop();
-            }
-        }
-
-        internal void AbortSubtreeFrom(NodeBase node)
-        {
-            if (this.currentNode is null)
-            {
-                return;
-            }
-
-            while (this.currentNode.Equals(node) == false && this.currentNode.depth > node.depth)
-            {
-                currentNode.ExitNode();
-            }
-        }
-
-#endregion
-
+#region Public Methods
 
         public void SetProperty<TValue>(in string key, TValue property)
         {
@@ -283,8 +251,8 @@ namespace BehaviourSystem.BT
                 Debug.LogWarning($"Node with path '{treePath}' was not found.");
             }
         }
-        
 
+#endregion
 
         private bool TryGetNodeByPath(string treePath, out NodeBase node)
         {
