@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
-using BehaviourSystem;
 using BehaviourSystem.BT;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -62,8 +62,9 @@ namespace BehaviourSystemEditor.BT
 
         private SearchTreeEntry[] NodeCreationSearchTreeEntry<T>(string title, Action<Type> invoke, int layerLevel = 1) where T : NodeBase
         {
-            TypeCache.TypeCollection typeList = TypeCache.GetTypesDerivedFrom<T>(); //하위 자식들 가져오는 방법인듯
-            SearchTreeEntry[] entries = new SearchTreeEntry[typeList.Count + 1];
+            Type[] typeList = TypeCache.GetTypesDerivedFrom<T>().ToArray();
+            Array.Sort(typeList, (x, y) => x.Name[0].CompareTo(y.Name[0]));
+            SearchTreeEntry[] entries = new SearchTreeEntry[typeList.Length + 1];
 
             entries[0] = new SearchTreeGroupEntry(new GUIContent(title))
             {

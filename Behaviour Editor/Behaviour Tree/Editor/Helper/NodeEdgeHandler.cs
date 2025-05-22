@@ -8,14 +8,14 @@ namespace BehaviourSystemEditor.BT
 {
     public class NodeEdgeHandler
     {
-        public void ConnectEdges(BehaviourTreeView treeView, NodeBase parentNodeBase, List<NodeBase> childrenNodes)
+        public void ConnectEdges(BehaviourTreeView treeView, NodeBase parentNodeBase, IBehaviourIterable childrenNodes)
         {
-            if (childrenNodes is null || childrenNodes.Count == 0)
+            if (childrenNodes is null || childrenNodes.childCount == 0)
             {
                 return;
             }
             
-            foreach (var child in childrenNodes)
+            foreach (var child in childrenNodes?.GetChildren())
             {
                 NodeView parentView = treeView.FindNodeView(parentNodeBase);
                 NodeView childView = treeView.FindNodeView(child);

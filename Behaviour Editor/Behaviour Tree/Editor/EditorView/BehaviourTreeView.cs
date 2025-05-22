@@ -76,7 +76,7 @@ namespace BehaviourSystemEditor.BT
                 //트리 구조라서 미리 모두 생성해둬야 자식과 부모를 연결 할 수 있음.
                 tree.nodeSet.nodeList.ForEach(n => this.RecreateNodeViewOnLoad(n));
                 tree.groupDataSet?.dataList.ForEach(d => this.RecreateNodeGroupViewOnLoad(d));
-                tree.nodeSet.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, tree.nodeSet.GetChildren(n)));
+                tree.nodeSet.nodeList.ForEach(n => _nodeEdgeHandler.ConnectEdges(this, n, n as IBehaviourIterable));
             }
         }
 

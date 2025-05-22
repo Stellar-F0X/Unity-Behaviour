@@ -15,7 +15,7 @@ namespace BehaviourSystem.BT
                 this.depth = depth;
                 this.stackID = stackID;
             }
-            
+
             public readonly NodeBase origin;
             public readonly NodeBase clone;
             public readonly int depth;
@@ -30,12 +30,12 @@ namespace BehaviourSystem.BT
                 this.callStackID = callStackID;
                 this.targetNode = targetNode;
             }
-            
+
             public readonly int callStackID;
             public readonly NodeBase targetNode; //null이면 전체 스택 중단
         }
 
-        
+
 #region 필드들
 
         /// <summary>
@@ -46,7 +46,60 @@ namespace BehaviourSystem.BT
 
 #endregion
 
+
 #region 공개 메서드들
+
+        /// <summary> 트리 디렉토리를 토대로 경로상에 위치한 노드를 찾습니다. </summary>
+        /// <param name="treePath">트리 디렉토리</param>
+        /// <param name="nodeSet">트리 집합</param>
+        /// <param name="node">찾은 노드</param>
+        /// <returns>트리 탐색 성공 여부</returns>
+        public bool TryGetNodeByPath(string treePath, BehaviourNodeSet nodeSet, out NodeBase node)
+        {
+            if (string.IsNullOrEmpty(treePath) || string.IsNullOrWhiteSpace(treePath))
+            {
+                node = null;
+                return false;
+            }
+
+            string[] paths = treePath.Split('/');
+
+            if (paths.Length == 0 || string.CompareOrdinal(nodeSet.rootNode.name, paths[0]) != 0)
+            {
+                node = null;
+                return false;
+            }
+
+            NodeBase nodeBase = nodeSet.rootNode;
+
+            for (int i = 1; i < paths.Length; i++)
+            {
+                bool find = false;
+
+                if (nodeBase is IBehaviourIterable iterable)
+                {
+                    foreach (NodeBase child in iterable.GetChildren())
+                    {
+                        if (string.CompareOrdinal(child.name, paths[i]) == 0)
+                        {
+                            nodeBase = child;
+                            find = true;
+                            break;
+                        }
+                    }
+
+                    if (find == false)
+                    {
+                        node = null;
+                        return false;
+                    }
+                }
+            }
+
+            node = nodeBase;
+            return true;
+        }
+
 
         /// <summary>
         /// 트리 클론 생성 및 CallStack 구축 - 기존 순회 로직을 활용하여 트리 구조를 복제하고 동시에 CallStack 생성
@@ -71,8 +124,13 @@ namespace BehaviourSystem.BT
             }
 
             // PostTreeCreation을 위한 후처리
-            this.ProcessPostInitialization(postInitStack);
+            while (postInitStack.Count > 0)
+            {
+                NodeBase currentNode = postInitStack.Pop();
+                currentNode.PostTreeCreation();
+            }
         }
+
 
         /// <summary> 지정된 호출 스택의 현재 실행 중인 노드를 반환 </summary>
         /// <param name="callStackID">호출 스택 ID</param>
@@ -87,15 +145,17 @@ namespace BehaviourSystem.BT
             return _runtimeCallStack[callStackID].Peek();
         }
 
+
         /// <summary> 지정된 호출 스택에 노드를 푸시 </summary>
         /// <param name="callStackID">호출 스택 ID</param>
         /// <param name="node">푸시할 노드</param>
         public void PushInCallStack(in int callStackID, NodeBase node)
         {
             this.EnsureCallStackExists(callStackID);
-            
+
             _runtimeCallStack[callStackID].Push(node);
         }
+
 
         /// <summary> 지정된 호출 스택에서 최상단 노드를 팝 </summary>
         /// <param name="callStackID">호출 스택 ID</param>
@@ -109,6 +169,7 @@ namespace BehaviourSystem.BT
 
             _runtimeCallStack[callStackID].Pop();
         }
+
 
         /// <summary>
         /// 지정된 노드부터 상위까지의 서브트리를 중단
@@ -124,6 +185,7 @@ namespace BehaviourSystem.BT
             this.ProcessAbortQueue(abortQueue, true);
         }
 
+
         /// <summary> 지정된 호출 스택의 전체 서브트리를 중단 </summary>
         /// <param name="callStackID">중단할 호출 스택 ID</param>
         public void AbortSubtree(in int callStackID)
@@ -135,6 +197,7 @@ namespace BehaviourSystem.BT
         }
 
 #endregion
+
 
 #region 클론 관련 내부 메서드들 (추후 JobSystem으로 분리)
 
@@ -148,21 +211,26 @@ namespace BehaviourSystem.BT
         /// <param name="treeRunner">트리 러너</param>
         /// <param name="clonedSet">클론된 노드셋</param>
         /// <param name="callStackID">CallStack ID (참조로 전달하여 증가)</param>
-        private void ProcessCloneBranch(CloneInfo cloneInfo, Queue<CloneInfo> cloneQueue, Stack<NodeBase> postInitStack, BehaviourTreeRunner treeRunner, BehaviourNodeSet clonedSet, ref int callStackID)
+        private void ProcessCloneBranch(CloneInfo cloneInfo,
+                                        Queue<CloneInfo> cloneQueue,
+                                        Stack<NodeBase> postInitStack,
+                                        BehaviourTreeRunner treeRunner,
+                                        BehaviourNodeSet clonedSet,
+                                        ref int callStackID)
         {
             NodeBase clone = cloneInfo.clone;
-            
+
             // 이름에서 Unity의 (Clone) 접미사 제거
             if (clone.name.EndsWith("(Clone)"))
             {
                 clone.name = clone.name.Remove(clone.name.Length - 7);
             }
-            
+
             clone.depth = cloneInfo.depth;
             clone.treeRunner = treeRunner;
             clonedSet.nodeList.Add(clone);
             postInitStack.Push(cloneInfo.clone);
-            
+
             // CallStack ID 설정 및 스택 생성
             this.SetNodeCallStackID(cloneInfo.clone, cloneInfo.stackID);
             this.EnsureCallStackExists(cloneInfo.stackID);
@@ -183,54 +251,59 @@ namespace BehaviourSystem.BT
 
             switch (origin.nodeType)
             {
-                case NodeBase.ENodeType.Root:
-                    this.ProcessRootNodeClone((RootNode)origin, (RootNode)clone, nextDepth, cloneInfo.stackID, cloneQueue);
-                    break;
-                    
+                case NodeBase.ENodeType.Root: this.ProcessRootNodeClone((RootNode)origin, (RootNode)clone, nextDepth, cloneInfo.stackID, cloneQueue); break;
+
                 case NodeBase.ENodeType.Decorator:
-                    this.ProcessDecoratorNodeClone((DecoratorNode)origin, (DecoratorNode)clone, nextDepth, cloneInfo.stackID, cloneQueue);
-                    break;
-                    
+                    this.ProcessDecoratorNodeClone((DecoratorNode)origin, (DecoratorNode)clone, nextDepth, cloneInfo.stackID, cloneQueue); break;
+
                 case NodeBase.ENodeType.Composite:
                     this.ProcessCompositeNodeClone((CompositeNode)origin, (CompositeNode)clone, nextDepth, cloneInfo.stackID, cloneQueue, ref callStackID);
                     break;
             }
         }
 
-        
+
         /// <summary> 루트 노드 클론 처리 </summary>
         private void ProcessRootNodeClone(RootNode origin, RootNode clone, int nextDepth, int stackID, Queue<CloneInfo> cloneQueue)
         {
-            if (origin.child == null) return;
-            
+            if (origin.child == null)
+                return;
+
             NodeBase childClone = Object.Instantiate(origin.child);
             childClone.parent = clone;
             clone.child = childClone;
-            
+
             cloneQueue.Enqueue(new CloneInfo(origin.child, childClone, nextDepth, stackID));
         }
 
-        
+
         /// <summary> 데코레이터 노드 클론 처리 </summary>
         private void ProcessDecoratorNodeClone(DecoratorNode origin, DecoratorNode clone, int nextDepth, int stackID, Queue<CloneInfo> cloneQueue)
         {
-            if (origin.child == null) return;
-            
+            if (origin.child == null)
+                return;
+
             NodeBase childClone = Object.Instantiate(origin.child);
             childClone.parent = clone;
             clone.child = childClone;
-            
+
             cloneQueue.Enqueue(new CloneInfo(origin.child, childClone, nextDepth, stackID));
         }
 
-        
+
         /// <summary> 컴포지트 노드 클론 처리 - 병렬 노드의 경우 새로운 CallStack ID 할당 </summary>
-        private void ProcessCompositeNodeClone(CompositeNode origin, CompositeNode clone, int nextDepth, int stackID, Queue<CloneInfo> cloneQueue, ref int callStackID)
+        private void ProcessCompositeNodeClone(CompositeNode origin,
+                                               CompositeNode clone,
+                                               int nextDepth,
+                                               int stackID,
+                                               Queue<CloneInfo> cloneQueue,
+                                               ref int callStackID)
         {
-            if (origin.children == null || origin.children.Count == 0) return;
-            
+            if (origin.children == null || origin.children.Count == 0)
+                return;
+
             bool isParallelNode = origin is ParallelNode;
-            
+
             if (isParallelNode)
             {
                 // 병렬 노드: 각 자식마다 새로운 CallStack ID 할당
@@ -239,7 +312,7 @@ namespace BehaviourSystem.BT
                     NodeBase childClone = Object.Instantiate(origin.children[i]);
                     childClone.parent = clone;
                     clone.children[i] = childClone;
-                    
+
                     int newStackID = ++callStackID;
                     this.EnsureCallStackExists(newStackID);
                     cloneQueue.Enqueue(new CloneInfo(origin.children[i], childClone, nextDepth, newStackID));
@@ -253,13 +326,13 @@ namespace BehaviourSystem.BT
                     NodeBase childClone = Object.Instantiate(origin.children[i]);
                     childClone.parent = clone;
                     clone.children[i] = childClone;
-                    
+
                     cloneQueue.Enqueue(new CloneInfo(origin.children[i], childClone, nextDepth, stackID));
                 }
             }
         }
 
-        
+
         /// <summary>
         /// 블랙보드 프로퍼티 처리
         /// JobSystem에서는 메인 스레드에서 실행되어야 함
@@ -268,14 +341,15 @@ namespace BehaviourSystem.BT
         {
             foreach (var fieldInfo in ReflectionHelper.GetCachedFieldInfo(clonedNode?.GetType()))
             {
-                if (!typeof(IBlackboardProperty).IsAssignableFrom(fieldInfo.FieldType)) continue;
-                
+                if (!typeof(IBlackboardProperty).IsAssignableFrom(fieldInfo.FieldType))
+                    continue;
+
                 ReflectionHelper.FieldAccessor accessor = ReflectionHelper.GetAccessor(fieldInfo);
-                
+
                 if (accessor.getter(clonedNode) is IBlackboardProperty property)
                 {
                     IBlackboardProperty foundProperty = treeRunner.runtimeTree.blackboard.FindProperty(property.key);
-                    
+
                     if (foundProperty != null)
                     {
                         accessor.setter(clonedNode, foundProperty);
@@ -284,23 +358,11 @@ namespace BehaviourSystem.BT
             }
         }
 
-        
-        /// <summary>
-        /// 후처리 초기화 실행
-        /// JobSystem에서는 메인 스레드에서 실행되어야 함
-        /// </summary>
-        private void ProcessPostInitialization(Stack<NodeBase> postInitStack)
-        {
-            while (postInitStack.Count > 0)
-            {
-                NodeBase currentNode = postInitStack.Pop();
-                currentNode.PostTreeCreation();
-            }
-        }
 #endregion
 
-        
-#region 내부 헬퍼 메서드들 (추후 JobSystem으로 분리)
+
+#region 내부 헬퍼 메서드들
+
         /// <summary>
         /// 중단 큐를 처리하여 노드들을 정리
         /// JobSystem으로 병렬화 가능하지만 상태 변경이 있어 주의 필요
@@ -329,7 +391,7 @@ namespace BehaviourSystem.BT
             }
         }
 
-        
+
         /// <summary> 특정 노드까지의 타겟 중단을 처리 </summary>
         private void ProcessTargetedAbort(AbortInfo abortInfo, Queue<AbortInfo> abortQueue)
         {
@@ -347,7 +409,7 @@ namespace BehaviourSystem.BT
             while (stackNode.Equals(targetNode) == false && stackNode.depth > targetNode.depth)
             {
                 this.ProcessNodeExit(stackNode, abortQueue);
-                
+
                 if (_runtimeCallStack[currentID].Count == 0)
                 {
                     break;
@@ -357,7 +419,7 @@ namespace BehaviourSystem.BT
             }
         }
 
-        
+
         /// <summary> 전체 스택 중단을 처리 </summary>
         private void ProcessFullStackAbort(AbortInfo abortInfo, Queue<AbortInfo> abortQueue)
         {
@@ -379,7 +441,7 @@ namespace BehaviourSystem.BT
             }
         }
 
-        
+
         /// <summary> 노드 종료 처리 (병렬 노드의 경우 자식들도 중단) </summary>
         private void ProcessNodeExit(NodeBase node, Queue<AbortInfo> abortQueue)
         {
@@ -398,7 +460,7 @@ namespace BehaviourSystem.BT
         }
 
 #endregion
-        
+
 
         /// <summary> 노드에 호출 스택 ID를 설정 </summary>
         private void SetNodeCallStackID(NodeBase node, int stackID)

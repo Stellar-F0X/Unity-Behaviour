@@ -12,21 +12,20 @@ namespace BehaviourSystem.BT
     {
         private readonly Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
         
-        private readonly BehaviourNodeHandler _NodeHandler = new BehaviourNodeHandler();
-
+        private readonly BehaviourNodeHandler _nodeHandler = new BehaviourNodeHandler();
         
-        public event Action<NodeBase.EBehaviourResult> onResolved;
-
+        
         public bool useUpdateRate = false;
         public bool useFixedUpdate = true;
         public bool useGizmos = true;
 
+        
         [SerializeField]
         private uint _updateRate = 60;
-
         private float _frameInterval;
         private float _timeSinceLastUpdate;
 
+        
         [SerializeField]
         private BehaviourTree _runtimeTree;
         private NodeBase _rootNode;
@@ -39,14 +38,7 @@ namespace BehaviourSystem.BT
 
         internal BehaviourNodeHandler handler
         {
-            get { return _NodeHandler; }
-        }
-        
-
-        public NodeBase.EBehaviourResult lastExecutingResult
-        {
-            get;
-            private set;
+            get { return _nodeHandler; }
         }
 
         public bool pause
@@ -55,26 +47,12 @@ namespace BehaviourSystem.BT
             set;
         }
 
+        /// <summary> Controls the update frequency for the behaviour tree runner. </summary>
+        /// <value> An integer representing the update rate in frames per second, or -1 if <see cref="useUpdateRate"/> is disabled. </value>
         public int updateRate
         {
-            get
-            {
-                return this.useUpdateRate ? (int)this._updateRate : -1; 
-            }
-
-            set
-            {
-                if (this.useUpdateRate)
-                {
-                    this._updateRate = (uint)Mathf.Max(Application.targetFrameRate, 0);
-                    this._updateRate = _updateRate == 0 ? (uint)value : _updateRate;
-                    this._frameInterval = 1f / _updateRate;
-                }
-                else
-                {
-                    Debug.LogWarning("Cannot set the update rate because useUpdateRate is disabled.");
-                }
-            }
+            get { return this.useUpdateRate ? (int)this._updateRate : -1; }
+            set { this.SetUpdateRate((uint)value); }
         }
 
 
@@ -84,19 +62,17 @@ namespace BehaviourSystem.BT
             {
                 Debug.LogError("BehaviourTree is not assigned.");
                 this.enabled = false;
+                return;
             }
-            else
+
+            if (this.useUpdateRate)
             {
-                if (this.useUpdateRate)
-                {
-                    this.updateRate = (int)_updateRate;
-                }
-
-                this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree);
-                this._rootNode = _runtimeTree.nodeSet.rootNode;
+                this.SetUpdateRate(_updateRate);
             }
-        }
 
+            this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree);
+            this._rootNode = _runtimeTree.nodeSet.rootNode;
+        }
 
 
         private void Update()
@@ -106,15 +82,9 @@ namespace BehaviourSystem.BT
                 return;
             }
 
-            if (useUpdateRate == false || _frameInterval + _timeSinceLastUpdate < Time.time)
+            if (_frameInterval + _timeSinceLastUpdate < Time.time || useUpdateRate == false)
             {
-                this._timeSinceLastUpdate = Time.time;
-                this.lastExecutingResult = _rootNode.UpdateNode();
-
-                if (this.lastExecutingResult != NodeBase.EBehaviourResult.Running)
-                {
-                    onResolved?.Invoke(this.lastExecutingResult);
-                }
+                _rootNode.UpdateNode();
             }
         }
 
@@ -138,13 +108,29 @@ namespace BehaviourSystem.BT
                 return;
             }
 #endif
-            
-            if (useGizmos == false || _runtimeTree is null || pause)
+
+            if (useGizmos == false || _runtimeTree is null)
             {
                 return;
             }
 
             _rootNode.GizmosUpdateNode();
+        }
+
+
+
+        private void SetUpdateRate(uint targetUpdateRate)
+        {
+            if (this.useUpdateRate)
+            {
+                this._updateRate = (uint)Mathf.Max(Application.targetFrameRate, 0);
+                this._updateRate = _updateRate == 0 ? targetUpdateRate : _updateRate;
+                this._frameInterval = 1f / _updateRate;
+            }
+            else
+            {
+                Debug.LogWarning("Cannot set the update rate because useUpdateRate is disabled.");
+            }
         }
 
 
@@ -201,7 +187,7 @@ namespace BehaviourSystem.BT
 
         public void RegisterOnNodeEnterCallback(string treePath, Action<NodeBase> callback)
         {
-            if (this.TryGetNodeByPath(treePath, out NodeBase node))
+            if (this.handler.TryGetNodeByPath(treePath, _runtimeTree.nodeSet, out NodeBase node))
             {
                 node.onNodeEnter += callback;
             }
@@ -214,7 +200,7 @@ namespace BehaviourSystem.BT
 
         public void RegisterNodeExitCallback(string treePath, Action<NodeBase> callback)
         {
-            if (this.TryGetNodeByPath(treePath, out NodeBase node))
+            if (this.handler.TryGetNodeByPath(treePath, _runtimeTree.nodeSet, out NodeBase node))
             {
                 node.onNodeExit += callback;
             }
@@ -227,7 +213,7 @@ namespace BehaviourSystem.BT
 
         public void UnregisterNodeEnterCallback(string treePath, Action<NodeBase> callback)
         {
-            if (this.TryGetNodeByPath(treePath, out NodeBase node))
+            if (this.handler.TryGetNodeByPath(treePath, _runtimeTree.nodeSet, out NodeBase node))
             {
                 node.onNodeEnter -= callback;
             }
@@ -240,7 +226,7 @@ namespace BehaviourSystem.BT
 
         public void UnregisterNodeExitCallback(string treePath, Action<NodeBase> callback)
         {
-            if (this.TryGetNodeByPath(treePath, out NodeBase node))
+            if (this.handler.TryGetNodeByPath(treePath, _runtimeTree.nodeSet, out NodeBase node))
             {
                 node.onNodeExit -= callback;
             }
@@ -248,50 +234,6 @@ namespace BehaviourSystem.BT
             {
                 Debug.LogWarning($"Node with path '{treePath}' was not found.");
             }
-        }
-
-
-        private bool TryGetNodeByPath(string treePath, out NodeBase node)
-        {
-            if (string.IsNullOrEmpty(treePath) || string.IsNullOrWhiteSpace(treePath))
-            {
-                node = null;
-                return false;
-            }
-
-            string[] paths = treePath.Split('/');
-
-            if (paths.Length == 0 || string.CompareOrdinal(_runtimeTree.nodeSet.rootNode.name, paths[0]) != 0)
-            {
-                node = null;
-                return false;
-            }
-
-            NodeBase nodeBase = _runtimeTree.nodeSet.rootNode;
-
-            for (int i = 1; i < paths.Length; i++)
-            {
-                bool find = false;
-
-                foreach (NodeBase child in _runtimeTree.nodeSet.GetChildren(nodeBase))
-                {
-                    if (string.CompareOrdinal(child.name, paths[i]) == 0)
-                    {
-                        nodeBase = child;
-                        find = true;
-                        break;
-                    }
-                }
-
-                if (find == false)
-                {
-                    node = null;
-                    return false;
-                }
-            }
-
-            node = nodeBase;
-            return true;
         }
     }
 }

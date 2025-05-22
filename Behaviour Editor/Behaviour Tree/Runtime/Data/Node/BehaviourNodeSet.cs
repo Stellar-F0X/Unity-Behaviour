@@ -19,7 +19,6 @@ namespace BehaviourSystem.BT
         public List<NodeBase> nodeList = new List<NodeBase>();
 
         
-        
         internal BehaviourNodeSet Clone(BehaviourTreeRunner treeRunner)
         {
             BehaviourNodeSet clonedSet = CreateInstance<BehaviourNodeSet>();
@@ -29,21 +28,6 @@ namespace BehaviourSystem.BT
             treeRunner.handler.CloneTree(this.rootNode, clonedSet.rootNode, treeRunner, clonedSet);
             
             return clonedSet;
-        }
-        
-
-        public List<NodeBase> GetChildren(NodeBase parent)
-        {
-            switch (parent.nodeType)
-            {
-                case NodeBase.ENodeType.Root: return new List<NodeBase> { ((RootNode)parent).child };
-
-                case NodeBase.ENodeType.Decorator: return new List<NodeBase> { ((DecoratorNode)parent).child };
-
-                case NodeBase.ENodeType.Composite: return ((CompositeNode)parent).children;
-            }
-
-            return null;
         }
 
 
