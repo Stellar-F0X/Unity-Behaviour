@@ -25,10 +25,16 @@ namespace BehaviourSystem.BT
 
         private List<bool> _isChildStopped;
 
-        
+
+        public override string tooltip
+        {
+            get { return "Executes multiple child nodes simultaneously. \nSuccess/failure is determined by the configured policy."; }
+        }
+
+
         public override void PostTreeCreation()
         {
-            _isChildStopped = new List<bool>(children.Count); // childCount -> children.Count
+            _isChildStopped = new List<bool>(children.Count);
 
             for (int i = 0; i < children.Count; ++i)
             {

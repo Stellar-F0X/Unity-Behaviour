@@ -14,6 +14,7 @@ namespace BehaviourSystemEditor.BT
         {
             this.node = node;
             this.title = node.name;
+            this.tooltip = node.tooltip;
             this.viewDataKey = node.guid;
             this.style.left = node.position.x;
             this.style.top = node.position.y;

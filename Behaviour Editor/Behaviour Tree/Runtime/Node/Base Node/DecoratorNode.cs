@@ -11,7 +11,7 @@ namespace BehaviourSystem.BT
         public NodeBase child;
         
         
-        public override ENodeType nodeType
+        public override sealed ENodeType nodeType
         {
             get { return ENodeType.Decorator; }
         }

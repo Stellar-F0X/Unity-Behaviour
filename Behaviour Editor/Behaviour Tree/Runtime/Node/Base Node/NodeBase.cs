@@ -10,7 +10,6 @@ namespace BehaviourSystem.BT
     public abstract class NodeBase : ScriptableObject, IEquatable<NodeBase>
     {
 #region Node Enums
-
         public enum ENodeCallState
         {
             BeforeEnter,
@@ -33,10 +32,8 @@ namespace BehaviourSystem.BT
             Decorator,
             Subset
         };
-
 #endregion
-
-
+        
         public event Action<NodeBase> onNodeEnter;
 
         public event Action<NodeBase> onNodeExit;
@@ -54,14 +51,16 @@ namespace BehaviourSystem.BT
         [HideInInspector]
         public Vector2 position;
 #endif
+        
+        [NonSerialized]
+        internal int callStackID;
 
         [HideInInspector]
         public NodeBase parent;
 
         [NonSerialized]
         public BehaviourTreeRunner treeRunner;
-
-        internal int callStackID;
+        
         
         protected ENodeCallState _callState;
 
@@ -87,6 +86,11 @@ namespace BehaviourSystem.BT
         public abstract ENodeType nodeType
         {
             get;
+        }
+
+        public virtual string tooltip
+        {
+            get { return string.Empty; }
         }
 
 

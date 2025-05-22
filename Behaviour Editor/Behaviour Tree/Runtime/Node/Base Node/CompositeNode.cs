@@ -13,7 +13,7 @@ namespace BehaviourSystem.BT
         protected int _currentChildIndex;
 
 
-        public override ENodeType nodeType
+        public override sealed ENodeType nodeType
         {
             get { return ENodeType.Composite; }
         }
