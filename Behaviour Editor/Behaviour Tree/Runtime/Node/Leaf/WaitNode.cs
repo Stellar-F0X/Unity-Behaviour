@@ -4,6 +4,7 @@ namespace BehaviourSystem.BT
 {
     public class WaitNode : ActionNode
     {
+        [Space]
         public float duration = 1f;
         private float _startTime;
         

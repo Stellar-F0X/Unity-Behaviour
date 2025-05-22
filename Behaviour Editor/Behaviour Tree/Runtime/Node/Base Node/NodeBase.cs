@@ -46,6 +46,9 @@ namespace BehaviourSystem.BT
         public string guid;
 
         public string tag;
+        
+        [Multiline(3)]
+        public string description;
 
 #if UNITY_EDITOR
         [HideInInspector]

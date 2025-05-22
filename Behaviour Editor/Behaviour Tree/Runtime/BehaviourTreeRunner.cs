@@ -57,7 +57,10 @@ namespace BehaviourSystem.BT
 
         public int updateRate
         {
-            get { return this.useUpdateRate ? (int)this._updateRate : -1; }
+            get
+            {
+                return this.useUpdateRate ? (int)this._updateRate : -1; 
+            }
 
             set
             {
@@ -129,7 +132,14 @@ namespace BehaviourSystem.BT
 
         private void OnDrawGizmos()
         {
-            if (useGizmos == false || _runtimeTree is null || pause || Application.isPlaying == false)
+#if UNITY_EDITOR
+            if (Application.isPlaying == false)
+            {
+                return;
+            }
+#endif
+            
+            if (useGizmos == false || _runtimeTree is null || pause)
             {
                 return;
             }

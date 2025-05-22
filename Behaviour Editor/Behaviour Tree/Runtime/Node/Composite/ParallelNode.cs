@@ -17,6 +17,7 @@ namespace BehaviourSystem.BT
             RequireOneFailure
         };
 
+        [Space]
         public EParallelPolicy parallelPolicy;
 
         private int _successfulChildCount = 0;

@@ -21,7 +21,7 @@ namespace BehaviourSystem.BT
         
         protected override EBehaviourResult OnUpdate()
         {
-            if (child == null)
+            if (child is null)
             {
                 return EBehaviourResult.Failure;
             }
