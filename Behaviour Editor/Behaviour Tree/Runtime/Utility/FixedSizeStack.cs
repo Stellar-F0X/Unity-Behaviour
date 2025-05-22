@@ -1,0 +1,42 @@
+namespace BehaviourSystem.BT
+{
+    public class FixedSizeStack<T>
+    {
+        public FixedSizeStack(int capacity)
+        {
+            _items = new T[capacity];
+            _count = 0;
+        }
+
+        private readonly T[] _items;
+        private int _count;
+
+
+        public int count
+        {
+            get { return _count; }
+        }
+
+        public bool isEmpty
+        {
+            get { return _count == 0; }
+        }
+        
+        public T peek
+        {
+            get { return _items[_count - 1]; }
+        }
+
+
+        public void Push(T item)
+        {
+            _items[_count++] = item;
+        }
+
+
+        public T Pop()
+        {
+            return _items[--_count];
+        }
+    }
+}

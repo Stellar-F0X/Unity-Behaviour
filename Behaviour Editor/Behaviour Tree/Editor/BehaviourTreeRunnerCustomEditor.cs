@@ -10,33 +10,35 @@ namespace BehaviourSystemEditor.BT
     {
         public override void OnInspectorGUI()
         {
-            if (target is BehaviourTreeRunner runner)
+            SerializedProperty treeAsset = serializedObject.FindProperty("_runtimeTree");
+            SerializedProperty useFixedUpdate = serializedObject.FindProperty("useFixedUpdate");
+            SerializedProperty useGizmos = serializedObject.FindProperty("useGizmos");
+
+            treeAsset.objectReferenceValue = EditorGUILayout.ObjectField("Tree Asset", treeAsset.objectReferenceValue, typeof(BehaviourTree), false);
+            useFixedUpdate.boolValue = EditorGUILayout.Toggle("Use Fixed Update", useFixedUpdate.boolValue);
+            useGizmos.boolValue = EditorGUILayout.Toggle("Use Gizmos Update", useGizmos.boolValue);
+
+            EditorGUILayout.Space(5);
+            EditorGUILayout.BeginHorizontal();
+
+            SerializedProperty useUpdateRate = serializedObject.FindProperty("useUpdateRate");
+            SerializedProperty updateRate = serializedObject.FindProperty("_updateRate");
+            
+            useUpdateRate.boolValue = EditorGUILayout.Toggle("Use Update Rate", useUpdateRate.boolValue);
+
+            if (useUpdateRate.boolValue)
             {
-                SerializedProperty runtimeTreeField = serializedObject.FindProperty("_runtimeTree");
-                runtimeTreeField.objectReferenceValue = EditorGUILayout.ObjectField("Tree Asset", runner.runtimeTree, typeof(BehaviourTree), false);
-                
-                runner.useFixedUpdate = EditorGUILayout.Toggle("Use Fixed Update", runner.useFixedUpdate);
-                runner.useGizmos = EditorGUILayout.Toggle("Use Gizmos Update", runner.useGizmos);
-
-                EditorGUILayout.Space(5);
-                EditorGUILayout.BeginHorizontal();
-
-                runner.useUpdateRate = EditorGUILayout.Toggle("Use Update Rate", runner.useUpdateRate);
-
-                if (runner.useUpdateRate)
-                {
-                    int maxFPS = Application.targetFrameRate > 0 ? Application.targetFrameRate : (int)BehaviourTreeEditor.Settings.maxUpdateRate;
-                    runner.updateRate = EditorGUILayout.IntSlider(runner.updateRate, 1, maxFPS);
-                    EditorGUILayout.EndHorizontal();
-                    EditorGUILayout.HelpBox($"This node executes with a time interval of {1f / runner.updateRate:F3} seconds.", MessageType.Info);
-                }
-                else
-                {
-                    EditorGUILayout.EndHorizontal();
-                }
-                
-                serializedObject.ApplyModifiedProperties();
+                int maxFPS = Application.targetFrameRate > 0 ? Application.targetFrameRate : (int)BehaviourTreeEditor.Settings.maxUpdateRate;
+                updateRate.uintValue = (uint)EditorGUILayout.IntSlider((int)updateRate.uintValue, 1, maxFPS);
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.HelpBox($"This node executes with a time interval of {1f / updateRate.uintValue:F3} seconds.", MessageType.Info);
             }
+            else
+            {
+                EditorGUILayout.EndHorizontal();
+            }
+
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace BehaviourSystem.BT
 
         protected override EBehaviourResult OnUpdate()
         {
-            if (conditions != null && conditions.All(c => c.Execute()))
+            if (conditions != null && this.CheckCondition())
             {
                 return EBehaviourResult.Success;
             }
@@ -27,6 +27,20 @@ namespace BehaviourSystem.BT
                 child.UpdateNode();
                 return EBehaviourResult.Running;
             }
+        }
+        
+        
+        private bool CheckCondition()
+        {
+            for (int i = 0; i < conditions.Count; ++i)
+            {
+                if (conditions[i].Execute() == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

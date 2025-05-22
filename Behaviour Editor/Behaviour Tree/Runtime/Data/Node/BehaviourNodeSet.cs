@@ -23,10 +23,7 @@ namespace BehaviourSystem.BT
         {
             BehaviourNodeSet clonedSet = CreateInstance<BehaviourNodeSet>();
             clonedSet.rootNode = Instantiate(this.rootNode) as RootNode;
-            
-            // BehaviourNodeTracer를 통해 클론 트리 구축
-            treeRunner.handler.CloneTree(this.rootNode, clonedSet.rootNode, treeRunner, clonedSet);
-            
+            treeRunner.handler.CloneNodeSet(this.rootNode, clonedSet.rootNode, treeRunner, this, clonedSet);
             return clonedSet;
         }
 

@@ -52,6 +52,7 @@ namespace BehaviourSystem.BT
         public int updateRate
         {
             get { return this.useUpdateRate ? (int)this._updateRate : -1; }
+            
             set { this.SetUpdateRate((uint)value); }
         }
 
