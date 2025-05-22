@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor.Callbacks;
+using UnityEditor.Experimental.GraphView;
 using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine.SceneManagement;
@@ -73,7 +74,7 @@ namespace BehaviourSystemEditor.BT
 
         private BehaviourTreeView _treeView;
         private InspectorView _inspectorView;
-        private BlackboardPropertyListView _blackboardProp;
+        private BlackboardPropertyListView _blackboardListView;
 
 
         public BehaviourTree Tree
@@ -118,7 +119,7 @@ namespace BehaviourSystemEditor.BT
             if (_tree is not null && AssetDatabase.Contains(_tree) == false)
             {
                 //상호 연관이 적은 것부터 삭제.
-                this._blackboardProp.ClearBlackboardView();
+                this._blackboardListView.ClearBlackboardView();
                 this._inspectorView.Clear();
                 this._treeView?.ClearEditorView();
 
@@ -139,7 +140,7 @@ namespace BehaviourSystemEditor.BT
         {
             if (_tree is null)
             {
-                this._blackboardProp.ClearBlackboardView();
+                this._blackboardListView.ClearBlackboardView();
                 this._inspectorView.Clear();
                 this._treeView?.ClearEditorView();
 
@@ -182,8 +183,8 @@ namespace BehaviourSystemEditor.BT
             _treeView = rootVisualElement.Q<BehaviourTreeView>();
             _inspectorView = rootVisualElement.Q<InspectorView>();
 
-            _blackboardProp = rootVisualElement.Q<BlackboardPropertyListView>();
-            _blackboardProp.Setup(rootVisualElement.Q<ToolbarMenu>("add-element-button"));
+            _blackboardListView = rootVisualElement.Q<BlackboardPropertyListView>();
+            _blackboardListView.Setup(rootVisualElement.Q<ToolbarMenu>("add-element-button"));
 
             _treeView.popupSearchField = rootVisualElement.Q<ToolbarPopupSearchField>("search-node-field");
             _treeView.popupSearchField.RegisterValueChangedCallback(_treeView.SearchNodeByNameOrTag);
@@ -234,10 +235,10 @@ namespace BehaviourSystemEditor.BT
                     isInLoadingBTAsset = true;
 
                     _inspectorView?.ClearInspectorView();
-                    _blackboardProp?.ClearBlackboardView();
+                    _blackboardListView?.ClearBlackboardView();
 
                     _treeView?.OnGraphEditorView(_tree);
-                    _blackboardProp?.OnBehaviourTreeChanged(_tree);
+                    _blackboardListView?.OnBehaviourTreeChanged(_tree);
 
                     isInLoadingBTAsset = false;
                 }

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 namespace BehaviourSystemEditor.BT
@@ -6,14 +7,16 @@ namespace BehaviourSystemEditor.BT
     public class BehaviourTreeEditorSettings : ScriptableObject
     {
         [Header("Grid Options")]
-        public float enlargementScale = 2.5f;
+        public float maxZoomScale = 1.5f;
 
-        public float reductionScale = 0.2f;
+        public float minZoomScale = 0.5f;
 
         [Header("Highlight Options")]
         public float minimumFocusingDuration = 0.5f;
-
-        public Color nodeGroupColor = new Color(65f, 65f, 65f, 1f);
+        
+        public Color miniMapBackgroundColor = new Color32(30, 30, 30, 255);
+        
+        public Color nodeGroupColor = new Color32(65, 65, 65, 255);
 
         public Color nodeAppearingColor = new Color32(54, 154, 204, 255);
         public Color nodeDisappearingColor = new Color32(24, 93, 125, 255);

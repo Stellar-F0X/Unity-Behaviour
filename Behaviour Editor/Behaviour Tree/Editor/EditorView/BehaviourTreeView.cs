@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using UnityEngine;
-using UnityEditor;
 using System;
 using System.Linq;
 using BehaviourSystem.BT;
@@ -19,14 +18,17 @@ namespace BehaviourSystemEditor.BT
 
             ContentZoomer zoomer = new ContentZoomer()
             {
-                maxScale = BehaviourTreeEditor.Settings.enlargementScale,
-                minScale = BehaviourTreeEditor.Settings.reductionScale
+                maxScale = BehaviourTreeEditor.Settings.maxZoomScale,
+                minScale = BehaviourTreeEditor.Settings.minZoomScale,
             };
 
             this.AddManipulator(zoomer);
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
+
+            this.UnregisterCallback<GeometryChangedEvent>(this.OnGraphViewGeometryChanged);
+            this.RegisterCallback<GeometryChangedEvent>(this.OnGraphViewGeometryChanged);
 
             styleSheets.Add(BehaviourTreeEditor.Settings.behaviourTreeStyle);
 
@@ -37,6 +39,7 @@ namespace BehaviourSystemEditor.BT
         public Action<NodeView> onNodeSelected;
         public ToolbarPopupSearchField popupSearchField;
 
+        private MiniMap _miniMap;
         private BehaviourTree _tree;
         private NodeSearchHelper _nodeSearchHelper;
         private NodeEdgeHandler _nodeEdgeHandler;
@@ -55,7 +58,7 @@ namespace BehaviourSystemEditor.BT
             if (tree is not null)
             {
                 this._tree = tree;
-                
+
                 graphViewChanged -= this.OnGraphViewChanged;
                 this.deleteSelection -= this.OnDeleteSelectionElements;
 
@@ -63,7 +66,7 @@ namespace BehaviourSystemEditor.BT
 
                 graphViewChanged += this.OnGraphViewChanged;
                 this.deleteSelection += this.OnDeleteSelectionElements;
-                
+
                 for (int i = 0; i < tree.nodeSet.nodeList.Count; ++i)
                 {
                     //Undo로 생성이 취소된 노드를 여기서 처리.
@@ -133,7 +136,7 @@ namespace BehaviourSystemEditor.BT
                 base.AddToSelection(nodeView);
             }
         }
-        
+
 
         public NodeView CreateNewNodeAndView(Type type, Vector2 mousePosition)
         {
@@ -238,12 +241,37 @@ namespace BehaviourSystemEditor.BT
         {
             NodeGroupView nodeGroupView = new NodeGroupView(_tree.groupDataSet, data);
             base.AddElement(nodeGroupView);
-            
+
             nodeGroupView.schedule.Execute(() =>
             {
                 nodeGroupView.SetPosition(new Rect(data.position, Vector2.zero));
                 nodeGroupView.AddElements(nodes.Where(n => n is NodeView v && data.Contains(v.node.guid)));
             });
+        }
+
+
+        private void OnGraphViewGeometryChanged(GeometryChangedEvent evt)
+        {
+            if (_miniMap is null)
+            {
+                _miniMap = new MiniMap();
+                _miniMap.anchored = true;
+                _miniMap.style.backgroundColor = BehaviourTreeEditor.Settings.miniMapBackgroundColor;
+                this.Add(_miniMap);
+            }
+
+            if (evt.newRect.width >= 280 && evt.newRect.height >= 240)
+            {
+                _miniMap.visible = true;
+                _miniMap.enabledSelf = true;
+                
+                _miniMap.SetPosition(new Rect(evt.newRect.width - 240, evt.newRect.height - 200, 220, 180));
+            }
+            else
+            {
+                _miniMap.visible = false;
+                _miniMap.enabledSelf = false;
+            }
         }
 
 
@@ -286,9 +314,7 @@ namespace BehaviourSystemEditor.BT
                     });
                 }
 
-                popupSearchField.schedule
-                                .Execute(_ => popupSearchField.ShowMenu())
-                                .ExecuteLater(100);
+                popupSearchField.ShowMenu();
             }
         }
     }
