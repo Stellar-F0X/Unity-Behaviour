@@ -10,23 +10,11 @@ namespace BehaviourSystem.BT
     [DefaultExecutionOrder(-1)]
     public class BehaviourTreeRunner : MonoBehaviour
     {
-        private struct TraversalInfo
-        {
-            public TraversalInfo(NodeBase node, int stackID)
-            {
-                this.node = node;
-                this.stackID = stackID;
-            }
-
-            public NodeBase node;
-            public int stackID;
-        }
-
-
         private readonly Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();
+        
+        private readonly BehaviourNodeHandler _NodeHandler = new BehaviourNodeHandler();
 
-        private readonly List<Stack<NodeBase>> _runtimeCallStack = new List<Stack<NodeBase>>();
-
+        
         public event Action<NodeBase.EBehaviourResult> onResolved;
 
         public bool useUpdateRate = false;
@@ -41,7 +29,6 @@ namespace BehaviourSystem.BT
 
         [SerializeField]
         private BehaviourTree _runtimeTree;
-
         private NodeBase _rootNode;
 
 
@@ -49,6 +36,12 @@ namespace BehaviourSystem.BT
         {
             get { return _runtimeTree; }
         }
+
+        internal BehaviourNodeHandler handler
+        {
+            get { return _NodeHandler; }
+        }
+        
 
         public NodeBase.EBehaviourResult lastExecutingResult
         {
@@ -98,9 +91,9 @@ namespace BehaviourSystem.BT
 
                 this._runtimeTree = BehaviourTree.MakeRuntimeTree(this, _runtimeTree);
                 this._rootNode = _runtimeTree.nodeSet.rootNode;
-                this.CreateCallStack(_rootNode);
             }
         }
+
 
 
         private void Update()
@@ -143,118 +136,6 @@ namespace BehaviourSystem.BT
 
             _rootNode.GizmosUpdateNode();
         }
-
-
-        internal NodeBase GetCurrentNode(in int callStackID)
-        {
-            if (_runtimeCallStack.Count <= callStackID || _runtimeCallStack[callStackID].Count == 0)
-            {
-                return null;
-            }
-
-            return _runtimeCallStack[callStackID].Peek();
-        }
-
-
-        internal void PushInCallStack(in int callStackID, NodeBase node)
-        {
-            _runtimeCallStack[callStackID].Push(node);
-        }
-
-
-        internal void PopInCallStack(in int callStackID)
-        {
-            if (_runtimeCallStack.Count == 0)
-            {
-                Debug.LogWarning("");
-                return;
-            }
-
-            _runtimeCallStack[callStackID].Pop();
-        }
-
-
-        internal void AbortSubtreeFrom(in int callStackID, NodeBase node)
-        {
-            Queue<TraversalInfo> abortQueue = new Queue<TraversalInfo>();
-            abortQueue.Enqueue(new TraversalInfo(node, callStackID));
-
-            while (abortQueue.Count > 0)
-            {
-                TraversalInfo current = abortQueue.Dequeue();
-                int currentID = current.stackID;
-                NodeBase currentNode = current.node;
-
-                if (_runtimeCallStack.Count <= currentID || _runtimeCallStack[currentID].Count == 0)
-                {
-                    continue;
-                }
-
-                NodeBase stackNode = _runtimeCallStack[currentID].Peek();
-
-                while (stackNode.Equals(currentNode) == false && stackNode.depth > currentNode.depth)
-                {
-                    if (stackNode is ParallelNode parallelNode)
-                    {
-                        parallelNode.Stop();
-
-                        foreach (var child in parallelNode.GetChildren())
-                        {
-                            abortQueue.Enqueue(new TraversalInfo(stackNode, child.callStackID));
-                        }
-                    }
-
-                    stackNode.ExitNode();
-
-                    if (_runtimeCallStack[currentID].Count == 0)
-                    {
-                        break;
-                    }
-
-                    stackNode = _runtimeCallStack[currentID].Peek();
-                }
-            }
-        }
-
-
-
-        internal void AbortSubtree(in int callStackID)
-        {
-            Queue<int> abortQueue = new Queue<int>();
-            abortQueue.Enqueue(callStackID);
-
-            while (abortQueue.Count > 0)
-            {
-                int currentID = abortQueue.Dequeue();
-
-                if (_runtimeCallStack.Count <= currentID || _runtimeCallStack[currentID].Count == 0)
-                {
-                    continue;
-                }
-
-                NodeBase stackNode = _runtimeCallStack[currentID].Peek();
-
-                if (stackNode is ParallelNode parallelNode)
-                {
-                    parallelNode.Stop();
-
-                    foreach (var child in parallelNode.GetChildren())
-                    {
-                        abortQueue.Enqueue(child.callStackID);
-                    }
-                }
-
-                stackNode.ExitNode();
-
-                if (_runtimeCallStack[currentID].Count == 0)
-                {
-                    break;
-                }
-                
-                abortQueue.Enqueue(_runtimeCallStack[currentID].Peek().callStackID);
-            }
-        }
-
 
 
         public void SetProperty<TValue>(in string key, TValue property)
@@ -356,53 +237,6 @@ namespace BehaviourSystem.BT
             else
             {
                 Debug.LogWarning($"Node with path '{treePath}' was not found.");
-            }
-        }
-
-
-        private void CreateCallStack(NodeBase rootOfSubtree)
-        {
-            int callStackID = 0;
-            Queue<TraversalInfo> workQueue = new Queue<TraversalInfo>();
-            workQueue.Enqueue(new TraversalInfo(rootOfSubtree, 0));
-
-            while (workQueue.Count > 0)
-            {
-                TraversalInfo currentTraversal = workQueue.Dequeue();
-                Stack<NodeBase> traversalStack = new Stack<NodeBase>();
-                currentTraversal.node.callStackID = currentTraversal.stackID;
-                traversalStack.Push(currentTraversal.node);
-
-                while (traversalStack.Count > 0)
-                {
-                    NodeBase currentNode = traversalStack.Pop();
-                    currentNode.callStackID = currentTraversal.stackID;
-
-                    while (_runtimeCallStack.Count <= currentNode.callStackID)
-                    {
-                        _runtimeCallStack.Add(new Stack<NodeBase>());
-                    }
-
-                    if (currentNode is IBehaviourIterable iterable && iterable.childCount > 0)
-                    {
-                        if (currentNode is ParallelNode)
-                        {
-                            _runtimeCallStack.Add(new Stack<NodeBase>());
-
-                            foreach (NodeBase child in iterable.GetChildren())
-                            {
-                                workQueue.Enqueue(new TraversalInfo(child, ++callStackID));
-                            }
-                        }
-                        else
-                        {
-                            foreach (NodeBase child in iterable.GetChildren())
-                            {
-                                traversalStack.Push(child);
-                            }
-                        }
-                    }
-                }
             }
         }
 

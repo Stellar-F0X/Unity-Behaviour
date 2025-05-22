@@ -18,6 +18,19 @@ namespace BehaviourSystem.BT
         [HideInInspector]
         public List<NodeBase> nodeList = new List<NodeBase>();
 
+        
+        
+        internal BehaviourNodeSet Clone(BehaviourTreeRunner treeRunner)
+        {
+            BehaviourNodeSet clonedSet = CreateInstance<BehaviourNodeSet>();
+            clonedSet.rootNode = Instantiate(this.rootNode) as RootNode;
+            
+            // BehaviourNodeTracer를 통해 클론 트리 구축
+            treeRunner.handler.CloneTree(this.rootNode, clonedSet.rootNode, treeRunner, clonedSet);
+            
+            return clonedSet;
+        }
+        
 
         public List<NodeBase> GetChildren(NodeBase parent)
         {

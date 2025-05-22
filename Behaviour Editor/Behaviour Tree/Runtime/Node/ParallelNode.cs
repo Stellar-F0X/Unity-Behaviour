@@ -22,9 +22,29 @@ namespace BehaviourSystem.BT
         private int _successfulChildCount = 0;
         private int _failedChildCount = 0;
 
-        private List<Coroutine> _executingCoroutines = new List<Coroutine>();
+        private List<bool> _isChildStopped;
 
+        
+        public override void PostTreeCreation()
+        {
+            _isChildStopped = new List<bool>(children.Count); // childCount -> children.Count
 
+            for (int i = 0; i < children.Count; ++i)
+            {
+                _isChildStopped.Add(false);
+            }
+        }
+
+        
+        public void Stop()
+        {
+            for (int i = 0; i < children.Count; ++i)
+            {
+                _isChildStopped[i] = false;
+            }
+        }
+
+        
         protected override void OnEnter()
         {
             if (children is null || children.Count == 0)
@@ -34,120 +54,124 @@ namespace BehaviourSystem.BT
 
             _failedChildCount = 0;
             _successfulChildCount = 0;
-
-            foreach (var child in children)
+            
+            for (int i = 0; i < children.Count; ++i)
             {
-                IEnumerator enumerator = this.Run(child);
-
-                _executingCoroutines.Add(treeRunner.StartCoroutine(enumerator));
+                _isChildStopped[i] = false;
             }
         }
 
-
+        
         protected override EBehaviourResult OnUpdate()
         {
-            if (_successfulChildCount + _failedChildCount > 0)
+            for (int i = 0; i < children.Count; ++i)
             {
-                switch (parallelPolicy)
+                if (_isChildStopped[i] == false)
                 {
-                    case EParallelPolicy.RequireAllSuccess:
+                    switch (children[i].UpdateNode())
                     {
-                        if (_successfulChildCount + _failedChildCount == children.Count)
+                        case EBehaviourResult.Success:
                         {
-                            return _successfulChildCount == children.Count ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                            _successfulChildCount++;
+                            _isChildStopped[i] = true;
+                            break;
                         }
 
-                        break;
-                    }
-
-                    case EParallelPolicy.RequireAllFailure:
-                    {
-                        if (_successfulChildCount + _failedChildCount == children.Count)
+                        case EBehaviourResult.Failure:
                         {
-                            return _failedChildCount == children.Count ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                            _failedChildCount++;
+                            _isChildStopped[i] = true;
+                            break;
                         }
-
-                        break;
                     }
+                }
+            }
 
-                    case EParallelPolicy.RequireOneSuccess:
+            return this.EvaluatePolicy();
+        }
+
+        
+        private EBehaviourResult EvaluatePolicy()
+        {
+            switch (parallelPolicy)
+            {
+                case EParallelPolicy.RequireAllSuccess:
+                {
+                    if (_successfulChildCount == children.Count)
                     {
-                        this.Stop();
-
-                        foreach (var child in children)
-                        {
-                            if (child.behaviourResult == EBehaviourResult.Running)
-                            {
-                                treeRunner.AbortSubtree(child.callStackID);
-                            }
-                        }
-
-                        return _successfulChildCount > 0 ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                        return EBehaviourResult.Success;
                     }
 
-                    case EParallelPolicy.RequireOneFailure:
+                    if (_failedChildCount > 0)
                     {
-                        this.Stop();
-
-                        foreach (var child in children)
-                        {
-                            if (child.behaviourResult == EBehaviourResult.Running)
-                            {
-                                treeRunner.AbortSubtree(child.callStackID);
-                            }
-                        }
-
-                        return _failedChildCount > 0 ? EBehaviourResult.Success : EBehaviourResult.Failure;
+                        return EBehaviourResult.Failure;
                     }
+
+                    return EBehaviourResult.Running;
+                }
+
+                case EParallelPolicy.RequireAllFailure:
+                {
+                    if (_failedChildCount == children.Count)
+                    {
+                        return EBehaviourResult.Success;
+                    }
+
+                    if (_successfulChildCount > 0)
+                    {
+                        return EBehaviourResult.Failure;
+                    }
+
+                    return EBehaviourResult.Running;
+                }
+
+                case EParallelPolicy.RequireOneSuccess:
+                {
+                    if (_successfulChildCount > 0)
+                    {
+                        return EBehaviourResult.Success;
+                    }
+
+                    if (_successfulChildCount + _failedChildCount == children.Count)
+                    {
+                        return EBehaviourResult.Failure;
+                    }
+
+                    return EBehaviourResult.Running;
+                }
+
+                case EParallelPolicy.RequireOneFailure:
+                {
+                    if (_failedChildCount > 0)
+                    {
+                        return EBehaviourResult.Success;
+                    }
+
+                    if (_successfulChildCount + _failedChildCount == children.Count)
+                    {
+                        return EBehaviourResult.Failure;
+                    }
+
+                    return EBehaviourResult.Running;
                 }
             }
 
             return EBehaviourResult.Running;
         }
 
-
+        
         protected override void OnExit()
         {
-            this.Stop();
-        }
-
-
-        private IEnumerator Run(NodeBase child)
-        {
-            while (true)
+            for (int i = 0; i < children.Count; ++i)
             {
-                switch (child.UpdateNode())
+                if (_isChildStopped[i] == false)
                 {
-                    case EBehaviourResult.Failure:
-                        _failedChildCount++;
-                        yield break;
-
-                    case EBehaviourResult.Success:
-                        _successfulChildCount++;
-                        yield break;
-                }
-
-                yield return null;
-            }
-        }
-
-
-        public void Stop()
-        {
-            if (_executingCoroutines is null || _executingCoroutines.Count == 0)
-            {
-                return;
-            }
-
-            for (int i = 0; i < _executingCoroutines.Count; ++i)
-            {
-                if (_executingCoroutines[i] is not null)
-                {
-                    treeRunner.StopCoroutine(_executingCoroutines[i]);
+                    int stackID = children[i].callStackID;
+                    
+                    treeRunner.handler.AbortSubtree(stackID);
+                    _isChildStopped[i] = true;
                 }
             }
-
-            _executingCoroutines.Clear();
         }
     }
 }

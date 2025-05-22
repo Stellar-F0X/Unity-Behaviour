@@ -58,7 +58,7 @@ namespace BehaviourSystem.BT
         [NonSerialized]
         public BehaviourTreeRunner treeRunner;
 
-        public int callStackID;
+        internal int callStackID;
         
         protected ENodeCallState _callState;
 
@@ -103,9 +103,9 @@ namespace BehaviourSystem.BT
 
                 if (this.behaviourResult != EBehaviourResult.Running)
                 {
-                    if (this.treeRunner.GetCurrentNode(callStackID) != this)
+                    if (this.treeRunner.handler.GetCurrentNode(callStackID) != this)
                     {
-                        this.treeRunner.AbortSubtreeFrom(callStackID, this);
+                        this.treeRunner.handler.AbortSubtreeFrom(callStackID, this);
                     }
 
                     this._callState = ENodeCallState.BeforeExit;
@@ -124,7 +124,7 @@ namespace BehaviourSystem.BT
 
         public void EnterNode()
         {
-            this.treeRunner.PushInCallStack(callStackID, this);
+            this.treeRunner.handler.PushInCallStack(callStackID, this);
             this.OnEnter();
             this._callState = ENodeCallState.Updating;
         }
@@ -133,7 +133,7 @@ namespace BehaviourSystem.BT
         public void ExitNode()
         {
             this.OnExit();
-            this.treeRunner.PopInCallStack(callStackID);
+            this.treeRunner.handler.PopInCallStack(callStackID);
             this._callState = ENodeCallState.BeforeEnter;
 
             // If a parent node fails during execution, this node's result is set to Failure.
@@ -158,15 +158,9 @@ namespace BehaviourSystem.BT
 
             return string.CompareOrdinal(this.guid, other.guid) == 0;
         }
-
-
-
-        /// 현재 노드가 생성 직후 호출되는 함수.
-        public virtual void OnInitialize() { }
-        
         
         /// 모든 노드가 생성된뒤 호출되는 함수.
-        public virtual void OnPostInitialize() { }
+        public virtual void PostTreeCreation() { }
         
 
         public virtual void FixedUpdateNode() { }
@@ -182,6 +176,5 @@ namespace BehaviourSystem.BT
 
 
         protected abstract EBehaviourResult OnUpdate();
-
     }
 }

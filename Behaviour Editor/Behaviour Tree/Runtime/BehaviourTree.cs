@@ -24,7 +24,7 @@ namespace BehaviourSystem.BT
         }
 
 
-        public static BehaviourTree MakeRuntimeTree(BehaviourTreeRunner treeRunner, BehaviourTree targetTree)
+        internal static BehaviourTree MakeRuntimeTree(BehaviourTreeRunner treeRunner, BehaviourTree targetTree)
         {
             if (treeRunner == null)
             {
