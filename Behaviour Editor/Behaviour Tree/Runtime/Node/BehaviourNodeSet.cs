@@ -10,7 +10,7 @@ using UnityEditor;
 
 namespace BehaviourSystem.BT
 {
-    public partial class BehaviourNodeSet : ScriptableObject
+    public class BehaviourNodeSet : ScriptableObject
     {
         [HideInInspector]
         public NodeBase rootNode;

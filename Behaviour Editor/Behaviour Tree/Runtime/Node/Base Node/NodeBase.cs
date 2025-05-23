@@ -139,8 +139,8 @@ namespace BehaviourSystem.BT
 
         public void ExitNode()
         {
-            this.OnExit();
             this.treeRunner.handler.PopInCallStack(callStackID);
+            this.OnExit();
             this._callState = ENodeCallState.BeforeEnter;
 
             // If a parent node fails during execution, this node's result is set to Failure.
