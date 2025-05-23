@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
+using UObject = UnityEngine.Object;
 
 namespace BehaviourSystem.BT
 {
@@ -43,60 +44,137 @@ namespace BehaviourSystem.BT
 
 
 #region Public Methods
+        /// <summary> 트리에서 지정된 태그가 수식된 노드들을 찾습니다. </summary>
+        /// <param name="nodeTag">수식된 태그</param>
+        /// <param name="nodeSet">트리 집합</param>
+        /// <param name="accessors">찾은 노드들</param>
+        /// <returns>노드 탐색 성공 여부</returns>
+        public NodeAccessor[] GetNodeByTag(string nodeTag, BehaviourNodeSet nodeSet)
+        {
+            Span<int> indexArray = stackalloc int[nodeSet.nodeList.Count];
+            int count = 0;
+            
+            for (int i = 0; i < nodeSet.nodeList.Count; ++i)
+            {
+                NodeBase currentNode = nodeSet.nodeList[i];
+
+                if (currentNode.tag.CompareTo(nodeTag) == 0)
+                {
+                    indexArray[count] = i;
+                    count++;
+                }
+            }
+
+            if (count > 0)
+            {
+                NodeAccessor[] accessors = new NodeAccessor[count];
+                
+                //만약 Tag가 모든 노드를 대상으로 한다면 시간 복잡도는 O(2n)이 되므로 GC 측면에선 좋으나, 빠른 검색의 관점에선 잘 모르겠다. 
+                for (int i = 0; i < count; ++i)
+                {
+                    NodeBase targetNode = nodeSet.nodeList[indexArray[i]];
+                    accessors[i] = new NodeAccessor(targetNode);
+                }
+
+                return accessors;
+            }
+            
+            return null;
+        }
+        
 
         /// <summary> 트리 디렉토리를 토대로 경로상에 위치한 노드를 찾습니다. </summary>
         /// <param name="treePath">트리 디렉토리</param>
         /// <param name="nodeSet">트리 집합</param>
         /// <param name="node">찾은 노드</param>
-        /// <returns>트리 탐색 성공 여부</returns>
-        public bool TryGetNodeByPath(string treePath, BehaviourNodeSet nodeSet, out NodeBase node)
+        /// <returns>노드 탐색 성공 여부</returns>
+        public bool TryGetNodeByPath(string treePath, BehaviourNodeSet nodeSet, out NodeAccessor node)
         {
             if (string.IsNullOrEmpty(treePath) || string.IsNullOrWhiteSpace(treePath))
             {
-                node = null;
+                node = default;
                 return false;
             }
-
-            string[] paths = treePath.Split('/');
-
-            if (paths.Length == 0 || string.CompareOrdinal(nodeSet.rootNode.name, paths[0]) != 0)
+            
+            Span<char> pathBuffer = stackalloc char[256];
+            Span<int> pathStartIndices = stackalloc int[128];
+            Span<int> pathLengths = stackalloc int[128];
+            
+            int pathCount = 0;
+            int currentStart = 0;
+            int pathLength = Math.Min(treePath.Length, 256);
+            
+            treePath.AsSpan(0, pathLength).CopyTo(pathBuffer);
+            
+            for (int i = 0; i < pathLength; i++)
             {
-                node = null;
+                if (pathBuffer[i] == '/')
+                {
+                    if (i > currentStart) // 빈 경로 세그먼트 방지
+                    {
+                        pathStartIndices[pathCount] = currentStart;
+                        pathLengths[pathCount] = i - currentStart;
+                        pathCount++;
+                    }
+                    currentStart = i + 1;
+                }
+            }
+            
+            if (currentStart < pathLength)
+            {
+                pathStartIndices[pathCount] = currentStart;
+                pathLengths[pathCount] = pathLength - currentStart;
+                pathCount++;
+            }
+            
+            if (pathCount == 0)
+            {
+                node = default;
                 return false;
             }
-
+            
+            ReadOnlySpan<char> rootNamePath = pathBuffer.Slice(pathStartIndices[0], pathLengths[0]);
+            
+            if (rootNamePath.Equals(nodeSet.rootNode.name.AsSpan(), StringComparison.Ordinal) == false)
+            {
+                node = default;
+                return false;
+            }
+            
             NodeBase nodeBase = nodeSet.rootNode;
-
-            for (int i = 1; i < paths.Length; i++)
+            
+            for (int i = 1; i < pathCount; i++)
             {
                 bool find = false;
-
+                ReadOnlySpan<char> currentPath = pathBuffer.Slice(pathStartIndices[i], pathLengths[i]);
+                
                 if (nodeBase is IBehaviourIterable iterable)
                 {
                     foreach (NodeBase child in iterable.GetChildren())
                     {
-                        if (string.CompareOrdinal(child.name, paths[i]) == 0)
+                        if (currentPath.Equals(child.name.AsSpan(), StringComparison.Ordinal))
                         {
                             nodeBase = child;
                             find = true;
                             break;
                         }
                     }
-
+                    
                     if (find == false)
                     {
-                        node = null;
+                        node = default;
                         return false;
                     }
                 }
             }
 
-            node = nodeBase;
+            node = new NodeAccessor(nodeBase);
             return true;
         }
 
 
-        /// <summary> 노드 클론 생성 및 CallStack 구축, 순회를 통해 트리의 노드들을 복제하고 동시에 CallStack 생성 </summary>
+
+        /// <summary> 노드 클론 생성 및 CallStack 구축, 순회를 통해 트리의 노드들을 복제하고 동시에 콜 스택을 생성합니다. </summary>
         /// <param name="originalRoot">원본 루트 노드</param>
         /// <param name="clonedRoot">클론된 루트 노드</param>
         /// <param name="treeRunner">트리 러너</param>
@@ -253,7 +331,7 @@ namespace BehaviourSystem.BT
                 return;
             }
 
-            NodeBase childClone = Object.Instantiate(origin.child);
+            NodeBase childClone = UObject.Instantiate(origin.child);
             childClone.parent = clone;
             clone.child = childClone;
 
@@ -269,7 +347,7 @@ namespace BehaviourSystem.BT
                 return;
             }
 
-            NodeBase childClone = Object.Instantiate(origin.child);
+            NodeBase childClone = UObject.Instantiate(origin.child);
             childClone.parent = clone;
             clone.child = childClone;
 
@@ -290,7 +368,7 @@ namespace BehaviourSystem.BT
                 // 병렬 노드: 각 자식마다 새로운 CallStack ID 할당
                 for (int i = 0; i < origin.children.Count; ++i)
                 {
-                    NodeBase childClone = Object.Instantiate(origin.children[i]);
+                    NodeBase childClone = UObject.Instantiate(origin.children[i]);
                     childClone.parent = clone;
                     clone.children[i] = childClone;
 
@@ -303,7 +381,7 @@ namespace BehaviourSystem.BT
                 // 일반 컴포지트 노드: 같은 CallStack ID 사용
                 for (int i = 0; i < origin.children.Count; ++i)
                 {
-                    NodeBase childClone = Object.Instantiate(origin.children[i]);
+                    NodeBase childClone = UObject.Instantiate(origin.children[i]);
                     childClone.parent = clone;
                     clone.children[i] = childClone;
 

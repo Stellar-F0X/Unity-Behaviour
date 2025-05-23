@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [assembly: InternalsVisibleTo("BehaviourSystemEditor-BT")]
 
@@ -9,7 +10,6 @@ namespace BehaviourSystem.BT
     [Serializable]
     public abstract class NodeBase : ScriptableObject, IEquatable<NodeBase>
     {
-#region Node Enums
         public enum ENodeCallState
         {
             BeforeEnter,
@@ -32,11 +32,10 @@ namespace BehaviourSystem.BT
             Decorator,
             Subset
         };
-#endregion
         
-        public event Action<NodeBase> onNodeEnter;
+        public event Action onNodeEnter;
 
-        public event Action<NodeBase> onNodeExit;
+        public event Action onNodeExit;
 
 
         [HideInInspector]
@@ -44,13 +43,17 @@ namespace BehaviourSystem.BT
 
         public string tag;
         
+        [NonSerialized]
+        public int depth;
+        
+        [NonSerialized]
+        public ulong callCount;
+        
+        [NonSerialized]
+        public EBehaviourResult behaviourResult;
+        
         [Multiline(3)]
         public string description;
-
-#if UNITY_EDITOR
-        [HideInInspector]
-        public Vector2 position;
-#endif
         
         [NonSerialized]
         internal int callStackID;
@@ -61,23 +64,12 @@ namespace BehaviourSystem.BT
         [NonSerialized]
         public BehaviourTreeRunner treeRunner;
         
-        
-        protected ENodeCallState _callState;
+#if UNITY_EDITOR
+        [HideInInspector]
+        public Vector2 position;
+#endif
 
-        
-        public int depth
-        {
-            get;
-            internal set;
-        }
-
-        public ulong callCount
-        {
-            get;
-            private set;
-        }
-
-        public EBehaviourResult behaviourResult
+        public ENodeCallState callState
         {
             get;
             private set;
@@ -90,7 +82,7 @@ namespace BehaviourSystem.BT
 
         public virtual string tooltip
         {
-            get { return string.Empty; }
+            get;
         }
 
 
@@ -98,13 +90,13 @@ namespace BehaviourSystem.BT
         {
             this.callCount++;
 
-            if (_callState == ENodeCallState.BeforeEnter)
+            if (callState == ENodeCallState.BeforeEnter)
             {
                 this.EnterNode();
-                this.onNodeEnter?.Invoke(this);
+                this.onNodeEnter?.Invoke();
             }
 
-            if (this._callState == ENodeCallState.Updating)
+            if (this.callState == ENodeCallState.Updating)
             {
                 this.behaviourResult = this.OnUpdate();
 
@@ -115,13 +107,13 @@ namespace BehaviourSystem.BT
                         this.treeRunner.handler.AbortSubtreeFrom(callStackID, this);
                     }
 
-                    this._callState = ENodeCallState.BeforeExit;
+                    this.callState = ENodeCallState.BeforeExit;
                 }
             }
 
-            if (this._callState == ENodeCallState.BeforeExit)
+            if (this.callState == ENodeCallState.BeforeExit)
             {
-                this.onNodeExit?.Invoke(this);
+                this.onNodeExit?.Invoke();
                 this.ExitNode();
             }
 
@@ -133,7 +125,7 @@ namespace BehaviourSystem.BT
         {
             this.treeRunner.handler.PushInCallStack(callStackID, this);
             this.OnEnter();
-            this._callState = ENodeCallState.Updating;
+            this.callState = ENodeCallState.Updating;
         }
 
 
@@ -141,7 +133,7 @@ namespace BehaviourSystem.BT
         {
             this.treeRunner.handler.PopInCallStack(callStackID);
             this.OnExit();
-            this._callState = ENodeCallState.BeforeEnter;
+            this.callState = ENodeCallState.BeforeEnter;
 
             // If a parent node fails during execution, this node's result is set to Failure.
             if (this.behaviourResult == EBehaviourResult.Running)

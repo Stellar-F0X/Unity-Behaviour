@@ -186,54 +186,30 @@ namespace BehaviourSystem.BT
         }
 
 
-        public void RegisterOnNodeEnterCallback(string treePath, Action<NodeBase> callback)
+        public bool TryGetNodeByTreePath(string path, out NodeAccessor accessor)
         {
-            if (this.handler.TryGetNodeByPath(treePath, _runtimeTree.nodeSet, out NodeBase node))
+            if (_nodeHandler.TryGetNodeByPath(path, _runtimeTree.nodeSet, out accessor))
             {
-                node.onNodeEnter += callback;
+                return true;
             }
             else
             {
-                Debug.LogWarning($"Node with path '{treePath}' was not found.");
+                return false;
             }
         }
 
 
-        public void RegisterNodeExitCallback(string treePath, Action<NodeBase> callback)
+        public bool TryGetNodeByTag(string nodeTag, out NodeAccessor[] accessors)
         {
-            if (this.handler.TryGetNodeByPath(treePath, _runtimeTree.nodeSet, out NodeBase node))
+            accessors = _nodeHandler.GetNodeByTag(nodeTag, _runtimeTree.nodeSet);
+            
+            if (accessors is null)
             {
-                node.onNodeExit += callback;
+                return false;
             }
             else
             {
-                Debug.LogWarning($"Node with path '{treePath}' was not found.");
-            }
-        }
-
-
-        public void UnregisterNodeEnterCallback(string treePath, Action<NodeBase> callback)
-        {
-            if (this.handler.TryGetNodeByPath(treePath, _runtimeTree.nodeSet, out NodeBase node))
-            {
-                node.onNodeEnter -= callback;
-            }
-            else
-            {
-                Debug.LogWarning($"Node with path '{treePath}' was not found.");
-            }
-        }
-
-
-        public void UnregisterNodeExitCallback(string treePath, Action<NodeBase> callback)
-        {
-            if (this.handler.TryGetNodeByPath(treePath, _runtimeTree.nodeSet, out NodeBase node))
-            {
-                node.onNodeExit -= callback;
-            }
-            else
-            {
-                Debug.LogWarning($"Node with path '{treePath}' was not found.");
+                return true;
             }
         }
     }
