@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace BehaviourSystem.BT
 {
-    [DefaultExecutionOrder(-1)]
+    [DefaultExecutionOrder(-1), AddComponentMenu("Behaviour System/Behaviour Tree Runner")]
     public class BehaviourTreeRunner : MonoBehaviour
     {
         private readonly Dictionary<string, IBlackboardProperty> _properties = new Dictionary<string, IBlackboardProperty>();

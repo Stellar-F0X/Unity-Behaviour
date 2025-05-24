@@ -5,7 +5,6 @@ namespace BehaviourSystem.BT
 {
     public class LogNode : ActionNode
     {
-        [Space(5)]
         public string[] onEnterMessages;
         public string[] onUpdateMessages;
         public string[] onExitMessages;

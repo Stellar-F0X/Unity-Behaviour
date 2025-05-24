@@ -5,10 +5,12 @@ namespace BehaviourSystem.BT
         public FixedSizeStack(int capacity)
         {
             _items = new T[capacity];
+            _capacity = capacity;
             _count = 0;
         }
 
         private readonly T[] _items;
+        private readonly int _capacity;
         private int _count;
 
 

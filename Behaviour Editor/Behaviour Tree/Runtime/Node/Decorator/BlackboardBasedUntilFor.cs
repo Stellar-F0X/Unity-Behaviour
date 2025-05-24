@@ -6,7 +6,6 @@ namespace BehaviourSystem.BT
 {
     public class BlackboardBasedUntilFor : DecoratorNode
     {
-        [Space(10)]
         public List<BlackboardBasedCondition> conditions;
 
 

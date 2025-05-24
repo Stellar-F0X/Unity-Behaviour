@@ -1,19 +1,19 @@
-using System;
-using UnityEngine;
-
 namespace BehaviourSystem.BT
 {
     public sealed class SequencerNode : CompositeNode
     {
+        private int _childrenCount;
+        private bool _childrenIsInvalid;
+        
         protected override void OnEnter()
         {
             _currentChildIndex = 0;
+            _childrenIsInvalid = children is null || children.Count == 0;
         }
-
 
         protected override EBehaviourResult OnUpdate()
         {
-            if (children is null || children.Count == 0)
+            if (_childrenIsInvalid)
             {
                 return EBehaviourResult.Failure;
             }
@@ -31,8 +31,10 @@ namespace BehaviourSystem.BT
             {
                 return EBehaviourResult.Success;
             }
-
-            return EBehaviourResult.Running;
+            else
+            {
+                return EBehaviourResult.Running;
+            }
         }
     }
 }

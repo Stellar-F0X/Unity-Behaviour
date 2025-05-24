@@ -37,11 +37,12 @@ namespace BehaviourSystem.BT
 
         public event Action onNodeExit;
 
-
-        [HideInInspector]
+        
         public string guid;
 
         public string tag;
+        
+        public string description;
         
         [NonSerialized]
         public int depth;
@@ -52,21 +53,17 @@ namespace BehaviourSystem.BT
         [NonSerialized]
         public EBehaviourResult behaviourResult;
         
-        [Multiline(3)]
-        public string description;
-        
         [NonSerialized]
         internal int callStackID;
-
-        [HideInInspector]
+        
         public NodeBase parent;
 
         [NonSerialized]
-        public BehaviourTreeRunner treeRunner;
+        public BehaviourTreeRunner runner;
         
 #if UNITY_EDITOR
-        [HideInInspector]
-        public Vector2 position;
+        [SerializeField]
+        internal Vector2 position;
 #endif
 
         public ENodeCallState callState
@@ -102,9 +99,9 @@ namespace BehaviourSystem.BT
 
                 if (this.behaviourResult != EBehaviourResult.Running)
                 {
-                    if (this.treeRunner.handler.GetCurrentNode(callStackID) != this)
+                    if (this.runner.handler.GetCurrentNode(callStackID) != this)
                     {
-                        this.treeRunner.handler.AbortSubtreeFrom(callStackID, this);
+                        this.runner.handler.AbortSubtreeFrom(callStackID, this);
                     }
 
                     this.callState = ENodeCallState.BeforeExit;
@@ -123,7 +120,7 @@ namespace BehaviourSystem.BT
 
         public void EnterNode()
         {
-            this.treeRunner.handler.PushInCallStack(callStackID, this);
+            this.runner.handler.PushInCallStack(callStackID, this);
             this.OnEnter();
             this.callState = ENodeCallState.Updating;
         }
@@ -131,7 +128,7 @@ namespace BehaviourSystem.BT
 
         public void ExitNode()
         {
-            this.treeRunner.handler.PopInCallStack(callStackID);
+            this.runner.handler.PopInCallStack(callStackID);
             this.OnExit();
             this.callState = ENodeCallState.BeforeEnter;
 

@@ -4,7 +4,6 @@ namespace BehaviourSystem.BT
 {
     public class RepeaterNode : DecoratorNode
     {
-        [Space]
         public uint repeatCount;
         
         [SerializeField, ReadOnly]

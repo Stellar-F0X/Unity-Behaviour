@@ -299,7 +299,7 @@ namespace BehaviourSystem.BT
             }
 
             clone.depth = cloneInfo.depth;
-            clone.treeRunner = treeRunner;
+            clone.runner = treeRunner;
             clone.callStackID = cloneInfo.stackID;
             clonedSet.nodeList.Add(clone);
             postInitStack.Push(cloneInfo.clone);

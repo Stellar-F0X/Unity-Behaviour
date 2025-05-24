@@ -2,30 +2,39 @@ namespace BehaviourSystem.BT
 {
     public sealed class SelectorNode : CompositeNode
     {
-        private int _currentIndex;
+        private int _childrenCount;
+        private bool _isChildrenInvalid;
 
         protected override void OnEnter()
         {
-            _currentIndex = 0;
+            _currentChildIndex = 0;
+            _isChildrenInvalid = children is null || children.Count == 0;
         }
 
         protected override EBehaviourResult OnUpdate()
         {
-            if (children is not null && _currentIndex < children.Count)
+            if (_isChildrenInvalid)
             {
-                switch (children[_currentIndex].UpdateNode())
-                {
-                    case EBehaviourResult.Success: return EBehaviourResult.Success;
-                    
-                    case EBehaviourResult.Running: return EBehaviourResult.Running;
-
-                    case EBehaviourResult.Failure: _currentIndex++; break; 
-                }
-                
-                return EBehaviourResult.Running;
+                return EBehaviourResult.Failure;
             }
 
-            return EBehaviourResult.Failure;
+            switch (children[_currentChildIndex].UpdateNode())
+            {
+                case EBehaviourResult.Success: return EBehaviourResult.Success;
+
+                case EBehaviourResult.Running: return EBehaviourResult.Running;
+
+                case EBehaviourResult.Failure: _currentChildIndex++; break;
+            }
+            
+            if (_currentChildIndex == children.Count)
+            {
+                return EBehaviourResult.Failure;
+            }
+            else
+            {
+                return EBehaviourResult.Running;
+            }
         }
     }
 }

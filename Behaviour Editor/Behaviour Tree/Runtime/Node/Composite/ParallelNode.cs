@@ -16,8 +16,7 @@ namespace BehaviourSystem.BT
             RequireAllFailure,
             RequireOneFailure
         };
-
-        [Space]
+        
         public EParallelPolicy parallelPolicy;
 
         private int _successfulChildCount = 0;
@@ -175,7 +174,7 @@ namespace BehaviourSystem.BT
                 {
                     int stackID = children[i].callStackID;
                     
-                    treeRunner.handler.AbortSubtree(stackID);
+                    runner.handler.AbortSubtree(stackID);
                     _isChildStopped[i] = true;
                 }
             }

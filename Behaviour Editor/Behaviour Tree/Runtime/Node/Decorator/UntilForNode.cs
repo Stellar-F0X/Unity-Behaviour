@@ -10,7 +10,6 @@ namespace BehaviourSystem.BT
             Success = 2
         };
         
-        [Space]
         public EUntilCondition targetResult = EUntilCondition.Success;
 
 
