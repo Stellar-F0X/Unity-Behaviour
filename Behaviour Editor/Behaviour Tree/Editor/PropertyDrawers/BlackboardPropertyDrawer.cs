@@ -32,7 +32,7 @@ namespace BehaviourSystemEditor.BT
             float height = EditorGUIUtility.singleLineHeight;
 
             Rect labelRect = new Rect(position.x, position.y, width, height);
-            Rect fieldRect = new Rect(position.x + width, position.y, position.width - width, height);
+            Rect fieldRect = new Rect(position.x + width + 2, position.y, position.width - width - 2, height);
 
             if (exception == false && this.GetProperties(blackboard, property, out List<IBlackboardProperty> properties))
             {
